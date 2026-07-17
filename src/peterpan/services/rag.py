@@ -1,8 +1,13 @@
 """RAG service — retrieves runbooks and past incidents relevant to an alert.
 
-MVP: fixture corpus + lexical scoring, same interface the real vector store
-(ChromaDB/pgvector/Pinecone) will implement. Every match carries a `source` —
-the citation trail is a product invariant, not a nice-to-have.
+The corpus is loaded from the committed files under knowledge/ (see
+peterpan.knowledge) — citations can never point at documents that don't
+exist. Two backends behind the same search() contract:
+
+- lexical (default): token-overlap scoring, zero external accounts —
+  fixture-first demo path.
+- pinecone (PP_RAG_BACKEND=pinecone): Voyage embeddings + Pinecone index,
+  falling back to lexical on ANY failure.
 """
 
 from __future__ import annotations
@@ -12,38 +17,14 @@ import re
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from peterpan.config import RagBackend, Settings
+from peterpan.knowledge import load_corpus
 from peterpan.schemas import Evidence, RagResult
 
 app = FastAPI(title="peter-pan-rag")
+settings = Settings()
 
-# Fixture corpus — synthetic runbooks/past incidents. Replaced by a real
-# vector store behind the same `search()` signature.
-_CORPUS: list[Evidence] = [
-    Evidence(
-        kind="runbook",
-        summary="OOM in checkout service: raise memory limit, roll pods, check for leak in v2.3+",
-        source="knowledge/runbooks/checkout-oom.md",
-        confidence=0.0,
-    ),
-    Evidence(
-        kind="past_incident",
-        summary="2026-05-12: payment latency spike from connection-pool exhaustion after deploy",
-        source="knowledge/incidents/INC-2231.md",
-        confidence=0.0,
-    ),
-    Evidence(
-        kind="runbook",
-        summary="Certificate expiry: rotate via cert-manager, verify with openssl s_client",
-        source="knowledge/runbooks/cert-rotation.md",
-        confidence=0.0,
-    ),
-    Evidence(
-        kind="past_incident",
-        summary="2026-06-03: 5xx storm from bad canary; rollback restored availability in 6 min",
-        source="knowledge/incidents/INC-2307.md",
-        confidence=0.0,
-    ),
-]
+_CORPUS: list[Evidence] = load_corpus()
 
 
 def _tokens(text: str) -> set[str]:
@@ -57,20 +38,59 @@ def _score(query: str, text: str) -> float:
     return round(len(q & t) / len(q), 3) if q else 0.0
 
 
-def search(query: str, top_k: int = 3) -> RagResult:
-    if not query.strip():
-        raise ValueError("query must be non-empty")
+def _search_lexical(query: str, top_k: int) -> list[Evidence]:
     ranked = sorted(
         (e.model_copy(update={"confidence": _score(query, e.summary)}) for e in _CORPUS),
         key=lambda e: e.confidence,
         reverse=True,
     )
-    matches = ranked[:top_k]
+    return ranked[:top_k]
+
+
+def _search_pinecone(query: str, top_k: int) -> list[Evidence]:
+    """Semantic retrieval. Raises on any failure; search() falls back."""
+    import pinecone  # noqa: F401  # lazy: optional `rag` extra
+    import voyageai
+
+    if not (settings.pinecone_api_key and settings.voyage_api_key):
+        raise RuntimeError("pinecone backend needs PINECONE_API_KEY and VOYAGE_API_KEY")
+
+    vector = (
+        voyageai.Client(api_key=settings.voyage_api_key)
+        .embed([query], model=settings.voyage_model, input_type="query")
+        .embeddings[0]
+    )
+    index = pinecone.Pinecone(api_key=settings.pinecone_api_key).Index(settings.pinecone_index)
+    result = index.query(vector=vector, top_k=top_k, include_metadata=True)
+    return [
+        Evidence(
+            kind=m["metadata"].get("kind", "document"),
+            summary=m["metadata"].get("summary", ""),
+            source=m["metadata"].get("source", ""),
+            confidence=round(max(0.0, min(1.0, m["score"])), 3),
+        )
+        for m in result["matches"]
+    ]
+
+
+def search(query: str, top_k: int = 3) -> RagResult:
+    if not query.strip():
+        raise ValueError("query must be non-empty")
+    backend = "lexical"
+    if settings.rag_backend is RagBackend.PINECONE:
+        try:
+            matches = _search_pinecone(query, top_k)
+            backend = "pinecone"
+        except Exception:
+            matches = _search_lexical(query, top_k)  # fail-safe: never lose retrieval
+    else:
+        matches = _search_lexical(query, top_k)
     cited = ", ".join(m.source for m in matches if m.confidence > 0) or "no relevant source"
     return RagResult(
         query=query,
         matches=matches,
-        insight=f"Top context drawn from: {cited}. Verify against live signals before acting.",
+        insight=f"Top context ({backend}) drawn from: {cited}. "
+        "Verify against live signals before acting.",
     )
 
 
@@ -81,7 +101,12 @@ class QueryIn(BaseModel):
 
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
-    return {"service": "rag", "status": "ok", "corpus_size": str(len(_CORPUS))}
+    return {
+        "service": "rag",
+        "status": "ok",
+        "corpus_size": str(len(_CORPUS)),
+        "backend": settings.rag_backend.value,
+    }
 
 
 @app.post("/query")

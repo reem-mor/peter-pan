@@ -28,6 +28,11 @@ class LlmProvider(StrEnum):
     ANTHROPIC = "anthropic"
 
 
+class RagBackend(StrEnum):
+    LEXICAL = "lexical"  # fixture-first default: token overlap over knowledge/
+    PINECONE = "pinecone"  # semantic: Voyage embeddings + Pinecone index
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PP_", env_file=".env", extra="ignore")
 
@@ -42,6 +47,20 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = Field(
         default=None,
         validation_alias=AliasChoices("ANTHROPIC_API_KEY", "PP_ANTHROPIC_API_KEY"),
+    )
+
+    # Retrieval backend — lexical by default; pinecone is the semantic upgrade
+    # and falls back to lexical on any failure.
+    rag_backend: RagBackend = Field(default=RagBackend.LEXICAL)
+    pinecone_index: str = Field(default="peter-pan-knowledge")
+    pinecone_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("PINECONE_API_KEY", "PP_PINECONE_API_KEY"),
+    )
+    voyage_model: str = Field(default="voyage-3.5-lite")
+    voyage_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("VOYAGE_API_KEY", "PP_VOYAGE_API_KEY"),
     )
 
     @property
