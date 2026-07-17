@@ -7,6 +7,8 @@ the citation trail is a product invariant, not a nice-to-have.
 
 from __future__ import annotations
 
+import re
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -44,9 +46,14 @@ _CORPUS: list[Evidence] = [
 ]
 
 
+def _tokens(text: str) -> set[str]:
+    # Split on any non-alphanumeric run so hyphenated/punctuated compounds
+    # ("connection-pool") match their parts — found by eval case eval-07.
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
+
+
 def _score(query: str, text: str) -> float:
-    q = {w.lower().strip(".,:") for w in query.split() if w}
-    t = {w.lower().strip(".,:") for w in text.split() if w}
+    q, t = _tokens(query), _tokens(text)
     return round(len(q & t) / len(q), 3) if q else 0.0
 
 

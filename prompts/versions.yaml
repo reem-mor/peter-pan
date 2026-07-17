@@ -1,0 +1,18 @@
+# Current prompt version per surface + last eval pass rate.
+# Updated on every prompt PR (the eval must run — see prompts/README.md).
+surfaces:
+  alert-extraction:
+    current: alert-extraction/v1.md
+    eval_pass_rate: null   # pending first live-LLM eval run
+  incident-agent:
+    current: incident-agent/v1.md
+    eval_pass_rate: null
+  rag-injection:
+    current: rag-injection/v1.md
+    eval_pass_rate: null
+  guardrails:
+    current: guardrails/v1.md
+    eval_pass_rate: null
+  assistant:
+    current: assistant/v1.md
+    eval_pass_rate: null

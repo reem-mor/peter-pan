@@ -1,0 +1,38 @@
+---
+name: quality-gate
+description: >-
+  Run PETER PAN's full pre-merge gate — tests, lint, format, types, eval
+  harness, compose config, secrets scan — and report real results. Use before
+  every commit/PR on this repo, after any dependency change, and whenever
+  asked "is it green?".
+---
+
+# Quality gate
+
+Run every step; report actual output per step, PASS/FAIL summary at the end.
+Never report green without running. Stop at nothing — collect all failures
+in one pass so they can be fixed together.
+
+```powershell
+.\.venv\Scripts\python -m pytest -q
+.\.venv\Scripts\python -m ruff check .
+.\.venv\Scripts\python -m ruff format --check .
+.\.venv\Scripts\python -m mypy src
+.\.venv\Scripts\python evals\run_story_eval.py
+docker compose config --quiet
+```
+
+Secrets scan (last, always):
+
+```bash
+grep -rInE 'AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|AIza[0-9A-Za-z_-]{30,}|-----BEGIN .*PRIVATE KEY' \
+  --exclude-dir=.venv --exclude-dir=.git . || echo "secrets: clean"
+```
+
+Optional (when services/Docker changed): `docker compose up -d`, curl every
+`/healthz` (ports 8001–8005), `docker compose down`.
+
+## Report format
+One line per step: `step — PASS/FAIL (real numbers: N tests, N files)`.
+If anything fails: the failing output verbatim, then the fix plan — never
+weaken a test, rail, or eval threshold to pass the gate.
