@@ -1,0 +1,83 @@
+{
+  "name": "PETER PAN — Triage (v2 scaffold)",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "peter-pan-intake", "responseMode": "responseNode" },
+      "name": "Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_SERVICES_BASE }}/check/input",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [{ "name": "text", "value": "={{ $json.body.title }} {{ $json.body.description }}" }] }
+      },
+      "name": "Guardrails Input",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [200, 0]
+    },
+    {
+      "parameters": { "conditions": { "boolean": [{ "value1": "={{ $json.passed }}", "value2": true }] } },
+      "name": "Passed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_SERVICES_BASE }}/story",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Alert Webhook').item.json.body }}"
+      },
+      "name": "Build Story",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [600, -80]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_SERVICES_BASE }}/check/output",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [{ "name": "text", "value": "={{ JSON.stringify($json) }}" }] }
+      },
+      "name": "Guardrails Output",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [800, -80]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ $('Build Story').item.json }}" },
+      "name": "Respond Story",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1000, -80]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"rejected\": true, \"reason\": $json.reason } }}" },
+      "name": "Respond Rejected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [600, 120]
+    }
+  ],
+  "connections": {
+    "Alert Webhook": { "main": [[{ "node": "Guardrails Input", "type": "main", "index": 0 }]] },
+    "Guardrails Input": { "main": [[{ "node": "Passed?", "type": "main", "index": 0 }]] },
+    "Passed?": {
+      "main": [
+        [{ "node": "Build Story", "type": "main", "index": 0 }],
+        [{ "node": "Respond Rejected", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Story": { "main": [[{ "node": "Guardrails Output", "type": "main", "index": 0 }]] },
+    "Guardrails Output": { "main": [[{ "node": "Respond Story", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

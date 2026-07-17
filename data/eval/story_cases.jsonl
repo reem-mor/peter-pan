@@ -1,0 +1,10 @@
+{"case_id": "eval-01", "alert_id": "syn-001", "expected_class": "resource_exhaustion", "expected_min_severity": "P1", "must_cite": ["knowledge/runbooks/checkout-oom.md"], "notes": "OOM must escalate and pull the checkout runbook"}
+{"case_id": "eval-02", "alert_id": "syn-002", "expected_class": "latency", "expected_min_severity": "P2", "must_cite": ["knowledge/incidents/INC-2231.md"], "notes": "deploy-correlated latency should surface the pool-exhaustion incident"}
+{"case_id": "eval-03", "alert_id": "syn-003", "expected_class": "availability", "expected_min_severity": "P1", "must_cite": ["knowledge/incidents/INC-2307.md"], "notes": "5xx canary storm should recall the canary rollback"}
+{"case_id": "eval-04", "alert_id": "syn-004", "expected_class": "security", "expected_min_severity": "P2", "must_cite": ["knowledge/runbooks/cert-rotation.md"], "notes": "cert expiry pulls rotation runbook"}
+{"case_id": "eval-05", "alert_id": "syn-005", "expected_class": "resource_exhaustion", "expected_min_severity": "P1", "must_cite": [], "notes": "disk full is resource exhaustion at P1"}
+{"case_id": "eval-06", "alert_id": "syn-006", "expected_class": "connectivity", "expected_min_severity": "P2", "must_cite": [], "notes": "connection refused is connectivity"}
+{"case_id": "eval-07", "alert_id": "syn-013", "expected_class": "latency", "expected_min_severity": "P2", "must_cite": ["knowledge/incidents/INC-2231.md"], "notes": "pool exhaustion maps to latency; must recall INC-2231"}
+{"case_id": "eval-08", "alert_id": "syn-014", "expected_class": "availability", "expected_min_severity": "P1", "must_cite": [], "notes": "flag-correlated 5xx is availability P1"}
+{"case_id": "eval-09", "alert_id": "syn-019", "expected_class": "unclassified", "expected_min_severity": "P4", "must_cite": [], "notes": "honest fallback: unknown stays unclassified with low confidence"}
+{"case_id": "eval-10", "alert_id": "syn-020", "expected_class": "latency", "expected_min_severity": "P1", "must_cite": [], "notes": "timeout cascade at P1 stays at least P1"}
