@@ -22,11 +22,15 @@ in one pass so they can be fixed together.
 docker compose config --quiet
 ```
 
-Secrets scan (last, always):
+Secrets scan (last, always). Two hard rules learned the hard way:
+scan only what git will actually ship (`git grep` over tracked files — the
+gitignored `.env` legitimately contains keys and must not trip the gate),
+and print **filenames only** (`-l`), never matched values (a scan that
+echoes a key into a log/transcript is itself a leak vector):
 
 ```bash
-grep -rInE 'AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|AIza[0-9A-Za-z_-]{30,}|-----BEGIN .*PRIVATE KEY' \
-  --exclude-dir=.venv --exclude-dir=.git . || echo "secrets: clean"
+git grep -lIE 'AKIA[0-9A-Z]{16}|sk-(ant|proj)-|pcsk_|ghp_[A-Za-z0-9]{30,}|AIza[0-9A-Za-z_-]{30,}|-----BEGIN .*PRIVATE KEY' \
+  -- . && echo "SECRETS IN TRACKED FILES — DO NOT PUSH" || echo "secrets: clean"
 ```
 
 Optional (when services/Docker changed): `docker compose up -d`, curl every
