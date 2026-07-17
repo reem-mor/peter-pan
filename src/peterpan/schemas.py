@@ -101,3 +101,34 @@ class AgentRun(BaseModel):
     tools_used: list[str]
     reasoning_steps: list[str]
     token_cost_usd: float = 0.0
+
+
+class PanelKind(StrEnum):
+    STAT = "stat"
+    TABLE = "table"
+    MARKDOWN = "markdown"
+    MERMAID = "mermaid"
+
+
+class Panel(BaseModel):
+    """One dashboard panel. `source` (when set) must cite real evidence —
+    the dashboard inherits the citation-trail invariant."""
+
+    kind: PanelKind
+    title: str
+    content: str  # stat value / markdown body / mermaid graph
+    rows: list[dict[str, str]] = Field(default_factory=list)  # TABLE only
+    source: str | None = None
+
+
+class DashboardSpec(BaseModel):
+    """A renderable dashboard: the answer to 'draw me the problem'.
+
+    Rendered by the Streamlit UI today; the same spec maps 1:1 onto Grafana
+    panel JSON when the Grafana exporter lands.
+    """
+
+    title: str
+    problem: str
+    generated_by: str  # "llm" | "deterministic-fallback"
+    panels: list[Panel]

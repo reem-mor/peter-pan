@@ -12,12 +12,14 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 from peterpan.config import LlmProvider, Settings
 from peterpan.schemas import (
     ActionPreview,
     ActionRisk,
     Alert,
+    DashboardSpec,
     Evidence,
     IncidentStory,
 )
@@ -118,3 +120,17 @@ def healthz() -> dict[str, str]:
 @app.post("/story")
 def story_route(alert: Alert) -> IncidentStory:
     return build_story(alert)
+
+
+class DrawRequest(BaseModel):
+    problem: str
+    alert: Alert
+
+
+@app.post("/dashboard")
+def dashboard_route(body: DrawRequest) -> DashboardSpec:
+    """'Draw me the problem': story pipeline + dashboard spec generation."""
+    from peterpan.dashboard import build_dashboard
+
+    story = build_story(body.alert)
+    return build_dashboard(body.problem, story, settings)
