@@ -20,25 +20,25 @@ _CORPUS: list[Evidence] = [
     Evidence(
         kind="runbook",
         summary="OOM in checkout service: raise memory limit, roll pods, check for leak in v2.3+",
-        source="runbooks/checkout-oom.md",
+        source="knowledge/runbooks/checkout-oom.md",
         confidence=0.0,
     ),
     Evidence(
         kind="past_incident",
         summary="2026-05-12: payment latency spike from connection-pool exhaustion after deploy",
-        source="incidents/INC-2231.md",
+        source="knowledge/incidents/INC-2231.md",
         confidence=0.0,
     ),
     Evidence(
         kind="runbook",
         summary="Certificate expiry: rotate via cert-manager, verify with openssl s_client",
-        source="runbooks/cert-rotation.md",
+        source="knowledge/runbooks/cert-rotation.md",
         confidence=0.0,
     ),
     Evidence(
         kind="past_incident",
         summary="2026-06-03: 5xx storm from bad canary; rollback restored availability in 6 min",
-        source="incidents/INC-2307.md",
+        source="knowledge/incidents/INC-2307.md",
         confidence=0.0,
     ),
 ]
