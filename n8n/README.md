@@ -16,19 +16,29 @@ services are reachable from n8n cloud:
 - The three HTTP nodes carry placeholder URLs on purpose — fill them with the
   EC2 public host (or a tunnel to localhost) before activating. No
   credentials are stored in the flow.
-- Before activating: run once with pinned test data in the n8n editor; never
-  `test_workflow` on it after activation (deregisters the live webhook).
+- Before activating: run once with pinned test data in the n8n editor. Once
+  a flow is live, prefer editing a duplicate and swapping, over experimenting
+  on the flow that owns the production webhook URL.
 
-## Conventions (hard rules)
-- Exports here carry **credential names only, never values**; `PP_SERVICES_BASE`
-  comes from n8n environment variables, so the same flow runs against
-  localhost, Docker, or EC2.
-- Never run `test_workflow` against a live webhook-triggered flow — it
-  deregisters the production webhook. Import as **inactive**, test with
-  pinned data, then activate.
-- Modify live flows via the n8n MCP `update_workflow` operations path;
-  re-export every approved change back to this file (git is the source of
-  truth, the n8n instance is a deployment target).
+## Conventions (PETER PAN's own rules, from the product invariants)
+
+- **Git is the source of truth; the n8n instance is a deployment target.**
+  Any change made in the n8n editor gets exported back into this directory
+  in the same PR that approves it — an unexported live edit is drift.
+- **No secret values ever leave n8n.** Exports carry credential *names* and
+  placeholder URLs only. Endpoints come from n8n environment variables
+  (`PP_SERVICES_BASE`-style), so one flow definition serves localhost,
+  Docker, and EC2.
+- **New flows land inactive.** Same idea as the ActionPreview gate: nothing
+  goes live without a human explicitly activating it after a pinned-data
+  test run in the editor.
+- **The flow never bypasses the rails.** Guardrails input check is the first
+  call after normalization; output check is the last before responding.
+  Re-wiring around either is an invariant violation (see CLAUDE.md), not a
+  flow optimization.
+- **Fail visible, not silent.** Every branch terminates in an explicit
+  response (story / flagged-for-review / rejected) — no path drops an alert
+  without telling the caller what happened.
 
 ## Local test
 1. `docker compose up -d` (services on 8001–8005).
