@@ -43,6 +43,12 @@ Public products (incident.io, resolve.ai, HolmesGPT, cytactic) are pattern
 references only — see docs/product-research/. Never copy source, branding,
 copy, icons, or screens; PETER PAN has its own design system.
 
+## Originality
+This project is built from scratch. Other repositories — including
+`reem-mor/peter-pan.io` (the earlier project) — are never a source: not
+their code, docs, conventions, or schemas. Design from Reem's specs and
+first principles only.
+
 ## Commands
 - Test: `python -m pytest -q`
 - Lint: `ruff check . && ruff format --check .`
