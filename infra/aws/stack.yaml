@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  PETER PAN demo stack: one EC2 instance running the five services from ECR.
+  No SSH ingress (SSM Session Manager only); service ports restricted to two
+  allowlisted CIDRs. Delete the stack to tear everything down.
+
+Parameters:
+  DevIp:
+    Type: String
+    Description: Developer public IP in CIDR form (x.x.x.x/32)
+  N8nIp:
+    Type: String
+    Description: n8n egress IP in CIDR form (x.x.x.x/32)
+  ImageUri:
+    Type: String
+    Description: ECR image URI (repo:tag)
+  InstanceType:
+    Type: String
+    Default: t3.medium
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PETER PAN services - allowlisted CIDRs only, no SSH
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 8001, ToPort: 8005, CidrIp: !Ref DevIp }
+        - { IpProtocol: tcp, FromPort: 8001, ToPort: 8005, CidrIp: !Ref N8nIp }
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ec2.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref InstanceRole]
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      IamInstanceProfile: !Ref InstanceProfile
+      SecurityGroupIds: [!GetAtt ServiceSecurityGroup.GroupId]
+      Tags:
+        - { Key: Name, Value: peter-pan-demo }
+        - { Key: project, Value: peter-pan }
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euxo pipefail
+          dnf install -y docker
+          systemctl enable --now docker
+          aws ecr get-login-password --region ${AWS::Region} \
+            | docker login --username AWS --password-stdin ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
+          for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
+            svc="${!entry%%:*}"; port="${!entry##*:}"
+            docker run -d --restart unless-stopped --name "$svc" \
+              -e SERVICE="$svc" -e PP_ENV=mirage \
+              -p "$port":8000 ${ImageUri}
+          done
+
+Outputs:
+  PublicIp:
+    Value: !GetAtt Instance.PublicIp
+  PublicDns:
+    Value: !GetAtt Instance.PublicDnsName
