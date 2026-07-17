@@ -30,8 +30,12 @@ echoes a key into a log/transcript is itself a leak vector):
 
 ```bash
 git grep -lIE 'AKIA[0-9A-Z]{16}|sk-(ant|proj)-|pcsk_|ghp_[A-Za-z0-9]{30,}|AIza[0-9A-Za-z_-]{30,}|-----BEGIN .*PRIVATE KEY' \
-  -- . && echo "SECRETS IN TRACKED FILES — DO NOT PUSH" || echo "secrets: clean"
+  -- . ':(exclude).claude/skills/quality-gate/SKILL.md' \
+  && echo "SECRETS IN TRACKED FILES — DO NOT PUSH" || echo "secrets: clean"
 ```
+
+(The exclusion is this file itself — it contains the patterns as literal
+text and would otherwise self-trip the gate.)
 
 Optional (when services/Docker changed): `docker compose up -d`, curl every
 `/healthz` (ports 8001–8005), `docker compose down`.
