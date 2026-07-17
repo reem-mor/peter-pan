@@ -1,0 +1,21 @@
+services:
+  predictor:
+    build: .
+    environment: { SERVICE: predictor, PP_ENV: "${PP_ENV:-mirage}" }
+    ports: ["8001:8000"]
+  rag:
+    build: .
+    environment: { SERVICE: rag, PP_ENV: "${PP_ENV:-mirage}" }
+    ports: ["8002:8000"]
+  guardrails:
+    build: .
+    environment: { SERVICE: guardrails, PP_ENV: "${PP_ENV:-mirage}" }
+    ports: ["8003:8000"]
+  agent:
+    build: .
+    environment: { SERVICE: agent, PP_ENV: "${PP_ENV:-mirage}" }
+    ports: ["8004:8000"]
+  ppos:
+    build: .
+    environment: { SERVICE: ppos, PP_ENV: "${PP_ENV:-mirage}" }
+    ports: ["8005:8000"]
