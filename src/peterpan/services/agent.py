@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 
 from fastapi import FastAPI
 
-from peterpan.config import Settings
+from peterpan.config import LlmProvider, Settings
 from peterpan.schemas import (
     ActionPreview,
     ActionRisk,
@@ -31,16 +31,30 @@ MAX_STEPS = 6  # bounded loop — the agent can never run away
 
 
 def build_story(alert: Alert) -> IncidentStory:
-    """Planner → tools → synthesis, deterministically. LangGraph swaps in here."""
+    """Planner → tools → synthesis. Deterministic by default; PP_LLM=anthropic
+    upgrades the synthesis step to Claude, guarded by peterpan.llm's invariant
+    checks and falling back here on ANY failure (fixture-first rule)."""
     steps = 0
 
-    # Step 1: classify.
+    # Step 1: classify (deterministic floor — its verdict is final).
     prediction = predict(alert)
     steps += 1
 
     # Step 2: retrieve context (runbooks, past incidents).
     rag = search(f"{alert.title} {alert.description}", top_k=3)
     steps += 1
+
+    # Step 3: synthesize — LLM if opted in, deterministic otherwise/on failure.
+    if settings.llm is LlmProvider.ANTHROPIC:
+        from peterpan.llm import LlmSynthesisError, synthesize
+
+        steps += 1
+        try:
+            story = synthesize(alert, prediction, rag, settings)
+            assert steps <= MAX_STEPS
+            return story
+        except LlmSynthesisError:
+            pass  # fall through to the deterministic synthesis below
 
     evidence: list[Evidence] = [
         Evidence(
