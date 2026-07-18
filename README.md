@@ -61,7 +61,7 @@ interfaces (`predict()`, `search()`, `check_*()`, `build_story()`).
 | `rag` (8002) | ✅ Two backends | Lexical retrieval over `knowledge/` (default); Pinecone + Voyage semantic backend (`PP_RAG_BACKEND=pinecone`), falls back to lexical on failure | RDS Postgres + pgvector (target) |
 | `guardrails` (8003) | ✅ Regex floor | Deterministic input/output rails in `services/guardrails.py`; floor always wins | NeMo Guardrails layered on top (planned) |
 | `agent` (8004) | ✅ Deterministic + opt-in LLM | `build_story()` deterministic by default; `PP_LLM=anthropic` enables Claude synthesis with citation/contradiction/confidence guards; LangGraph graph mirrors the same contract | LLM planner nodes inside the graph (planned) |
-| PETER PAN OS (8005) | ✅ MVP | Usage metering via `peterpan.usage` (thread-safe queue), `/os/usage`, `/os/agents`, `/os/tips` | Cost dashboards + routing analytics (planned) |
+| PETER PAN OS (8005) | ✅ MVP+ | Usage metering via `peterpan.usage`; `/os/usage` with time windows (`?hours=`) and grouping (`?by=agent\|model\|service`); `/os/budget` — deterministic daily-spend guard (`PP_DAILY_BUDGET_USD`, ok/warn/exceeded, report-only); `/os/agents`, `/os/tips` | Budget enforcement + routing analytics (planned) |
 | Streamlit UI | ✅ MVP | Incident dashboard + dynamic LLM-designed panels (`dashboard.py`) | — |
 | n8n spine | ✅ Cloud workflow | `PETER PAN — Triage v2` triage flow (webhook → rails → story); currently deactivated pending EC2 redeploy | Self-hosted n8n in compose (target) |
 | AWS deploy | ✅ CloudFormation | `infra/aws/stack.yaml` — EC2 + Docker mesh (~4 min create/teardown) | Private subnet + tunnel hardening (target) |
