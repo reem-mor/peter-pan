@@ -69,3 +69,20 @@ recorded result, not a guarantee. v5 candidate target: separate "what the
 evidence shows" from "what we infer" (mark inferences as hypotheses), and
 mirror the honest-confidence rule with "never state impact as confirmed
 unless an evidence item states it."
+
+## v5 — evidence vs inference (`system-v5.txt`, current)
+Implements the v5 target with three additions: (1) every claim is either
+read off an evidence item or marked as a hypothesis ("likely"/"suggests");
+(2) impact is never stated as confirmed unless an evidence item states it
+(an alert firing ≠ confirmed user impact); (3) confidence rounds to the
+nearest 0.1 — the number is itself an estimate, no false precision.
+
+**Judge run (10 cases, full LLM pipeline): 9/10 grounded.** Both v4
+refutations are gone — the impact-confirmed failure (eval-03) and the
+inference-as-fact cluster (eval-07). The single remaining refutation is a
+new, narrower family: a repair option said "escalate to DB/infra on-call"
+and the judge flagged the team name as a fabricated specific.
+
+Same caveat as v4: single nondeterministic judge run. v6 candidate
+target: repair options must not name teams, owners, or escalation paths
+that no evidence item mentions — suggest the action, not the addressee.
