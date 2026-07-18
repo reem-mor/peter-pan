@@ -17,14 +17,18 @@ import re
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from peterpan import memory
 from peterpan.config import RagBackend, Settings
 from peterpan.knowledge import load_corpus
+from peterpan.memory import MemoryRecord
 from peterpan.schemas import Evidence, RagResult
 
 app = FastAPI(title="peter-pan-rag")
 settings = Settings()
 
 _CORPUS: list[Evidence] = load_corpus()
+# Tests point the feed at a temp knowledge tree; None = the real KNOWLEDGE_ROOT.
+_KNOWLEDGE_ROOT_OVERRIDE: object = None
 
 
 def _tokens(text: str) -> set[str]:
@@ -115,3 +119,35 @@ def query_route(body: QueryIn) -> RagResult:
         return search(body.query, body.top_k)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/memory")
+def memory_route(record: MemoryRecord) -> dict[str, object]:
+    """Feed a resolved, human-approved incident into the knowledge base.
+
+    The local write is the source of truth and reloads the corpus in place;
+    the Pinecone upsert (pinecone backend only) is best-effort and reported
+    honestly — a sync failure never rolls back the document.
+    """
+    global _CORPUS
+    from pathlib import Path
+
+    root = _KNOWLEDGE_ROOT_OVERRIDE if isinstance(_KNOWLEDGE_ROOT_OVERRIDE, Path) else None
+    source = memory.feed(record, root=root)
+    _CORPUS = load_corpus(root)
+
+    pinecone_synced = False
+    sync_error = ""
+    if settings.rag_backend is RagBackend.PINECONE:
+        try:
+            memory.upsert_to_pinecone(record, source)
+            pinecone_synced = True
+        except memory.MemoryFeedError as exc:
+            sync_error = str(exc)
+
+    return {
+        "source": source,
+        "corpus_size": len(_CORPUS),
+        "pinecone_synced": pinecone_synced,
+        **({"sync_error": sync_error} if sync_error else {}),
+    }

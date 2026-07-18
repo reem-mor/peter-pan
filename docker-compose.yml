@@ -7,6 +7,9 @@ services:
     build: .
     environment: { SERVICE: rag, PP_ENV: "${PP_ENV:-mirage}" }
     ports: ["8002:8000"]
+    # Memory feed persistence: fed incident docs land on the host, not in the
+    # ephemeral container layer (POST /memory would otherwise vanish on restart).
+    volumes: ["./knowledge:/app/knowledge"]
   guardrails:
     build: .
     environment: { SERVICE: guardrails, PP_ENV: "${PP_ENV:-mirage}" }

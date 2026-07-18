@@ -14,8 +14,9 @@ COPY data/models/ data/models/
 # interpreter tree and shipped an empty corpus (rag corpus_size=0).
 RUN pip install --no-cache-dir -e .
 
-# Non-root, matching the security baseline.
-RUN useradd --create-home peterpan
+# Non-root, matching the security baseline. knowledge/ stays writable for the
+# memory feed (POST /memory writes incident docs); everything else stays root-owned.
+RUN useradd --create-home peterpan && chown -R peterpan /app/knowledge
 USER peterpan
 
 ENV SERVICE=agent PORT=8000
