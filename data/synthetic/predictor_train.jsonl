@@ -1,0 +1,68 @@
+{"text": "pod restarted after hitting its memory limit, RSS climbing steadily for an hour", "incident_class": "resource_exhaustion"}
+{"text": "java heap space exceeded in checkout worker, GC thrashing observed", "incident_class": "resource_exhaustion"}
+{"text": "container evicted, node memory pressure critical", "incident_class": "resource_exhaustion"}
+{"text": "worker killed by cgroup limit, swap exhausted on host", "incident_class": "resource_exhaustion"}
+{"text": "log volume at 97 percent capacity, writes will stall soon", "incident_class": "resource_exhaustion"}
+{"text": "inode usage maxed on data partition, new files failing", "incident_class": "resource_exhaustion"}
+{"text": "kafka broker paging heavily, heap saturated after retention change", "incident_class": "resource_exhaustion"}
+{"text": "redis maxmemory reached, evictions spiking and cache hit rate collapsing", "incident_class": "resource_exhaustion"}
+{"text": "file descriptors exhausted on api node, accept loop failing", "incident_class": "resource_exhaustion"}
+{"text": "thread pool saturated, queue depth growing without bound", "incident_class": "resource_exhaustion"}
+{"text": "upstream service unreachable from payments, TCP resets on every attempt", "incident_class": "connectivity"}
+{"text": "DNS resolution failing for internal service discovery", "incident_class": "connectivity"}
+{"text": "network partition between az-1 and az-2, cross-zone calls dropping", "incident_class": "connectivity"}
+{"text": "load balancer marking all backends unhealthy, no route to service", "incident_class": "connectivity"}
+{"text": "VPN tunnel to on-prem datacenter flapping every few minutes", "incident_class": "connectivity"}
+{"text": "socket hang up errors from the billing gateway, peer closing early", "incident_class": "connectivity"}
+{"text": "packet loss 12 percent on the east-west mesh, retries exploding", "incident_class": "connectivity"}
+{"text": "service mesh sidecar cannot reach control plane, config sync stalled", "incident_class": "connectivity"}
+{"text": "database port closed after firewall rule rollout, clients cannot attach", "incident_class": "connectivity"}
+{"text": "grpc UNAVAILABLE from inventory service, channel keeps resetting", "incident_class": "connectivity"}
+{"text": "p99 response time tripled in the last 15 minutes on search", "incident_class": "latency"}
+{"text": "checkout requests taking 8 seconds, users abandoning carts", "incident_class": "latency"}
+{"text": "slow queries piling up, database responses degraded under load", "incident_class": "latency"}
+{"text": "queue consumer lag rising, events processed minutes late", "incident_class": "latency"}
+{"text": "API gateway p95 breached SLO for 3 consecutive windows", "incident_class": "latency"}
+{"text": "cache misses forcing origin fetches, page loads sluggish", "incident_class": "latency"}
+{"text": "report generation crawling, jobs exceeding their deadline", "incident_class": "latency"}
+{"text": "downstream calls waiting on slow auth service, requests backing up", "incident_class": "latency"}
+{"text": "elevated response times after index rebuild, scan cost way up", "incident_class": "latency"}
+{"text": "stream processing behind real time, watermark drifting", "incident_class": "latency"}
+{"text": "error rate 18 percent on public endpoints, users seeing failures", "incident_class": "availability"}
+{"text": "site down for a subset of regions, health checks failing", "incident_class": "availability"}
+{"text": "login service returning internal errors for every request", "incident_class": "availability"}
+{"text": "crash loop on the orders service, no healthy replicas left", "incident_class": "availability"}
+{"text": "elevated failure ratio on checkout API, canary rollback armed", "incident_class": "availability"}
+{"text": "storefront blank page, static assets failing to load", "incident_class": "availability"}
+{"text": "payment processor rejecting all transactions with server errors", "incident_class": "availability"}
+{"text": "search results empty for all queries, index unreachable", "incident_class": "availability"}
+{"text": "mobile API returning bad gateway to every client", "incident_class": "availability"}
+{"text": "half the fleet failing readiness, traffic concentrating on survivors", "incident_class": "availability"}
+{"text": "TLS handshake failures after cert rotation on the edge", "incident_class": "security"}
+{"text": "spike in failed admin logins from unfamiliar IP ranges", "incident_class": "security"}
+{"text": "WAF blocking surge of SQL injection attempts on search", "incident_class": "security"}
+{"text": "expired signing key breaking token validation for partners", "incident_class": "security"}
+{"text": "unusual data egress from the analytics bucket overnight", "incident_class": "security"}
+{"text": "brute force pattern against the customer portal detected", "incident_class": "security"}
+{"text": "secrets scanner flagged a leaked credential in build logs", "incident_class": "security"}
+{"text": "mutual TLS trust chain broken between mesh services", "incident_class": "security"}
+{"text": "audit log gap detected, tamper alarm raised on prod account", "incident_class": "security"}
+{"text": "suspicious privilege escalation attempt on the bastion host", "incident_class": "security"}
+{"text": "errors started right after the 14:20 rollout of the pricing service", "incident_class": "change_related"}
+{"text": "regression traced to yesterday's config push, feature flag misconfigured", "incident_class": "change_related"}
+{"text": "new release doubled memory footprint, rollback candidate", "incident_class": "change_related"}
+{"text": "schema migration locked the orders table during peak traffic", "incident_class": "change_related"}
+{"text": "canary showing errors absent from baseline, build 4812 suspect", "incident_class": "change_related"}
+{"text": "infrastructure update changed instance types, workloads misplaced", "incident_class": "change_related"}
+{"text": "dependency bump broke serialization between services", "incident_class": "change_related"}
+{"text": "traffic shifted to the new version and failures followed it", "incident_class": "change_related"}
+{"text": "helm chart upgrade dropped an env var the service needs", "incident_class": "change_related"}
+{"text": "incident window matches the terraform apply in the change calendar", "incident_class": "change_related"}
+{"text": "scheduled maintenance notice for the weekend", "incident_class": "unclassified"}
+{"text": "quarterly cost report ready for review", "incident_class": "unclassified"}
+{"text": "test alert please ignore, validating pager rotation", "incident_class": "unclassified"}
+{"text": "informational: backup completed successfully", "incident_class": "unclassified"}
+{"text": "capacity planning reminder for next sprint", "incident_class": "unclassified"}
+{"text": "new dashboard published for the payments team", "incident_class": "unclassified"}
+{"text": "on-call handoff notes for tonight", "incident_class": "unclassified"}
+{"text": "monitoring agent version notice, no action required", "incident_class": "unclassified"}
