@@ -8,14 +8,17 @@ writes weights + vocab to data/models/. Needs the `ml` extra (torch).
 
 from __future__ import annotations
 
-from peterpan.ml import DEFAULT_MODEL_DIR, train
+from peterpan.ml import DEFAULT_MODEL_DIR, evaluate_holdout, train
 
 
 def main() -> int:
-    accuracy = train()
-    print(f"train accuracy: {accuracy:.2%}")
+    holdout = evaluate_holdout()
+    train_acc = train()
+    print(f"holdout accuracy: {holdout:.2%}   <- the number to quote")
+    print(f"train accuracy:   {train_acc:.2%}   (memorization ceiling, not quality)")
     print(f"artifacts: {DEFAULT_MODEL_DIR / 'predictor.pt'}, {DEFAULT_MODEL_DIR / 'vocab.json'}")
-    return 0 if accuracy >= 0.9 else 1
+    # Ship gate rides on the holdout — never on train accuracy.
+    return 0 if holdout >= 0.7 else 1
 
 
 if __name__ == "__main__":
