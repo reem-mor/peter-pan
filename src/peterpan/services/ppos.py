@@ -169,8 +169,10 @@ def _notify_lead_webhook(record: dict[str, object]) -> None:
         return
     try:
         httpx.post(url, json=record, timeout=_LEAD_WEBHOOK_TIMEOUT_S)
-    except Exception:  # noqa: BLE001 — notification is best-effort by contract
-        logger.warning("lead webhook notification failed", exc_info=True)
+    except Exception as exc:  # noqa: BLE001 — notification is best-effort by contract
+        # Type name only — httpx exception reprs can embed the webhook URL,
+        # and n8n webhook paths are secret-bearing.
+        logger.warning("lead webhook notification failed: %s", type(exc).__name__)
 
 
 @app.post("/leads", status_code=201)

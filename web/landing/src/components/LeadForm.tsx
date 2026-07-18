@@ -3,13 +3,14 @@ import type { FormEvent, ReactNode } from "react";
 
 /**
  * "Get a demo" lead form. Client-side validation mirrors the server's
- * LeadRequest bounds; the POST goes to `${VITE_API_BASE}/api/leads`
+ * LeadRequest bounds; the POST goes to `${VITE_API_BASE}/leads` (ppos :8005;
+ * vite dev proxy forwards /leads — see vite.config.ts)
  * (relative by default, so a reverse proxy can route it to the PPOS
  * service without a rebuild).
  */
 
 const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "";
-const LEADS_ENDPOINT = `${API_BASE}/api/leads`;
+const LEADS_ENDPOINT = `${API_BASE}/leads`;
 
 interface LeadValues {
   name: string;
