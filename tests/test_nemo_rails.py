@@ -114,12 +114,16 @@ def test_topical_llm_check_off_by_default_never_calls_anthropic() -> None:
     assert topical_llm_check("write me a poem", settings) is False
 
 
-def test_topical_llm_check_enabled_without_key_raises() -> None:
-    # anthropic_api_key has a validation_alias (ANTHROPIC_API_KEY /
-    # PP_ANTHROPIC_API_KEY) — not settable by field-name kwarg, only by env
-    # var — so the default (unset) Settings() already exercises "no key".
+def test_topical_llm_check_enabled_without_key_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Hermetic no-key state: relying on an unset env is NOT enough — an
+    # ambient .env populates anthropic_api_key on developer machines, which
+    # both fails the test and echoes the live key into pytest's assertion
+    # diff. Blank the resolved field directly (same fix as the pinecone
+    # no-key test, PR #35 review).
     settings = Settings(nemo_topical_llm=True)
-    assert settings.anthropic_api_key is None
+    monkeypatch.setattr(settings, "anthropic_api_key", None)
     with pytest.raises(NemoCheckError, match="ANTHROPIC_API_KEY"):
         topical_llm_check("some alert text", settings)
 
