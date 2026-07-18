@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PETER PAN OS — Agentic Control Plane</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #070b0e;
+    --bg-grid: #0c1216;
+    --panel: #0d141a;
+    --panel-2: #101a21;
+    --border: #1b2831;
+    --border-hi: #29414f;
+    --text: #e6f1f3;
+    --muted: #7c93a3;
+    --faint: #4a5f6d;
+    --accent: #2fe6b0;
+    --accent-dim: rgba(47, 230, 176, 0.12);
+    --cyan: #4cc9f0;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --violet: #b794f6;
+    --blue: #60a5fa;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --z-header: 30;
+    --z-tooltip: 50;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background:
+      linear-gradient(rgba(47, 230, 176, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(47, 230, 176, 0.025) 1px, transparent 1px),
+      var(--bg);
+    background-size: 34px 34px, 34px 34px, auto;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+
+  a { color: var(--accent); }
+
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 20px 24px 64px; }
+
+  /* ---------- header ---------- */
+  header.topbar {
+    position: sticky; top: 12px; z-index: var(--z-header);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    background: rgba(13, 20, 26, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .glyph {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    display: grid; place-items: center;
+    color: var(--accent);
+  }
+  .brand h1 { font-family: var(--mono); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; }
+  .brand .sub { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase; }
+
+  .spacer { flex: 1; }
+
+  .badge {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border-hi); color: var(--muted);
+    display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+  .badge.live .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .badge.live { color: var(--accent); border-color: rgba(47, 230, 176, 0.45); }
+  .badge.demo .dot { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .badge.demo { color: var(--amber); border-color: rgba(251, 191, 36, 0.45); }
+
+  .win-select { display: inline-flex; border: 1px solid var(--border-hi); border-radius: 8px; overflow: hidden; }
+  .win-select button {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+    background: transparent; color: var(--muted); border: 0; padding: 8px 13px;
+    cursor: pointer; transition: color 0.2s, background 0.2s;
+    min-width: 44px; min-height: 36px;
+  }
+  .win-select button + button { border-left: 1px solid var(--border); }
+  .win-select button:hover { color: var(--text); background: var(--panel-2); }
+  .win-select button.active { color: var(--bg); background: var(--accent); font-weight: 700; }
+  .win-select button:focus-visible, .icon-btn:focus-visible {
+    outline: 2px solid var(--cyan); outline-offset: -2px;
+  }
+
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border-hi); border-radius: 8px;
+    color: var(--muted); width: 38px; height: 38px; display: grid; place-items: center;
+    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+  }
+  .icon-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ---------- layout ---------- */
+  .grid { display: grid; gap: 16px; }
+  .kpis { grid-template-columns: repeat(5, 1fr); }
+  .charts { grid-template-columns: 2fr 1fr; margin-top: 16px; }
+  .mid { grid-template-columns: 1.2fr 1fr 1fr; margin-top: 16px; }
+  .bottom { grid-template-columns: 1.4fr 1fr; margin-top: 16px; }
+
+  @media (max-width: 1100px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .charts, .mid, .bottom { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) { .kpis { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    transition: border-color 0.2s;
+  }
+  .panel:hover { border-color: var(--border-hi); }
+  .panel h2 {
+    font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel h2 svg { color: var(--accent); flex: none; }
+
+  /* ---------- KPIs ---------- */
+  .kpi .label {
+    font-family: var(--mono); font-size: 10.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.16em;
+  }
+  .kpi .value {
+    font-family: var(--mono); font-size: 30px; font-weight: 700; margin-top: 6px;
+    color: var(--text); line-height: 1.15;
+  }
+  .kpi .value .unit { font-size: 14px; color: var(--faint); font-weight: 500; margin-left: 4px; }
+  .kpi .hint { font-size: 12.5px; color: var(--faint); margin-top: 4px; font-family: var(--mono); }
+  .kpi.accent .value { color: var(--accent); text-shadow: 0 0 18px rgba(47, 230, 176, 0.35); }
+
+  /* ---------- budget ---------- */
+  .budget-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .budget-bar { flex: 1; min-width: 220px; height: 12px; border-radius: 999px; background: var(--bg-grid); border: 1px solid var(--border); overflow: hidden; }
+  .budget-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--cyan)); transition: width 0.6s ease; }
+  .budget-fill.warn { background: linear-gradient(90deg, var(--amber), #f59e0b); }
+  .budget-fill.exceeded { background: linear-gradient(90deg, var(--red), #dc2626); }
+  .budget-meta { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .budget-meta strong { color: var(--text); }
+  .pill { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+  .pill.ok { color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(47, 230, 176, 0.4); }
+  .pill.warn { color: var(--amber); background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.4); }
+  .pill.exceeded { color: var(--red); background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.4); }
+
+  /* ---------- charts ---------- */
+  .chart-box { width: 100%; overflow-x: auto; }
+  svg text { font-family: var(--mono); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+  .legend .item { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ---------- tables ---------- */
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+  th { text-align: left; color: var(--faint); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; font-size: 10.5px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--bg-grid); color: var(--text); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: var(--panel-2); }
+  .rowbar { height: 4px; border-radius: 2px; background: var(--accent); opacity: 0.7; min-width: 2px; }
+  .name-cell { display: flex; align-items: center; gap: 8px; }
+  .name-cell .chip { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+
+  /* ---------- services ---------- */
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .svc {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    background: var(--bg-grid); font-family: var(--mono);
+  }
+  .svc .n { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .svc .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .svc.up .dot { background: var(--accent); box-shadow: 0 0 8px rgba(47, 230, 176, 0.7); }
+  .svc.down .dot { background: var(--red); box-shadow: 0 0 8px rgba(248, 113, 113, 0.7); }
+  .svc.unknown .dot { background: var(--faint); }
+  .svc .m { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .svc.down .m { color: var(--red); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .svc.up .dot { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 2px rgba(47, 230, 176, 0.25); } }
+  }
+
+  /* ---------- tips ---------- */
+  .tips li {
+    list-style: none; display: flex; gap: 12px; align-items: flex-start;
+    padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg-grid); margin-bottom: 10px; font-size: 14px; color: var(--text);
+  }
+  .tips li svg { color: var(--amber); flex: none; margin-top: 2px; }
+  .tips .static-tip svg { color: var(--cyan); }
+  .tips .k { font-family: var(--mono); color: var(--accent); }
+
+  footer { margin-top: 28px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); display: flex; gap: 18px; flex-wrap: wrap; }
+  footer code { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="glyph" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>
+      </span>
+      <div>
+        <h1>PETER PAN OS</h1>
+        <div class="sub">agentic control plane</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <span class="badge" id="env-badge"><span class="dot"></span><span id="env-label">env: —</span></span>
+    <span class="badge" id="source-badge"><span class="dot"></span><span id="source-label">connecting…</span></span>
+    <nav class="win-select" aria-label="Time window">
+      <button data-hours="1">1H</button>
+      <button data-hours="6">6H</button>
+      <button data-hours="24" class="active">24H</button>
+      <button data-hours="168">7D</button>
+      <button data-hours="">ALL</button>
+    </nav>
+    <button class="icon-btn" id="refresh" aria-label="Refresh data" title="Refresh">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
+  </header>
+
+  <section class="grid kpis" aria-label="Key metrics">
+    <div class="panel kpi accent"><div class="label">Spend · window</div><div class="value" id="kpi-cost">—</div><div class="hint" id="kpi-cost-hint"></div></div>
+    <div class="panel kpi"><div class="label">Input tokens</div><div class="value" id="kpi-in">—</div><div class="hint">prompt side</div></div>
+    <div class="panel kpi"><div class="label">Output tokens</div><div class="value" id="kpi-out">—</div><div class="hint">completion side</div></div>
+    <div class="panel kpi"><div class="label">LLM calls</div><div class="value" id="kpi-calls">—</div><div class="hint" id="kpi-agents-hint"></div></div>
+    <div class="panel kpi"><div class="label">Avg tokens / call</div><div class="value" id="kpi-avg">—</div><div class="hint">in + out</div></div>
+  </section>
+
+  <section class="panel" style="margin-top:16px" aria-label="Daily budget">
+    <h2>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Daily budget guard <span style="color:var(--faint);letter-spacing:0.06em">· report-only · deterministic</span>
+    </h2>
+    <div class="budget-row">
+      <span class="pill ok" id="budget-pill">—</span>
+      <div class="budget-bar" role="progressbar" aria-label="Budget consumption" aria-valuemin="0" aria-valuemax="100" id="budget-bar-outer">
+        <div class="budget-fill" id="budget-fill"></div>
+      </div>
+      <span class="budget-meta" id="budget-meta">—</span>
+    </div>
+  </section>
+
+  <section class="grid charts">
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-6 4 3 5-8"/></svg>
+        Spend over time
+      </h2>
+      <div class="chart-box" id="series-chart" role="img" aria-label="Area chart of LLM spend over the selected window"></div>
+      <div class="legend">
+        <span class="item"><span class="sw" style="background:var(--accent)"></span>cost usd / bucket</span>
+        <span class="item"><span class="sw" style="background:var(--violet)"></span>calls / bucket</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10h-10z"/></svg>
+        Cost share by model
+      </h2>
+      <div class="chart-box" id="model-donut" role="img" aria-label="Donut chart of cost share per model"></div>
+      <div class="legend" id="model-legend"></div>
+    </div>
+  </section>
+
+  <section class="grid mid">
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 16h.01"/><path d="M16 16h.01"/></svg>
+        Agents · token &amp; cost breakdown
+      </h2>
+      <div style="overflow-x:auto"><table id="agents-table" aria-label="Per-agent usage">
+        <thead><tr><th>Agent</th><th class="num">Calls</th><th class="num">Tok in</th><th class="num">Tok out</th><th class="num">Cost</th><th style="width:26%">Share</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a5 5 0 0 0-7.07 7.07l-4.1 4.1a1.5 1.5 0 0 0 2.12 2.12l4.1-4.1a5 5 0 0 0 7.07-7.07l-2.83 2.83-2.12-2.12z"/></svg>
+        Tools &amp; services
+      </h2>
+      <div style="overflow-x:auto"><table id="services-table" aria-label="Per-service usage">
+        <thead><tr><th>Service</th><th class="num">Calls</th><th class="num">Tokens</th><th class="num">Cost</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Mesh health
+      </h2>
+      <div class="svc-grid" id="mesh-grid"></div>
+    </div>
+  </section>
+
+  <section class="grid bottom">
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+        Optimization tips
+      </h2>
+      <ul class="tips" id="tips-list"></ul>
+    </div>
+    <div class="panel">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        Token playbook
+      </h2>
+      <ul class="tips">
+        <li class="static-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span><span class="k">Route by tier.</span> Deterministic floors + local predictor first; call the commercial model only for synthesis.</span></li>
+        <li class="static-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span><span class="k">Trim retrieval.</span> Cap RAG chunks per story; irrelevant context is the #1 input-token leak.</span></li>
+        <li class="static-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span><span class="k">Cache prompts.</span> Stable system prompts + versioned templates make prompt caching effective.</span></li>
+        <li class="static-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span><span class="k">Bound the loop.</span> Step + token budgets on every LangGraph run; exhaustion = deterministic fallback, not retry storms.</span></li>
+        <li class="static-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span><span class="k">Meter everything.</span> No unlogged LLM call — this dashboard is only as honest as <code>log_usage()</code> coverage.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>feeds: <code>/os/usage</code> <code>/os/usage/series</code> <code>/os/budget</code> <code>/os/tips</code> <code>/os/agents</code> <code>/os/services</code></span>
+    <span id="last-refresh"></span>
+  </footer>
+</div>
+
+<script>
+'use strict';
+
+/* ---------------- config + state ---------------- */
+const API = ''; // same-origin (served by PETER PAN OS at /os/dashboard)
+const PALETTE = ['#2fe6b0', '#4cc9f0', '#b794f6', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
+const state = { hours: 24, live: false, timer: null, seq: 0 };
+
+/* Demo fixture — keeps the page fully renderable with zero backends
+   (mirage-mode invariant). Activated only when the API is unreachable. */
+const DEMO = (() => {
+  const agents = {
+    'incident-agent': { calls: 42, input_tokens: 51240, output_tokens: 38920, cost_usd: 0.7462 },
+    'llm-judge': { calls: 38, input_tokens: 36110, output_tokens: 9860, cost_usd: 0.2564 },
+    'rag': { calls: 61, input_tokens: 18300, output_tokens: 6100, cost_usd: 0.0915 },
+    'predictor': { calls: 57, input_tokens: 8550, output_tokens: 1140, cost_usd: 0.0299 }
+  };
+  const models = {
+    'claude-sonnet-5': { calls: 80, input_tokens: 87350, output_tokens: 48780, cost_usd: 1.0026 },
+    'claude-haiku-4-5-20251001': { calls: 118, input_tokens: 26850, output_tokens: 7240, cost_usd: 0.1214 }
+  };
+  const services = {
+    'agent': { calls: 42, input_tokens: 51240, output_tokens: 38920, cost_usd: 0.7462 },
+    'evals': { calls: 38, input_tokens: 36110, output_tokens: 9860, cost_usd: 0.2564 },
+    'rag': { calls: 61, input_tokens: 18300, output_tokens: 6100, cost_usd: 0.0915 },
+    'predictor': { calls: 57, input_tokens: 8550, output_tokens: 1140, cost_usd: 0.0299 }
+  };
+  const n = 48, now = Date.now(), points = [];
+  for (let i = 0; i < n; i++) {
+    const wave = Math.sin(i / 5.1) * 0.5 + 0.5, spike = (i % 17 === 0) ? 1.8 : 1;
+    points.push({
+      t: new Date(now - (n - i) * 30 * 60 * 1000).toISOString(),
+      calls: Math.round((2 + wave * 6) * spike),
+      input_tokens: Math.round((900 + wave * 2400) * spike),
+      output_tokens: Math.round((300 + wave * 900) * spike),
+      cost_usd: +(((0.004 + wave * 0.02) * spike)).toFixed(6)
+    });
+  }
+  return {
+    usageByAgent: agents, usageByModel: models, usageByService: services,
+    series: { points },
+    budget: { status: 'ok', spent_usd: 1.1240, budget_usd: 5.0, window_hours: 24 },
+    tips: { tips: ['Usage looks healthy.'] },
+    servicesHealth: { services: [
+      { name: 'predictor', status: 'up', latency_ms: 6.2 },
+      { name: 'rag', status: 'up', latency_ms: 9.8 },
+      { name: 'guardrails', status: 'up', latency_ms: 4.1 },
+      { name: 'agent', status: 'up', latency_ms: 12.4 }
+    ] },
+    health: { env: 'mirage (demo)' }
+  };
+})();
+
+/* ---------------- helpers ---------------- */
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtInt = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+const fmtTok = (n) => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : fmtInt(n);
+const fmtUsd = (n) => '$' + Number(n).toFixed(n >= 10 ? 2 : 4);
+
+async function getJSON(path) {
+  const r = await fetch(API + path, { headers: { Accept: 'application/json' } });
+  if (!r.ok) throw new Error(path + ' → ' + r.status);
+  return r.json();
+}
+
+/* ---------------- data load ---------------- */
+async function loadAll() {
+  const seq = ++state.seq; // drop stale responses (timer vs window-switch races)
+  const h = state.hours;
+  const q = h ? `?hours=${h}` : '';
+  const seriesQ = `?hours=${h || 168}&buckets=48`;
+  const wants = {
+    usageByAgent: getJSON(`/os/usage${q}${q ? '&' : '?'}by=agent`),
+    usageByModel: getJSON(`/os/usage${q}${q ? '&' : '?'}by=model`),
+    usageByService: getJSON(`/os/usage${q}${q ? '&' : '?'}by=service`),
+    series: getJSON(`/os/usage/series${seriesQ}`),
+    budget: getJSON('/os/budget'),
+    tips: getJSON('/os/tips'),
+    servicesHealth: getJSON('/os/services'),
+    health: getJSON('/healthz')
+  };
+  const out = {};
+  const settled = await Promise.allSettled(Object.values(wants));
+  if (seq !== state.seq) return; // a newer load superseded this one
+  Object.keys(wants).forEach((k, i) => { out[k] = settled[i].status === 'fulfilled' ? settled[i].value : null; });
+
+  state.live = out.usageByAgent !== null;
+  if (!state.live) {
+    Object.keys(DEMO).forEach(k => { if (out[k] === null) out[k] = DEMO[k]; });
+  }
+  render(out);
+}
+
+/* ---------------- render ---------------- */
+function render(d) {
+  const src = $('#source-badge'), srcLabel = $('#source-label');
+  src.classList.toggle('live', state.live);
+  src.classList.toggle('demo', !state.live);
+  srcLabel.textContent = state.live ? 'live data' : 'demo data — OS offline';
+  $('#env-label').textContent = 'env: ' + ((d.health && d.health.env) || '—');
+  $('#last-refresh').textContent = 'refreshed ' + new Date().toLocaleTimeString();
+
+  renderKpis(d.usageByAgent || {});
+  renderBudget(d.budget);
+  renderSeries((d.series && d.series.points) || []);
+  renderDonut(d.usageByModel || {});
+  renderAgents(d.usageByAgent || {});
+  renderServices(d.usageByService || {});
+  renderMesh(d.servicesHealth);
+  renderTips(d.tips);
+}
+
+function totals(agg) {
+  let calls = 0, tin = 0, tout = 0, cost = 0;
+  for (const row of Object.values(agg)) {
+    calls += row.calls; tin += row.input_tokens; tout += row.output_tokens; cost += row.cost_usd;
+  }
+  return { calls, tin, tout, cost };
+}
+
+function renderKpis(agg) {
+  const t = totals(agg);
+  $('#kpi-cost').textContent = fmtUsd(t.cost);
+  $('#kpi-cost-hint').textContent = state.hours ? `last ${state.hours >= 24 ? (state.hours / 24) + 'd' : state.hours + 'h'}` : 'all time';
+  $('#kpi-in').textContent = fmtTok(t.tin);
+  $('#kpi-out').textContent = fmtTok(t.tout);
+  $('#kpi-calls').textContent = fmtInt(t.calls);
+  $('#kpi-agents-hint').textContent = Object.keys(agg).length + ' agents active';
+  $('#kpi-avg').textContent = t.calls ? fmtTok(Math.round((t.tin + t.tout) / t.calls)) : '0';
+}
+
+function renderBudget(b) {
+  const pill = $('#budget-pill'), fill = $('#budget-fill'), meta = $('#budget-meta');
+  if (!b) { pill.textContent = 'n/a'; meta.textContent = 'budget endpoint unavailable'; return; }
+  const pct = Math.min(100, (b.spent_usd / b.budget_usd) * 100);
+  pill.textContent = b.status;
+  pill.className = 'pill ' + b.status;
+  fill.className = 'budget-fill ' + (b.status === 'ok' ? '' : b.status);
+  fill.style.width = pct.toFixed(1) + '%';
+  $('#budget-bar-outer').setAttribute('aria-valuenow', pct.toFixed(0));
+  meta.innerHTML = `<strong>${fmtUsd(b.spent_usd)}</strong> / ${fmtUsd(b.budget_usd)} · ${pct.toFixed(1)}% of daily budget (${b.window_hours}h window)`;
+}
+
+/* Area + line chart, hand-rolled SVG. */
+function renderSeries(points) {
+  const W = 760, H = 240, padL = 46, padR = 14, padT = 14, padB = 30;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  const host = $('#series-chart');
+  if (!points.length) { host.innerHTML = '<p style="color:var(--faint);font-family:var(--mono);font-size:13px">no data in window</p>'; return; }
+
+  const maxCost = Math.max(...points.map(p => p.cost_usd), 1e-9);
+  const maxCalls = Math.max(...points.map(p => p.calls), 1);
+  const x = (i) => padL + (i / (points.length - 1)) * iw;
+  const yc = (v) => padT + ih - (v / maxCost) * ih;
+  const yn = (v) => padT + ih - (v / maxCalls) * ih;
+
+  let area = `M ${x(0)} ${padT + ih}`, line = '', callLine = '';
+  points.forEach((p, i) => {
+    area += ` L ${x(i)} ${yc(p.cost_usd)}`;
+    line += (i ? ' L' : 'M') + ` ${x(i)} ${yc(p.cost_usd)}`;
+    callLine += (i ? ' L' : 'M') + ` ${x(i)} ${yn(p.calls)}`;
+  });
+  area += ` L ${x(points.length - 1)} ${padT + ih} Z`;
+
+  const gridLines = [0.25, 0.5, 0.75, 1].map(f => {
+    const y = padT + ih - f * ih;
+    return `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1b2831" stroke-dasharray="3 5"/>` +
+      `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#4a5f6d">$${(maxCost * f).toFixed(3)}</text>`;
+  }).join('');
+
+  const ticks = [0, Math.floor(points.length / 2), points.length - 1].map(i => {
+    const t = new Date(points[i].t);
+    const lbl = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
+    return `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#4a5f6d">${lbl}</text>`;
+  }).join('');
+
+  host.innerHTML = `
+  <svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:520px" aria-hidden="true">
+    <defs>
+      <linearGradient id="costFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2fe6b0" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#2fe6b0" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    ${gridLines}
+    <path d="${area}" fill="url(#costFill)"/>
+    <path d="${line}" fill="none" stroke="#2fe6b0" stroke-width="2" stroke-linejoin="round"/>
+    <path d="${callLine}" fill="none" stroke="#b794f6" stroke-width="1.4" stroke-dasharray="4 4" stroke-linejoin="round" opacity="0.85"/>
+    ${ticks}
+  </svg>`;
+}
+
+function renderDonut(byModel) {
+  const entries = Object.entries(byModel).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
+  const host = $('#model-donut'), legend = $('#model-legend');
+  const total = entries.reduce((s, [, r]) => s + r.cost_usd, 0);
+  if (!total) { host.innerHTML = '<p style="color:var(--faint);font-family:var(--mono);font-size:13px">no model spend in window</p>'; legend.innerHTML = ''; return; }
+
+  const C = 100, R = 74, SW = 26, circ = 2 * Math.PI * R;
+  let offset = 0, segs = '';
+  entries.forEach(([name, row], i) => {
+    const frac = row.cost_usd / total;
+    segs += `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${PALETTE[i % PALETTE.length]}"
+      stroke-width="${SW}" stroke-dasharray="${(frac * circ).toFixed(2)} ${circ.toFixed(2)}"
+      stroke-dashoffset="${(-offset * circ).toFixed(2)}" transform="rotate(-90 ${C} ${C})"/>`;
+    offset += frac;
+  });
+  host.innerHTML = `
+  <svg viewBox="0 0 200 200" width="200" style="display:block;margin:0 auto" aria-hidden="true">
+    ${segs}
+    <text x="100" y="94" text-anchor="middle" font-size="20" font-weight="700" fill="#e6f1f3">${fmtUsd(total)}</text>
+    <text x="100" y="114" text-anchor="middle" font-size="10" fill="#7c93a3">TOTAL SPEND</text>
+  </svg>`;
+  legend.innerHTML = entries.map(([name, row], i) =>
+    `<span class="item"><span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>${esc(name)} · ${((row.cost_usd / total) * 100).toFixed(1)}%</span>`
+  ).join('');
+}
+
+function renderAgents(agg) {
+  const tbody = $('#agents-table tbody');
+  const entries = Object.entries(agg).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
+  const maxCost = Math.max(...entries.map(([, r]) => r.cost_usd), 1e-9);
+  tbody.innerHTML = entries.map(([name, r], i) => `
+    <tr>
+      <td><span class="name-cell"><span class="chip" style="background:${PALETTE[i % PALETTE.length]}"></span>${esc(name)}</span></td>
+      <td class="num">${fmtInt(r.calls)}</td>
+      <td class="num">${fmtTok(r.input_tokens)}</td>
+      <td class="num">${fmtTok(r.output_tokens)}</td>
+      <td class="num">${fmtUsd(r.cost_usd)}</td>
+      <td><div class="rowbar" style="width:${((r.cost_usd / maxCost) * 100).toFixed(1)}%"></div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="color:var(--faint)">no usage in window</td></tr>';
+}
+
+function renderServices(agg) {
+  const tbody = $('#services-table tbody');
+  const entries = Object.entries(agg).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
+  tbody.innerHTML = entries.map(([name, r]) => `
+    <tr>
+      <td>${esc(name)}</td>
+      <td class="num">${fmtInt(r.calls)}</td>
+      <td class="num">${fmtTok(r.input_tokens + r.output_tokens)}</td>
+      <td class="num">${fmtUsd(r.cost_usd)}</td>
+    </tr>`).join('') || '<tr><td colspan="4" style="color:var(--faint)">no usage in window</td></tr>';
+}
+
+function renderMesh(health) {
+  const grid = $('#mesh-grid');
+  const items = (health && health.services) || [];
+  const os = { name: 'peter-pan-os', status: state.live ? 'up' : 'down', latency_ms: null };
+  grid.innerHTML = [os, ...items].map(s => `
+    <div class="svc ${esc(s.status || 'unknown')}">
+      <div class="n"><span class="dot"></span>${esc(s.name)}</div>
+      <div class="m">${s.status === 'up' ? (s.latency_ms != null ? s.latency_ms + ' ms' : 'serving') : s.status === 'down' ? 'unreachable' : 'unknown'}</div>
+    </div>`).join('');
+}
+
+function renderTips(t) {
+  const list = $('#tips-list');
+  const tipsArr = (t && t.tips) || ['tips endpoint unavailable'];
+  const bulb = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>';
+  list.innerHTML = tipsArr.map(tip => `<li>${bulb}<span>${esc(tip)}</span></li>`).join('');
+}
+
+/* ---------------- wiring ---------------- */
+document.querySelectorAll('.win-select button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.win-select button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.hours = btn.dataset.hours ? Number(btn.dataset.hours) : null;
+    loadAll();
+  });
+});
+$('#refresh').addEventListener('click', loadAll);
+
+loadAll();
+state.timer = setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

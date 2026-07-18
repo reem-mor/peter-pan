@@ -91,6 +91,50 @@ def aggregate(events: list[UsageEvent], by: str = "agent") -> dict[str, dict[str
     return out
 
 
+def timeseries(
+    events: list[UsageEvent], hours: float = 24.0, buckets: int = 48
+) -> dict[str, object]:
+    """Bucketed cost/token series over the last N hours — the OS chart feed.
+
+    Empty buckets are kept so charts render a continuous axis; the bucket
+    timestamp is the bucket's start.
+    """
+    if hours <= 0:
+        raise ValueError("hours must be positive")
+    if buckets <= 0:
+        raise ValueError("buckets must be positive")
+    end = datetime.now(UTC)
+    start = end - timedelta(hours=hours)
+    step = (end - start) / buckets
+    calls = [0] * buckets
+    input_tokens = [0] * buckets
+    output_tokens = [0] * buckets
+    cost_usd = [0.0] * buckets
+    for e in window(events, hours):
+        idx = min(int((datetime.fromisoformat(e.ts) - start) / step), buckets - 1)
+        calls[idx] += 1
+        input_tokens[idx] += e.input_tokens
+        output_tokens[idx] += e.output_tokens
+        cost_usd[idx] += e.cost_usd
+    points = [
+        {
+            "t": (start + i * step).isoformat(),
+            "calls": calls[i],
+            "input_tokens": input_tokens[i],
+            "output_tokens": output_tokens[i],
+            "cost_usd": round(cost_usd[i], 6),
+        }
+        for i in range(buckets)
+    ]
+    return {
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "hours": hours,
+        "buckets": buckets,
+        "points": points,
+    }
+
+
 # Warn threshold for the budget guard. Deterministic and unit-tested — an LLM
 # never decides whether spend is acceptable.
 _BUDGET_WARN_RATIO = 0.8

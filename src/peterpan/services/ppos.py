@@ -7,15 +7,27 @@ dashboard, pointed at the LLM layer instead of the app layer.
 
 from __future__ import annotations
 
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI, Query
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from peterpan.config import Settings
-from peterpan.usage import aggregate, budget_status, load_usage, tips, window
+from peterpan.usage import aggregate, budget_status, load_usage, timeseries, tips, window
 
 app = FastAPI(title="peter-pan-os")
 settings = Settings()
+
+# Self-contained dashboard page, kept next to the Streamlit UI. Resolved
+# relative to CWD like `usage_log_path`, so it works from the repo root and
+# inside the container image.
+DASHBOARD_PATH = Path("ui/os_dashboard.html")
+
+_HEALTH_TIMEOUT_S = 1.5
 
 
 @app.get("/healthz")
@@ -29,6 +41,15 @@ def usage_route(
     by: Literal["agent", "model", "service"] = "agent",
 ) -> dict[str, dict[str, float]]:
     return aggregate(window(load_usage(settings.usage_log_path), hours), by=by)
+
+
+@app.get("/os/usage/series")
+def usage_series_route(
+    hours: float = Query(default=24, gt=0),
+    buckets: int = Query(default=48, gt=0, le=500),
+) -> dict[str, object]:
+    """Bucketed cost/token time series — feeds the OS dashboard charts."""
+    return timeseries(load_usage(settings.usage_log_path), hours=hours, buckets=buckets)
 
 
 @app.get("/os/budget")
@@ -46,3 +67,39 @@ def tips_route() -> dict[str, list[str]]:
 def agents_route() -> dict[str, list[str]]:
     """Known agents this deployment runs. Extend as agents are added."""
     return {"agents": ["predictor", "rag", "guardrails", "incident-agent"]}
+
+
+def _probe(name: str, base_url: str) -> dict[str, object]:
+    """One healthz ping. Failures are data, not exceptions — the dashboard
+    renders a down service the same way an APM would."""
+    url = f"{base_url.rstrip('/')}/healthz"
+    started = time.perf_counter()
+    try:
+        with urllib.request.urlopen(url, timeout=_HEALTH_TIMEOUT_S) as resp:  # noqa: S310
+            ok = resp.status == 200
+    except (urllib.error.URLError, TimeoutError, OSError):
+        ok = False
+    latency_ms = round((time.perf_counter() - started) * 1000, 1)
+    return {
+        "name": name,
+        "url": base_url,
+        "status": "up" if ok else "down",
+        "latency_ms": latency_ms,
+    }
+
+
+@app.get("/os/services")
+def services_route() -> dict[str, list[dict[str, object]]]:
+    """Server-side health sweep of the mesh (browsers can't cross-origin poll it)."""
+    return {"services": [_probe(name, url) for name, url in settings.mesh.items()]}
+
+
+@app.get("/os/dashboard", response_model=None)
+def dashboard_route() -> HTMLResponse | JSONResponse:
+    """Serve the self-contained monitoring dashboard."""
+    if not DASHBOARD_PATH.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"dashboard file not found at {DASHBOARD_PATH}"},
+        )
+    return HTMLResponse(DASHBOARD_PATH.read_text(encoding="utf-8"))
