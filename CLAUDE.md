@@ -66,6 +66,10 @@ first principles only.
 - **FastAPI:** routes returning `Response` subclasses (or unions of them)
   declare `response_model=None` in the decorator — otherwise app import
   fails and takes the whole test collection down with it.
+- **Parallel subagents on a shared tree:** scoped green runs do not compose —
+  run the FULL gate (all tests + `mypy src`) after agents converge and before
+  commit; the seam that breaks is cross-file imports. For overlapping file
+  sets, use worktree isolation instead.
 
 ## Commands
 - Test: `python -m pytest -q`
