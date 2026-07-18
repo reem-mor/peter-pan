@@ -5,8 +5,8 @@ surfaces:
     current: alert-extraction/v1.md
     eval_pass_rate: null   # pending first live-LLM eval run
   incident-agent:
-    current: incident-agent/system-v4.txt
-    eval_pass_rate: 0.8  # 8/10 judge-grounded; see incident-agent/LOG.md
+    current: incident-agent/system-v5.txt
+    eval_pass_rate: 0.9  # 9/10 judge-grounded; see incident-agent/LOG.md
   rag-injection:
     current: rag-injection/v1.md
     eval_pass_rate: null
