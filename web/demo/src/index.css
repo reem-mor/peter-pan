@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* PETER PAN demo — design tokens per .claude/skills/peter-pan-design
-   (canonical implementation: ui/os_dashboard.html). Dark-only product;
-   hex values are copied verbatim from the design system — never invent new. */
+/* PETER PAN demo — design tokens per .claude/skills/peter-pan-design.
+   Dark-only product; hex values are copied verbatim from the design
+   system — never invent new. */
 @theme {
   /* surfaces */
   --color-surface: #070b0e; /* page */
