@@ -86,9 +86,12 @@ def test_namespaces_for_kinds_fans_out_or_narrows() -> None:
     assert ps.namespaces_for_kinds(None) == list(ps.NAMESPACES)  # incident query: all four
     assert ps.namespaces_for_kinds(["runbook"]) == [ps.RUNBOOKS]  # explicit filter narrows
     # Two kinds mapping to distinct namespaces, de-duped and order-preserved.
+    # past_incident also searches memory: memory-fed incidents keep
+    # kind="past_incident" but live in the memory namespace.
     assert ps.namespaces_for_kinds(["runbook", "past_incident", "runbook"]) == [
         ps.RUNBOOKS,
         ps.PAST_INCIDENTS,
+        ps.MEMORY,
     ]
 
 
