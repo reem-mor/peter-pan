@@ -44,6 +44,16 @@ class Settings(BaseSettings):
     env: Env = Field(default=Env.MIRAGE)
     service_name: str = Field(default="peter-pan")
     usage_log_path: str = Field(default="usage.jsonl")
+    # Mesh healthz targets for PETER PAN OS /os/services. Defaults match local
+    # dev; in docker-compose set PP_MESH='{"predictor": "http://predictor:8001", ...}'.
+    mesh: dict[str, str] = Field(
+        default={
+            "predictor": "http://localhost:8001",
+            "rag": "http://localhost:8002",
+            "guardrails": "http://localhost:8003",
+            "agent": "http://localhost:8004",
+        }
+    )
     # Daily LLM spend budget surfaced by PETER PAN OS (/os/budget). Report-only.
     daily_budget_usd: float = Field(default=5.0, gt=0)
 
