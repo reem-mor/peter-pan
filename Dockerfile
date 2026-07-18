@@ -1,5 +1,5 @@
 # Shared image for all PETER PAN services. SERVICE selects the app at runtime.
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 COPY pyproject.toml README.md ./
