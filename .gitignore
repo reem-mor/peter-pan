@@ -11,3 +11,4 @@ dist/
 build/
 *.egg-info/
 usage.jsonl
+.deploy-secret.tmp.json

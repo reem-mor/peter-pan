@@ -14,6 +14,21 @@ Parameters:
   ImageUri:
     Type: String
     Description: ECR image URI (repo:tag)
+  SecretArn:
+    Type: String
+    Description: >-
+      Secrets Manager secret (JSON with ANTHROPIC_API_KEY, PINECONE_API_KEY,
+      VOYAGE_API_KEY). Created by scripts/put_deploy_secret.py.
+  LlmProvider:
+    Type: String
+    Default: anthropic
+    AllowedValues: [off, anthropic]
+    Description: PP_LLM for the agent service (off = deterministic only)
+  RagBackend:
+    Type: String
+    Default: pinecone
+    AllowedValues: [lexical, pinecone]
+    Description: PP_RAG_BACKEND for the rag service
   InstanceType:
     Type: String
     Default: t3.medium
@@ -42,6 +57,14 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: read-deploy-secret
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref SecretArn
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -61,15 +84,34 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          set -euxo pipefail
-          dnf install -y docker
+          # NO -x: xtrace would echo fetched secret values into the boot log.
+          set -euo pipefail
+          dnf install -y docker jq
           systemctl enable --now docker
           aws ecr get-login-password --region ${AWS::Region} \
             | docker login --username AWS --password-stdin ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
+
+          SECRET_JSON=$(aws secretsmanager get-secret-value --region ${AWS::Region} \
+            --secret-id "${SecretArn}" --query SecretString --output text)
+          ANTHROPIC_API_KEY=$(echo "$SECRET_JSON" | jq -r '.ANTHROPIC_API_KEY // empty')
+          PINECONE_API_KEY=$(echo "$SECRET_JSON" | jq -r '.PINECONE_API_KEY // empty')
+          VOYAGE_API_KEY=$(echo "$SECRET_JSON" | jq -r '.VOYAGE_API_KEY // empty')
+          unset SECRET_JSON
+
+          # Least privilege per service: only agent sees the Anthropic key,
+          # only rag sees the retrieval keys. Everything else runs key-less.
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
             svc="${!entry%%:*}"; port="${!entry##*:}"
+            extra=()
+            if [ "$svc" = "agent" ]; then
+              extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY")
+            elif [ "$svc" = "rag" ]; then
+              extra+=(-e "PP_RAG_BACKEND=${RagBackend}" \
+                      -e "PINECONE_API_KEY=$PINECONE_API_KEY" \
+                      -e "VOYAGE_API_KEY=$VOYAGE_API_KEY")
+            fi
             docker run -d --restart unless-stopped --name "$svc" \
-              -e SERVICE="$svc" -e PP_ENV=mirage \
+              -e SERVICE="$svc" -e PP_ENV=mirage "${!extra[@]}" \
               -p "$port":8000 ${ImageUri}
           done
 
