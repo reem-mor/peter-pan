@@ -8,7 +8,7 @@ import pytest
 
 from peterpan.config import Settings
 from peterpan.llm import LlmSynthesisError, _LlmStoryDraft, _validate_draft, load_system_prompt
-from peterpan.schemas import Alert, Evidence, Prediction, Severity
+from peterpan.schemas import Alert, Evidence, Prediction, RagResult, Severity
 from peterpan.services.agent import build_story
 from peterpan.services.predictor import predict
 
@@ -73,6 +73,94 @@ def test_story_without_evidence_rejected() -> None:
 
 def test_llm_off_by_default_keeps_deterministic_path() -> None:
     assert Settings().llm.value == "off"
+
+
+def test_synthesize_caches_response_and_skips_second_llm_call(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: object
+) -> None:
+    """ADR-0001 response cache wired into the one real log_usage call: a
+    cache hit must skip both the anthropic API call AND the usage-log
+    entry, while still returning the same validated story."""
+    import json
+    import sys
+    import types
+
+    import peterpan.cache as cache_mod
+    from peterpan.usage import load_usage
+
+    monkeypatch.delenv("PP_REDIS_URL", raising=False)
+    cache_mod.reset_backend()
+
+    calls = {"n": 0}
+    draft_json = json.dumps(
+        {
+            "what_changed": "OOM kills on checkout pods",
+            "probable_cause": "resource_exhaustion",
+            "confidence": 0.7,
+            "evidence": [
+                {
+                    "kind": "metric",
+                    "summary": "classified as resource_exhaustion",
+                    "source": "predictor:/predict",
+                    "confidence": 0.5,
+                }
+            ],
+            "repair_options": ["raise memory limit"],
+        }
+    )
+
+    class _FakeBlock:
+        type = "text"
+        text = draft_json
+
+    class _FakeUsage:
+        input_tokens = 10
+        output_tokens = 5
+
+    class _FakeResponse:
+        content = [_FakeBlock()]
+        usage = _FakeUsage()
+
+    class _FakeMessages:
+        def create(self, **kwargs: object) -> _FakeResponse:
+            calls["n"] += 1
+            return _FakeResponse()
+
+    class _FakeClient:
+        def __init__(self, api_key: str) -> None:
+            self.messages = _FakeMessages()
+
+    fake_anthropic = types.SimpleNamespace(Anthropic=_FakeClient)
+    monkeypatch.setitem(sys.modules, "anthropic", fake_anthropic)
+
+    usage_log = tmp_path / "usage.jsonl"  # type: ignore[operator]
+    # anthropic_api_key has a validation_alias (env var name), so it must be
+    # set via that alias — a plain `anthropic_api_key=` kwarg is silently
+    # ignored by pydantic-settings without populate_by_name=True.
+    settings = Settings(
+        llm="anthropic", PP_ANTHROPIC_API_KEY="test-not-real", usage_log_path=str(usage_log)
+    )
+    alert = Alert(
+        id="cache-1",
+        source="grafana",
+        title="checkout OOMKilled",
+        severity=Severity.P2,
+        received_at=datetime.now(UTC),
+    )
+    prediction = make_prediction()
+    rag = RagResult(query="q", matches=[], insight="no matches")
+
+    from peterpan.llm import synthesize
+
+    story1 = synthesize(alert, prediction, rag, settings)
+    story2 = synthesize(alert, prediction, rag, settings)
+
+    assert calls["n"] == 1  # second call was a cache hit, no API call
+    assert story1 == story2
+    assert len(load_usage(str(usage_log))) == 1  # cache hit logged no cost entry
+    assert cache_mod.cache_stats() == {"hits": 1, "misses": 1}
+
+    cache_mod.reset_backend()
 
 
 def test_build_story_falls_back_when_llm_fails(monkeypatch: pytest.MonkeyPatch) -> None:

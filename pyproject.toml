@@ -16,6 +16,7 @@ agents = ["langgraph>=0.2"]
 ml = ["torch>=2.4"]
 llm = ["anthropic>=0.40"]
 rag = ["pinecone>=5.0", "voyageai>=0.2"]
+cache = ["redis>=5"]
 nemo = ["nemoguardrails>=0.11"]
 dev = [
     "pytest>=8",
@@ -47,8 +48,8 @@ python_version = "3.12"
 [[tool.mypy.overrides]]
 # torch stays here (unlike anthropic/langgraph) because its wheel is too heavy
 # to install in CI just for type stubs; the import is lazy behind the ml extra.
-# nemoguardrails ships no py.typed / stubs either; its import is lazy behind
-# the nemo extra (peterpan.nemo_rails).
-module = ["streamlit.*", "voyageai.*", "pinecone.*", "torch.*", "nemoguardrails.*"]
+# redis is lazy behind the optional `cache` extra (peterpan.cache.RedisBackend);
+# nemoguardrails ships no py.typed / stubs either, lazy behind the nemo extra.
+module = ["streamlit.*", "voyageai.*", "pinecone.*", "torch.*", "redis.*", "nemoguardrails.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
