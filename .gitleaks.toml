@@ -1,0 +1,15 @@
+# Gitleaks config — extends default rules with triaged false-positive allowlist.
+# Every entry here must state WHY it is safe; never allowlist a real secret.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Triaged false positives"
+paths = [
+    # Graphify's local cache: file-stat index of SHA-256 content hashes.
+    # Verified 2026-07-18 (PR #33): hex digests only, no credentials. The
+    # directory is gitignored going forward; this entry covers the one
+    # pre-cleanup commit in branch history.
+    '''graphify-out/cache/.*''',
+]
