@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -70,7 +70,11 @@ class Settings(BaseSettings):
     # the deterministic path so the demo never hard-depends on a live model.
     llm: LlmProvider = Field(default=LlmProvider.OFF)
     anthropic_model: str = Field(default="claude-sonnet-5")
-    anthropic_api_key: str | None = Field(
+    # Credentials are SecretStr: repr/str/model_dump mask the value, so a
+    # settings object landing in a log line, traceback, or pytest assertion
+    # diff never echoes a live key. Call .get_secret_value() only at the
+    # client-construction boundary.
+    anthropic_api_key: SecretStr | None = Field(
         default=None,
         validation_alias=AliasChoices("ANTHROPIC_API_KEY", "PP_ANTHROPIC_API_KEY"),
     )
@@ -94,12 +98,12 @@ class Settings(BaseSettings):
     # and falls back to lexical on any failure.
     rag_backend: RagBackend = Field(default=RagBackend.LEXICAL)
     pinecone_index: str = Field(default="peter-pan-knowledge")
-    pinecone_api_key: str | None = Field(
+    pinecone_api_key: SecretStr | None = Field(
         default=None,
         validation_alias=AliasChoices("PINECONE_API_KEY", "PP_PINECONE_API_KEY"),
     )
     voyage_model: str = Field(default="voyage-3.5-lite")
-    voyage_api_key: str | None = Field(
+    voyage_api_key: SecretStr | None = Field(
         default=None,
         validation_alias=AliasChoices("VOYAGE_API_KEY", "PP_VOYAGE_API_KEY"),
     )
@@ -120,7 +124,7 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("LANGFUSE_PUBLIC_KEY", "PP_LANGFUSE_PUBLIC_KEY"),
     )
-    langfuse_secret_key: str | None = Field(
+    langfuse_secret_key: SecretStr | None = Field(
         default=None,
         validation_alias=AliasChoices("LANGFUSE_SECRET_KEY", "PP_LANGFUSE_SECRET_KEY"),
     )

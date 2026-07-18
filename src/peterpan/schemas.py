@@ -53,7 +53,9 @@ class IncidentStory(BaseModel):
     alert: Alert
     what_changed: str
     probable_cause: str
-    confidence: float = Field(ge=0.0, le=1.0)
+    # lt=1.0: same type-level guarantee as Evidence — every producer caps at
+    # 0.9 (min(confidence, 0.9) in agent.py / graph.py / llm.py).
+    confidence: float = Field(ge=0.0, lt=1.0)
     evidence: list[Evidence]
     repair_options: list[str]
 
@@ -118,7 +120,8 @@ class GuardrailVerdict(BaseModel):
 class Prediction(BaseModel):
     incident_class: str
     severity: Severity
-    confidence: float = Field(ge=0.0, le=1.0)
+    # lt=1.0: floor emits 0.75/0.3; the torch path caps at _CONFIDENCE_CAP.
+    confidence: float = Field(ge=0.0, lt=1.0)
 
 
 class RagResult(BaseModel):

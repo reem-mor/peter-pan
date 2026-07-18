@@ -255,13 +255,15 @@ def upsert_batch(
 def _voyage_client(settings: Settings) -> Any:
     import voyageai
 
-    return voyageai.Client(api_key=settings.voyage_api_key)
+    assert settings.voyage_api_key is not None  # guarded by pinecone_available()
+    return voyageai.Client(api_key=settings.voyage_api_key.get_secret_value())
 
 
 def _pinecone(settings: Settings) -> Any:
     from pinecone import Pinecone
 
-    return Pinecone(api_key=settings.pinecone_api_key)
+    assert settings.pinecone_api_key is not None  # guarded by pinecone_available()
+    return Pinecone(api_key=settings.pinecone_api_key.get_secret_value())
 
 
 def embed_documents(client: Any, texts: Sequence[str], model: str) -> list[list[float]]:

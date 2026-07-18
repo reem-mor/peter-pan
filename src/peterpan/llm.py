@@ -37,6 +37,9 @@ class _LlmStoryDraft(BaseModel):
 
     what_changed: str
     probable_cause: str
+    # le=1.0 (not lt): this is the model's RAW draft, not a system output. A
+    # draft claiming 1.0 is accepted and clamped by min(confidence, 0.9) below
+    # — rejecting it here would trade a cheap cap for a full fallback.
     confidence: float = Field(ge=0.0, le=1.0)
     evidence: list[Evidence]
     repair_options: list[str]
@@ -126,7 +129,7 @@ def synthesize(
 
     if raw is None:
         try:
-            client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+            client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
             response = client.messages.create(
                 model=settings.anthropic_model,
                 max_tokens=1500,

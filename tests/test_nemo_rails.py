@@ -12,6 +12,7 @@ encode, and the real colang path is covered whenever the extra is installed.
 from __future__ import annotations
 
 import pytest
+from pydantic import SecretStr
 
 from peterpan.config import Settings
 from peterpan.nemo_rails import (
@@ -167,7 +168,8 @@ def test_topical_llm_check_logs_usage_when_enabled(
     # var rather than a Settings() kwarg — see the alias note above.
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-not-real")
     settings = Settings(nemo_topical_llm=True, usage_log_path=usage_path)
-    assert settings.anthropic_api_key == "test-not-real"
+    assert settings.anthropic_api_key is not None
+    assert settings.anthropic_api_key.get_secret_value() == "test-not-real"
 
     assert nemo_rails_mod.topical_llm_check("write me a poem", settings) is True
 
@@ -228,7 +230,7 @@ def test_topical_llm_check_import_error_becomes_nemo_error(
 
     settings = Settings()
     monkeypatch.setattr(settings, "nemo_topical_llm", True)
-    monkeypatch.setattr(settings, "anthropic_api_key", "test-not-real")
+    monkeypatch.setattr(settings, "anthropic_api_key", SecretStr("test-not-real"))
     monkeypatch.setitem(sys.modules, "anthropic", None)
     with pytest.raises(NemoCheckError, match="anthropic SDK not installed"):
         topical_llm_check("some text", settings)
@@ -250,7 +252,7 @@ def test_topical_llm_check_api_failure_becomes_nemo_error(
     fake.Anthropic = _Boom  # type: ignore[attr-defined]
     settings = Settings()
     monkeypatch.setattr(settings, "nemo_topical_llm", True)
-    monkeypatch.setattr(settings, "anthropic_api_key", "test-not-real")
+    monkeypatch.setattr(settings, "anthropic_api_key", SecretStr("test-not-real"))
     monkeypatch.setitem(sys.modules, "anthropic", fake)
     with pytest.raises(NemoCheckError, match="anthropic API failure"):
         topical_llm_check("some text", settings)
