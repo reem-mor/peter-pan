@@ -47,3 +47,25 @@ patterns/precedents ("as a past incident showed...") instead of stating
 their low relevance. v4 target: add "when citing evidence with confidence
 below 0.3, you must qualify it as weak/possibly unrelated - never present
 it as precedent."
+
+## v4 — weak-evidence qualification (`system-v4.txt`, current)
+Implements the v4 target: new principle — evidence items with confidence
+below 0.3 MUST be qualified as weak/possibly unrelated in the summary,
+"as a past incident showed" explicitly forbidden for them, and they may
+not raise overall confidence. (No `system-v3.txt` exists: v3 was the
+contract/code change above, prompt unchanged.)
+
+**Judge run (10 cases, full LLM pipeline): 8/10 grounded.** The v3 failure
+family is gone — zero weak-precedent refutations. The two remaining
+refutations are a *different* family, both overconfidence-shaped:
+- eval-03: availability impact stated as confirmed ("already confirmed by
+  the alert - overconfidence").
+- eval-07: inferential conclusion stated as fact ("pool is fully
+  saturated...") + predictor's incident_class narrated as an established
+  root cause + a precise confidence figure the judge deemed non-derivable.
+
+Note: single judge run, judge is nondeterministic — treat 8/10 as the
+recorded result, not a guarantee. v5 candidate target: separate "what the
+evidence shows" from "what we infer" (mark inferences as hypotheses), and
+mirror the honest-confidence rule with "never state impact as confirmed
+unless an evidence item states it."
