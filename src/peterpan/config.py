@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     env: Env = Field(default=Env.MIRAGE)
     service_name: str = Field(default="peter-pan")
     usage_log_path: str = Field(default="usage.jsonl")
+    # Operator feedback on agent output — the learning loop's raw material
+    # (see peterpan.feedback_store / peterpan.scoring). Same append-only
+    # JSONL pattern as usage_log_path.
+    feedback_log_path: str = Field(default="data/feedback.jsonl")
     # Mesh healthz targets for PETER PAN OS /os/services. Defaults match local
     # dev; in docker-compose set PP_MESH='{"predictor": "http://predictor:8001", ...}'.
     mesh: dict[str, str] = Field(
