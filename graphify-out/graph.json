@@ -802,8 +802,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "guardrails_config_actions_check_topical_llm_action",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "check_topical_llm_action()"
     },
     {
@@ -2136,8 +2136,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "src_peterpan_config_settings",
-      "community": 48,
-      "community_name": "tips",
+      "community": 80,
+      "community_name": "test_observability.py",
       "norm_label": "settings"
     },
     {
@@ -2147,8 +2147,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "basesettings",
-      "community": 48,
-      "community_name": "tips",
+      "community": 80,
+      "community_name": "test_observability.py",
       "norm_label": "basesettings"
     },
     {
@@ -2158,8 +2158,8 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "src_peterpan_config_settings_actions_allowed",
-      "community": 105,
-      "community_name": ".actions_allowed",
+      "community": 80,
+      "community_name": "test_observability.py",
       "norm_label": ".actions_allowed()"
     },
     {
@@ -2180,8 +2180,8 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "src_peterpan_config_rationale_141",
-      "community": 105,
-      "community_name": ".actions_allowed",
+      "community": 80,
+      "community_name": "test_observability.py",
       "norm_label": "mutating actions may only auto-execute outside production."
     },
     {
@@ -2202,8 +2202,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "src_peterpan_dashboard_dashboarderror",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 45,
+      "community_name": "IncidentStory",
       "norm_label": "dashboarderror"
     },
     {
@@ -2213,8 +2213,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_dashboard_py_exception",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 45,
+      "community_name": "IncidentStory",
       "norm_label": "exception"
     },
     {
@@ -2290,8 +2290,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "src_peterpan_dashboard_rationale_25",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 45,
+      "community_name": "IncidentStory",
       "norm_label": "any llm dashboard failure. callers fall back to the deterministic spec."
     },
     {
@@ -3258,8 +3258,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "nemo_rails.py"
     },
     {
@@ -3379,8 +3379,8 @@
       "source_location": "L233",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_scan_input",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "scan_input()"
     },
     {
@@ -3390,8 +3390,8 @@
       "source_location": "L245",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_scan_output",
-      "community": 48,
-      "community_name": "tips",
+      "community": 89,
+      "community_name": "os.ts",
       "norm_label": "scan_output()"
     },
     {
@@ -3401,8 +3401,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_1",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "nemo guardrails layer \u2014 additive screening behind the regex floor.  `peterpan.se"
     },
     {
@@ -3445,8 +3445,8 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_234",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "run the nemo input rails. returns flags (empty = nothing flagged).     raises ne"
     },
     {
@@ -3456,8 +3456,8 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_246",
-      "community": 48,
-      "community_name": "tips",
+      "community": 89,
+      "community_name": "os.ts",
       "norm_label": "run the nemo output rails against already-generated text. returns     flags (emp"
     },
     {
@@ -4402,8 +4402,8 @@
       "source_location": "L148",
       "_origin": "ast",
       "id": "src_peterpan_schemas_panel",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 45,
+      "community_name": "IncidentStory",
       "norm_label": "panel"
     },
     {
@@ -4501,8 +4501,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "src_peterpan_schemas_rationale_149",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 45,
+      "community_name": "IncidentStory",
       "norm_label": "one dashboard panel. `source` (when set) must cite real evidence \u2014     the dashb"
     },
     {
@@ -5213,7 +5213,7 @@
       "label": "healthz()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L44",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_healthz",
       "community": 12,
@@ -5224,29 +5224,29 @@
       "label": "usage_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L53",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_usage_route",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "usage_route()"
     },
     {
       "label": "usage_series_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L61",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_usage_series_route",
-      "community": 12,
-      "community_name": "Operations Console",
+      "community": 46,
+      "community_name": "test_ppos_dashboard.py",
       "norm_label": "usage_series_route()"
     },
     {
       "label": "budget_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L70",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_budget_route",
       "community": 12,
@@ -5257,18 +5257,18 @@
       "label": "tips_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L76",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_tips_route",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "tips_route()"
     },
     {
       "label": "agents_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L81",
+      "source_location": "L76",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_agents_route",
       "community": 12,
@@ -5279,7 +5279,7 @@
       "label": "info_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L87",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_info_route",
       "community": 12,
@@ -5290,7 +5290,7 @@
       "label": "_probe()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L104",
+      "source_location": "L99",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_probe",
       "community": 12,
@@ -5301,7 +5301,7 @@
       "label": "services_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L126",
+      "source_location": "L121",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_services_route",
       "community": 12,
@@ -5312,7 +5312,7 @@
       "label": "LeadRequest",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L153",
+      "source_location": "L148",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_leadrequest",
       "community": 12,
@@ -5334,7 +5334,7 @@
       "label": "_notify_lead_webhook()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L163",
+      "source_location": "L158",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_notify_lead_webhook",
       "community": 12,
@@ -5345,7 +5345,7 @@
       "label": "create_lead()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L181",
+      "source_location": "L176",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_create_lead",
       "community": 12,
@@ -5353,47 +5353,14 @@
       "norm_label": "create_lead()"
     },
     {
-      "label": "dashboard_route()",
-      "file_type": "code",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L196",
-      "_origin": "ast",
-      "id": "src_peterpan_services_ppos_dashboard_route",
-      "community": 98,
-      "community_name": "dashboard_route",
-      "norm_label": "dashboard_route()"
-    },
-    {
-      "label": "HTMLResponse",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "htmlresponse",
-      "community": 98,
-      "community_name": "dashboard_route",
-      "norm_label": "htmlresponse"
-    },
-    {
-      "label": "JSONResponse",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "src_peterpan_services_ppos_py_jsonresponse",
-      "community": 98,
-      "community_name": "dashboard_route",
-      "norm_label": "jsonresponse"
-    },
-    {
       "label": "feedback_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L214",
+      "source_location": "L198",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_feedback_route",
-      "community": 98,
-      "community_name": "dashboard_route",
+      "community": 12,
+      "community_name": "Operations Console",
       "norm_label": "feedback_route()"
     },
     {
@@ -5403,15 +5370,26 @@
       "source_location": "",
       "_origin": "ast",
       "id": "request",
-      "community": 98,
-      "community_name": "dashboard_route",
+      "community": 12,
+      "community_name": "Operations Console",
       "norm_label": "request"
+    },
+    {
+      "label": "JSONResponse",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "src_peterpan_services_ppos_py_jsonresponse",
+      "community": 12,
+      "community_name": "Operations Console",
+      "norm_label": "jsonresponse"
     },
     {
       "label": "feedback_summary_route()",
       "file_type": "code",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L256",
+      "source_location": "L240",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_feedback_summary_route",
       "community": 12,
@@ -5433,20 +5411,20 @@
       "label": "Bucketed cost/token time series \u2014 feeds the OS dashboard charts.",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L65",
+      "source_location": "L60",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_65",
-      "community": 12,
-      "community_name": "Operations Console",
+      "id": "src_peterpan_services_ppos_rationale_60",
+      "community": 46,
+      "community_name": "test_ppos_dashboard.py",
       "norm_label": "bucketed cost/token time series \u2014 feeds the os dashboard charts."
     },
     {
       "label": "Last-24h spend vs the PP_DAILY_BUDGET_USD budget. Report-only guard.",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L71",
+      "source_location": "L66",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_71",
+      "id": "src_peterpan_services_ppos_rationale_66",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "last-24h spend vs the pp_daily_budget_usd budget. report-only guard."
@@ -5455,9 +5433,9 @@
       "label": "Known agents this deployment runs. Extend as agents are added.",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L82",
+      "source_location": "L77",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_82",
+      "id": "src_peterpan_services_ppos_rationale_77",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "known agents this deployment runs. extend as agents are added."
@@ -5466,9 +5444,9 @@
       "label": "Deployment identity for the dashboard header \u2014 env, backends, budget.      Confi",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L88",
+      "source_location": "L83",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_88",
+      "id": "src_peterpan_services_ppos_rationale_83",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "deployment identity for the dashboard header \u2014 env, backends, budget.      confi"
@@ -5477,9 +5455,9 @@
       "label": "One healthz ping. Failures are data, not exceptions \u2014 the dashboard     renders",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L105",
+      "source_location": "L100",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_105",
+      "id": "src_peterpan_services_ppos_rationale_100",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "one healthz ping. failures are data, not exceptions \u2014 the dashboard     renders"
@@ -5488,9 +5466,9 @@
       "label": "Server-side health sweep of the mesh (browsers can't cross-origin poll it).",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L127",
+      "source_location": "L122",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_127",
+      "id": "src_peterpan_services_ppos_rationale_122",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "server-side health sweep of the mesh (browsers can't cross-origin poll it)."
@@ -5499,9 +5477,9 @@
       "label": "A demo request submitted from the landing page. Free-text fields are     visitor",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L154",
+      "source_location": "L149",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_154",
+      "id": "src_peterpan_services_ppos_rationale_149",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "a demo request submitted from the landing page. free-text fields are     visitor"
@@ -5510,9 +5488,9 @@
       "label": "Best-effort n8n notification, only when PP_N8N_LEAD_WEBHOOK is set.      The lea",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L164",
+      "source_location": "L159",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_164",
+      "id": "src_peterpan_services_ppos_rationale_159",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "best-effort n8n notification, only when pp_n8n_lead_webhook is set.      the lea"
@@ -5521,42 +5499,31 @@
       "label": "Store a landing-page demo request, then (optionally) notify n8n.",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L182",
+      "source_location": "L177",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_182",
+      "id": "src_peterpan_services_ppos_rationale_177",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "store a landing-page demo request, then (optionally) notify n8n."
     },
     {
-      "label": "Serve the self-contained monitoring dashboard.",
-      "file_type": "rationale",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L197",
-      "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_197",
-      "community": 98,
-      "community_name": "dashboard_route",
-      "norm_label": "serve the self-contained monitoring dashboard."
-    },
-    {
       "label": "Record one operator verdict on an agent output.      Reads the raw body first so",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L215",
+      "source_location": "L199",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_215",
-      "community": 98,
-      "community_name": "dashboard_route",
+      "id": "src_peterpan_services_ppos_rationale_199",
+      "community": 12,
+      "community_name": "Operations Console",
       "norm_label": "record one operator verdict on an agent output.      reads the raw body first so"
     },
     {
       "label": "Counts by verdict, a bounded tail of recent entries, and a deterministic     acc",
       "file_type": "rationale",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L260",
+      "source_location": "L244",
       "_origin": "ast",
-      "id": "src_peterpan_services_ppos_rationale_260",
+      "id": "src_peterpan_services_ppos_rationale_244",
       "community": 12,
       "community_name": "Operations Console",
       "norm_label": "counts by verdict, a bounded tail of recent entries, and a deterministic     acc"
@@ -5909,8 +5876,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_usage",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "usage.py"
     },
     {
@@ -5931,8 +5898,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "src_peterpan_usage_usageevent",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "usageevent"
     },
     {
@@ -5975,8 +5942,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "src_peterpan_usage_is_valid_row",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "_is_valid_row()"
     },
     {
@@ -5986,8 +5953,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "src_peterpan_usage_load_usage",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "load_usage()"
     },
     {
@@ -5997,8 +5964,8 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "src_peterpan_usage_window",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "window()"
     },
     {
@@ -6008,8 +5975,8 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "src_peterpan_usage_aggregate",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "aggregate()"
     },
     {
@@ -6041,8 +6008,8 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "src_peterpan_usage_tips",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "tips()"
     },
     {
@@ -6052,8 +6019,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_1",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "token/cost usage logging \u2014 the data source for peter pan os.  every llm call in"
     },
     {
@@ -6074,8 +6041,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_65",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "schema-valid json can still be a poisoned row: an unparsable/naive ts,     or no"
     },
     {
@@ -6085,8 +6052,8 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_110",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "events from the last n hours (none = everything)."
     },
     {
@@ -6096,8 +6063,8 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_118",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "cost and token totals grouped by agent/model/service \u2014 the os headline table."
     },
     {
@@ -6129,8 +6096,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_203",
-      "community": 0,
-      "community_name": "Budget Tracking",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "cheap heuristics that catch the common cost regressions early."
     },
     {
@@ -6893,15 +6860,15 @@
       "norm_label": "test_llm_off_returns_deterministic()"
     },
     {
-      "label": "test_llm_failure_falls_back()",
+      "label": "test_llm_spec_api_failure_raises_dashboard_error()",
       "file_type": "code",
       "source_file": "tests/test_dashboard.py",
       "source_location": "L44",
       "_origin": "ast",
-      "id": "tests_test_dashboard_test_llm_failure_falls_back",
+      "id": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
       "community": 45,
       "community_name": "IncidentStory",
-      "norm_label": "test_llm_failure_falls_back()"
+      "norm_label": "test_llm_spec_api_failure_raises_dashboard_error()"
     },
     {
       "label": "MonkeyPatch",
@@ -6915,10 +6882,21 @@
       "norm_label": "monkeypatch"
     },
     {
+      "label": "test_llm_failure_falls_back()",
+      "file_type": "code",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L68",
+      "_origin": "ast",
+      "id": "tests_test_dashboard_test_llm_failure_falls_back",
+      "community": 45,
+      "community_name": "IncidentStory",
+      "norm_label": "test_llm_failure_falls_back()"
+    },
+    {
       "label": "test_dashboard_endpoint()",
       "file_type": "code",
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L57",
+      "source_location": "L81",
       "_origin": "ast",
       "id": "tests_test_dashboard_test_dashboard_endpoint",
       "community": 45,
@@ -6935,6 +6913,17 @@
       "community": 45,
       "community_name": "IncidentStory",
       "norm_label": "dashboard generator: fallback determinism, allowlist guard, endpoint."
+    },
+    {
+      "label": "_llm_spec unwraps the SecretStr key for the SDK and wraps any API     failure in",
+      "file_type": "rationale",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "tests_test_dashboard_rationale_45",
+      "community": 45,
+      "community_name": "IncidentStory",
+      "norm_label": "_llm_spec unwraps the secretstr key for the sdk and wraps any api     failure in"
     },
     {
       "label": "test_edge_cases.py",
@@ -7713,8 +7702,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "tests_test_guardrails_test_endpoints",
-      "community": 3,
-      "community_name": "Predictor Training",
+      "community": 6,
+      "community_name": "Input/Output Guardrails",
       "norm_label": "test_endpoints()"
     },
     {
@@ -8967,8 +8956,8 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_input_blocks_prompt_injection",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_input_blocks_prompt_injection()"
     },
     {
@@ -8978,8 +8967,8 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_input_passes_benign_alert",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_input_passes_benign_alert()"
     },
     {
@@ -8989,8 +8978,8 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_output_blocks_fabricated_citation",
-      "community": 48,
-      "community_name": "tips",
+      "community": 89,
+      "community_name": "os.ts",
       "norm_label": "test_scan_output_blocks_fabricated_citation()"
     },
     {
@@ -9000,8 +8989,8 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_output_passes_honest_report",
-      "community": 48,
-      "community_name": "tips",
+      "community": 89,
+      "community_name": "os.ts",
       "norm_label": "test_scan_output_passes_honest_report()"
     },
     {
@@ -9786,10 +9775,21 @@
       "norm_label": "test_query_requires_keys()"
     },
     {
+      "label": "test_client_factories_unwrap_secret_keys()",
+      "file_type": "code",
+      "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L352",
+      "_origin": "ast",
+      "id": "tests_test_pinecone_store_test_client_factories_unwrap_secret_keys",
+      "community": 42,
+      "community_name": "StrEnum",
+      "norm_label": "test_client_factories_unwrap_secret_keys()"
+    },
+    {
       "label": "test_memory_upsert_routes_to_memory_namespace_with_fed_at()",
       "file_type": "code",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L355",
+      "source_location": "L387",
       "_origin": "ast",
       "id": "tests_test_pinecone_store_test_memory_upsert_routes_to_memory_namespace_with_fed_at",
       "community": 42,
@@ -9828,6 +9828,17 @@
       "community": 42,
       "community_name": "StrEnum",
       "norm_label": "records upserts keyed by (namespace, id) so re-upsert overwrites \u2014     exactly t"
+    },
+    {
+      "label": "SecretStr unwraps exactly at the client-construction boundary \u2014     the SDK rece",
+      "file_type": "rationale",
+      "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L353",
+      "_origin": "ast",
+      "id": "tests_test_pinecone_store_rationale_353",
+      "community": 42,
+      "community_name": "StrEnum",
+      "norm_label": "secretstr unwraps exactly at the client-construction boundary \u2014     the sdk rece"
     },
     {
       "label": "test_ppos_budget.py",
@@ -9902,8 +9913,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_test_aggregate_rejects_unknown_grouping",
-      "community": 44,
-      "community_name": "test_ppos_budget.py",
+      "community": 86,
+      "community_name": "TokenUsage.tsx",
       "norm_label": "test_aggregate_rejects_unknown_grouping()"
     },
     {
@@ -9968,8 +9979,8 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_test_usage_endpoint_supports_window_and_grouping",
-      "community": 104,
-      "community_name": "test_budget_endpoint",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "test_usage_endpoint_supports_window_and_grouping()"
     },
     {
@@ -9979,8 +9990,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_py_path",
-      "community": 104,
-      "community_name": "test_budget_endpoint",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "path"
     },
     {
@@ -9990,8 +10001,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_py_monkeypatch",
-      "community": 104,
-      "community_name": "test_budget_endpoint",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "monkeypatch"
     },
     {
@@ -10001,8 +10012,8 @@
       "source_location": "L121",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_test_budget_endpoint",
-      "community": 104,
-      "community_name": "test_budget_endpoint",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "test_budget_endpoint()"
     },
     {
@@ -10031,7 +10042,7 @@
       "label": "event_at()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L14",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_event_at",
       "community": 46,
@@ -10053,7 +10064,7 @@
       "label": "test_timeseries_buckets_events_and_keeps_empty_buckets()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L29",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_timeseries_buckets_events_and_keeps_empty_buckets",
       "community": 46,
@@ -10064,7 +10075,7 @@
       "label": "test_timeseries_excludes_events_outside_window()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L42",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_timeseries_excludes_events_outside_window",
       "community": 46,
@@ -10075,7 +10086,7 @@
       "label": "test_timeseries_empty_events_yields_zero_buckets()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L49",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_timeseries_empty_events_yields_zero_buckets",
       "community": 46,
@@ -10086,7 +10097,7 @@
       "label": "test_timeseries_rejects_nonpositive_args()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L56",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_timeseries_rejects_nonpositive_args",
       "community": 46,
@@ -10097,7 +10108,7 @@
       "label": "test_series_endpoint()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L66",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_series_endpoint",
       "community": 46,
@@ -10130,7 +10141,7 @@
       "label": "test_services_endpoint_reports_down_without_raising()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L84",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "tests_test_ppos_dashboard_test_services_endpoint_reports_down_without_raising",
       "community": 46,
@@ -10138,29 +10149,18 @@
       "norm_label": "test_services_endpoint_reports_down_without_raising()"
     },
     {
-      "label": "test_dashboard_endpoint_serves_html()",
+      "label": "test_dashboard_route_is_retired()",
       "file_type": "code",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L103",
+      "source_location": "L107",
       "_origin": "ast",
-      "id": "tests_test_ppos_dashboard_test_dashboard_endpoint_serves_html",
+      "id": "tests_test_ppos_dashboard_test_dashboard_route_is_retired",
       "community": 46,
       "community_name": "test_ppos_dashboard.py",
-      "norm_label": "test_dashboard_endpoint_serves_html()"
+      "norm_label": "test_dashboard_route_is_retired()"
     },
     {
-      "label": "test_dashboard_endpoint_404_when_file_missing()",
-      "file_type": "code",
-      "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L113",
-      "_origin": "ast",
-      "id": "tests_test_ppos_dashboard_test_dashboard_endpoint_404_when_file_missing",
-      "community": 46,
-      "community_name": "test_ppos_dashboard.py",
-      "norm_label": "test_dashboard_endpoint_404_when_file_missing()"
-    },
-    {
-      "label": "PETER PAN OS dashboard feeds: time series, mesh health sweep, dashboard page.",
+      "label": "PETER PAN OS dashboard feeds: time series and mesh health sweep.  (The legacy se",
       "file_type": "rationale",
       "source_file": "tests/test_ppos_dashboard.py",
       "source_location": "L1",
@@ -10168,7 +10168,18 @@
       "id": "tests_test_ppos_dashboard_rationale_1",
       "community": 46,
       "community_name": "test_ppos_dashboard.py",
-      "norm_label": "peter pan os dashboard feeds: time series, mesh health sweep, dashboard page."
+      "norm_label": "peter pan os dashboard feeds: time series and mesh health sweep.  (the legacy se"
+    },
+    {
+      "label": "/os/dashboard must stay gone \u2014 the operator console is web/agent-os.",
+      "file_type": "rationale",
+      "source_file": "tests/test_ppos_dashboard.py",
+      "source_location": "L108",
+      "_origin": "ast",
+      "id": "tests_test_ppos_dashboard_rationale_108",
+      "community": 46,
+      "community_name": "test_ppos_dashboard.py",
+      "norm_label": "/os/dashboard must stay gone \u2014 the operator console is web/agent-os."
     },
     {
       "label": "test_ppos_leads.py",
@@ -11332,8 +11343,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_healthstrip",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "healthstrip.tsx"
     },
     {
@@ -11343,8 +11354,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "web_agent_os_src_components_healthstrip_loadservices",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "loadservices()"
     },
     {
@@ -11354,8 +11365,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "web_agent_os_src_components_healthstrip_servicedot",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "servicedot()"
     },
     {
@@ -11365,8 +11376,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "web_agent_os_src_components_healthstrip_healthstrip",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "healthstrip()"
     },
     {
@@ -11398,8 +11409,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_panel",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "panel.tsx"
     },
     {
@@ -11409,8 +11420,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "web_agent_os_src_components_panel_panel",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "panel()"
     },
     {
@@ -11420,8 +11431,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "pill.tsx"
     },
     {
@@ -11431,8 +11442,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_severity_style",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "severity_style"
     },
     {
@@ -11453,8 +11464,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_status_style",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "status_style"
     },
     {
@@ -11464,8 +11475,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_statuspill",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "statuspill()"
     },
     {
@@ -11475,8 +11486,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_budget_style",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "budget_style"
     },
     {
@@ -11486,8 +11497,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_budgetpill",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "budgetpill()"
     },
     {
@@ -11497,8 +11508,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "web_agent_os_src_components_pill_sourcebadge",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "sourcebadge()"
     },
     {
@@ -11508,8 +11519,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_areachart",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "areachart.tsx"
     },
     {
@@ -11519,8 +11530,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_areachart_areachart",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "areachart()"
     },
     {
@@ -11530,8 +11541,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_barlist",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "barlist.tsx"
     },
     {
@@ -11541,8 +11552,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_barlist_barlist",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "barlist()"
     },
     {
@@ -11552,8 +11563,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_donut",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "donut.tsx"
     },
     {
@@ -11563,8 +11574,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_donut_palette",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "palette"
     },
     {
@@ -11574,8 +11585,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "web_agent_os_src_components_charts_donut_donut",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "donut()"
     },
     {
@@ -11618,8 +11629,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_health",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "health.ts"
     },
     {
@@ -11629,8 +11640,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_health_fixture_services",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_services"
     },
     {
@@ -11640,8 +11651,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_health_evalscore",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "evalscore"
     },
     {
@@ -11651,8 +11662,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_health_fixture_eval_scores",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_eval_scores"
     },
     {
@@ -11662,8 +11673,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "incidents.ts"
     },
     {
@@ -11673,8 +11684,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents_incidentstatus",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "incidentstatus"
     },
     {
@@ -11684,8 +11695,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents_incidentsummary",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 99,
+      "community_name": "ServiceDetailPanel.tsx",
       "norm_label": "incidentsummary"
     },
     {
@@ -11695,8 +11706,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents_fixture_incidents",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_incidents"
     },
     {
@@ -11706,8 +11717,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_oncall",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "oncall.ts"
     },
     {
@@ -11717,8 +11728,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_oncall_escalationstep",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "escalationstep"
     },
     {
@@ -11728,8 +11739,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_oncall_serviceowner",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "serviceowner"
     },
     {
@@ -11739,8 +11750,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_oncall_fixture_escalation",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_escalation"
     },
     {
@@ -11750,8 +11761,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_oncall_fixture_owners",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_owners"
     },
     {
@@ -11794,8 +11805,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "usage.ts"
     },
     {
@@ -11805,8 +11816,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixture_by_agent",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_by_agent"
     },
     {
@@ -11816,8 +11827,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixture_by_model",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_by_model"
     },
     {
@@ -11827,8 +11838,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixture_by_service",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_by_service"
     },
     {
@@ -11838,8 +11849,8 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixtureseries",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixtureseries()"
     },
     {
@@ -11849,8 +11860,8 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixture_budget",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_budget"
     },
     {
@@ -11860,8 +11871,8 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_usage_fixture_tips",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fixture_tips"
     },
     {
@@ -11871,8 +11882,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_hooks_uselivedata",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "uselivedata.ts"
     },
     {
@@ -11882,8 +11893,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "web_agent_os_src_hooks_uselivedata_livedata",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "livedata"
     },
     {
@@ -11893,8 +11904,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "web_agent_os_src_hooks_uselivedata_uselivedata",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "uselivedata()"
     },
     {
@@ -11904,8 +11915,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_anomaly",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "anomaly.ts"
     },
     {
@@ -11915,8 +11926,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_anomaly_anomaly",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "anomaly"
     },
     {
@@ -11926,8 +11937,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_anomaly_detectanomalies",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "detectanomalies()"
     },
     {
@@ -11937,8 +11948,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_api",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "api.ts"
     },
     {
@@ -11948,8 +11959,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_api_getjson",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "getjson()"
     },
     {
@@ -11959,8 +11970,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_format",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "format.ts"
     },
     {
@@ -11970,8 +11981,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_format_fmtint",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fmtint()"
     },
     {
@@ -11981,8 +11992,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_format_fmttok",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fmttok()"
     },
     {
@@ -11992,8 +12003,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_format_fmtusd",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fmtusd()"
     },
     {
@@ -12003,8 +12014,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_format_fmttime",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fmttime()"
     },
     {
@@ -12025,8 +12036,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "os.ts"
     },
     {
@@ -12036,8 +12047,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_usagerow",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "usagerow"
     },
     {
@@ -12047,8 +12058,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_usageaggregate",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "usageaggregate"
     },
     {
@@ -12058,8 +12069,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_seriespoint",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "seriespoint"
     },
     {
@@ -12069,8 +12080,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_usageseries",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "usageseries"
     },
     {
@@ -12080,8 +12091,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_budgetstate",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "budgetstate"
     },
     {
@@ -12091,8 +12102,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_budgetstatus",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "budgetstatus"
     },
     {
@@ -12102,8 +12113,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_servicehealth",
-      "community": 91,
-      "community_name": "HealthStrip.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "servicehealth"
     },
     {
@@ -12113,8 +12124,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_fetchusage",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fetchusage()"
     },
     {
@@ -12124,8 +12135,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_fetchseries",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fetchseries()"
     },
     {
@@ -12135,8 +12146,8 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_fetchbudget",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fetchbudget()"
     },
     {
@@ -12146,8 +12157,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_fetchtips",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fetchtips()"
     },
     {
@@ -12157,8 +12168,8 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "web_agent_os_src_lib_os_fetchservices",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "fetchservices()"
     },
     {
@@ -12201,8 +12212,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_incidents",
-      "community": 90,
-      "community_name": "Pill.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "incidents.tsx"
     },
     {
@@ -12223,8 +12234,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_oncall",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "oncall.tsx"
     },
     {
@@ -12234,8 +12245,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_oncall_oncall",
-      "community": 95,
-      "community_name": "OnCall.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "oncall()"
     },
     {
@@ -12300,8 +12311,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "tokenusage.tsx"
     },
     {
@@ -12311,8 +12322,8 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_windows",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "windows"
     },
     {
@@ -12322,8 +12333,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_tokenusagedata",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "tokenusagedata"
     },
     {
@@ -12333,8 +12344,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_makeloader",
-      "community": 89,
-      "community_name": "os.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "makeloader()"
     },
     {
@@ -12344,8 +12355,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_makefixture",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "makefixture()"
     },
     {
@@ -12355,8 +12366,8 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_totals",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "totals()"
     },
     {
@@ -12366,8 +12377,8 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_kpi",
-      "community": 86,
-      "community_name": "TokenUsage.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "kpi()"
     },
     {
@@ -12377,8 +12388,8 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "web_agent_os_src_pages_tokenusage_tokenusage",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "tokenusage()"
     },
     {
@@ -13114,8 +13125,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_app",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "app.tsx"
     },
     {
@@ -13125,8 +13136,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "web_demo_src_app_modebadge",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "modebadge()"
     },
     {
@@ -13136,8 +13147,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "web_demo_src_app_app",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "app()"
     },
     {
@@ -13169,8 +13180,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "web_demo_src_components_evidencepanel_evidencepanel",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "evidencepanel()"
     },
     {
@@ -13268,8 +13279,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "reasoningpanel.tsx"
     },
     {
@@ -13279,8 +13290,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel_steprow",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "steprow()"
     },
     {
@@ -13290,8 +13301,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel_reasoningpanel",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "reasoningpanel()"
     },
     {
@@ -13334,8 +13345,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "web_demo_src_components_storypanel_storypanel",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "storypanel()"
     },
     {
@@ -13675,8 +13686,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "web_demo_src_lib_stream_useagentstream",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "useagentstream()"
     },
     {
@@ -13686,8 +13697,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_main",
-      "community": 100,
-      "community_name": "App.tsx",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "main.tsx"
     },
     {
@@ -15190,7 +15201,7 @@
       "label": "Repo-level assertions (`tests/test_n8n_contracts.py`)",
       "file_type": "document",
       "source_file": "n8n/COVERAGE.md",
-      "source_location": "L61",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "n8n_coverage_repo_level_assertions_tests_test_n8n_contracts_py",
       "community": 97,
@@ -20753,7 +20764,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L52",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_llm_failure_falls_back",
@@ -20769,6 +20780,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_llm_off_returns_deterministic",
+      "target": "src_peterpan_config_settings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
       "target": "src_peterpan_config_settings"
     },
     {
@@ -21195,7 +21218,7 @@
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L340",
+      "source_location": "L360",
       "weight": 0.8,
       "_origin": "ast",
       "source": "tests_test_pinecone_store_embeddings",
@@ -21206,7 +21229,7 @@
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L340",
+      "source_location": "L360",
       "weight": 0.8,
       "_origin": "ast",
       "source": "tests_test_pinecone_store_fakeindex",
@@ -21217,12 +21240,24 @@
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L340",
+      "source_location": "L360",
       "weight": 0.8,
       "_origin": "ast",
       "source": "tests_test_pinecone_store_fakevoyage",
       "target": "src_peterpan_config_settings",
       "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L375",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_pinecone_store_test_client_factories_unwrap_secret_keys",
+      "target": "src_peterpan_config_settings"
     },
     {
       "relation": "calls",
@@ -21453,6 +21488,18 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
+      "target": "src_peterpan_dashboard_dashboarderror"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -21612,7 +21659,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L51",
+      "source_location": "L75",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_llm_failure_falls_back",
@@ -28995,7 +29042,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L81",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29006,7 +29053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L70",
+      "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29017,7 +29064,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L181",
+      "source_location": "L176",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29028,18 +29075,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L196",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_peterpan_services_ppos",
-      "target": "src_peterpan_services_ppos_dashboard_route",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L214",
+      "source_location": "L198",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29050,7 +29086,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L256",
+      "source_location": "L240",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29061,7 +29097,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L44",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29072,7 +29108,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L87",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29083,7 +29119,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L153",
+      "source_location": "L148",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29094,7 +29130,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L163",
+      "source_location": "L158",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29105,7 +29141,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L104",
+      "source_location": "L99",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29116,7 +29152,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L126",
+      "source_location": "L121",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29127,7 +29163,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L76",
+      "source_location": "L71",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29138,7 +29174,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L53",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29149,7 +29185,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L61",
+      "source_location": "L56",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos",
@@ -29173,7 +29209,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L57",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_usage_route",
@@ -29185,7 +29221,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L57",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_usage_route",
@@ -29197,7 +29233,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L57",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_usage_route",
@@ -29207,10 +29243,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L65",
+      "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_65",
+      "source": "src_peterpan_services_ppos_rationale_60",
       "target": "src_peterpan_services_ppos_usage_series_route",
       "confidence_score": 1.0
     },
@@ -29220,7 +29256,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L66",
+      "source_location": "L61",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_usage_series_route",
@@ -29232,7 +29268,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L66",
+      "source_location": "L61",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_usage_series_route",
@@ -29244,7 +29280,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L72",
+      "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_budget_route",
@@ -29256,7 +29292,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L72",
+      "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_budget_route",
@@ -29266,10 +29302,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L71",
+      "source_location": "L66",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_71",
+      "source": "src_peterpan_services_ppos_rationale_66",
       "target": "src_peterpan_services_ppos_budget_route",
       "confidence_score": 1.0
     },
@@ -29279,7 +29315,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L77",
+      "source_location": "L72",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_tips_route",
@@ -29291,7 +29327,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L77",
+      "source_location": "L72",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_tips_route",
@@ -29301,10 +29337,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L82",
+      "source_location": "L77",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_82",
+      "source": "src_peterpan_services_ppos_rationale_77",
       "target": "src_peterpan_services_ppos_agents_route",
       "confidence_score": 1.0
     },
@@ -29312,10 +29348,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L88",
+      "source_location": "L83",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_88",
+      "source": "src_peterpan_services_ppos_rationale_83",
       "target": "src_peterpan_services_ppos_info_route",
       "confidence_score": 1.0
     },
@@ -29323,10 +29359,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L105",
+      "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_105",
+      "source": "src_peterpan_services_ppos_rationale_100",
       "target": "src_peterpan_services_ppos_probe",
       "confidence_score": 1.0
     },
@@ -29335,7 +29371,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L137",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_services_route",
@@ -29346,10 +29382,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L127",
+      "source_location": "L122",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_127",
+      "source": "src_peterpan_services_ppos_rationale_122",
       "target": "src_peterpan_services_ppos_services_route",
       "confidence_score": 1.0
     },
@@ -29358,7 +29394,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L181",
+      "source_location": "L176",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_create_lead",
@@ -29369,7 +29405,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L153",
+      "source_location": "L148",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_leadrequest",
@@ -29380,10 +29416,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L154",
+      "source_location": "L149",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_154",
+      "source": "src_peterpan_services_ppos_rationale_149",
       "target": "src_peterpan_services_ppos_leadrequest",
       "confidence_score": 1.0
     },
@@ -29392,7 +29428,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L191",
+      "source_location": "L186",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_create_lead",
@@ -29403,10 +29439,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L164",
+      "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_164",
+      "source": "src_peterpan_services_ppos_rationale_159",
       "target": "src_peterpan_services_ppos_notify_lead_webhook",
       "confidence_score": 1.0
     },
@@ -29414,58 +29450,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L182",
+      "source_location": "L177",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_182",
+      "source": "src_peterpan_services_ppos_rationale_177",
       "target": "src_peterpan_services_ppos_create_lead",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L196",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_peterpan_services_ppos_dashboard_route",
-      "target": "htmlresponse",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L196",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_peterpan_services_ppos_dashboard_route",
-      "target": "src_peterpan_services_ppos_py_jsonresponse",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L197",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_197",
-      "target": "src_peterpan_services_ppos_dashboard_route",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L214",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_peterpan_services_ppos_feedback_route",
-      "target": "src_peterpan_services_ppos_py_jsonresponse",
       "confidence_score": 1.0
     },
     {
@@ -29473,7 +29462,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L214",
+      "source_location": "L198",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_services_ppos_feedback_route",
@@ -29481,13 +29470,25 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/peterpan/services/ppos.py",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_peterpan_services_ppos_feedback_route",
+      "target": "src_peterpan_services_ppos_py_jsonresponse",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L215",
+      "source_location": "L199",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_215",
+      "source": "src_peterpan_services_ppos_rationale_199",
       "target": "src_peterpan_services_ppos_feedback_route",
       "confidence_score": 1.0
     },
@@ -29495,10 +29496,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/services/ppos.py",
-      "source_location": "L260",
+      "source_location": "L244",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_services_ppos_rationale_260",
+      "source": "src_peterpan_services_ppos_rationale_244",
       "target": "src_peterpan_services_ppos_feedback_summary_route",
       "confidence_score": 1.0
     },
@@ -30467,7 +30468,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L11",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -30634,7 +30635,7 @@
       "context": "return_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_event_at",
@@ -30695,7 +30696,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L70",
+      "source_location": "L74",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_series_endpoint",
@@ -30803,7 +30804,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L70",
+      "source_location": "L74",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_series_endpoint",
@@ -31087,7 +31088,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L32",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_buckets_events_and_keeps_empty_buckets",
@@ -31099,7 +31100,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L50",
+      "source_location": "L54",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_empty_events_yields_zero_buckets",
@@ -31111,7 +31112,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L45",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_excludes_events_outside_window",
@@ -31123,7 +31124,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L58",
+      "source_location": "L62",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_rejects_nonpositive_args",
@@ -32144,7 +32145,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L57",
+      "source_location": "L81",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard",
@@ -32166,7 +32167,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L44",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard",
@@ -32182,6 +32183,17 @@
       "_origin": "ast",
       "source": "tests_test_dashboard",
       "target": "tests_test_dashboard_test_llm_off_returns_deterministic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard",
+      "target": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
       "confidence_score": 1.0
     },
     {
@@ -32212,7 +32224,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L52",
+      "source_location": "L76",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_llm_failure_falls_back",
@@ -32232,11 +32244,46 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
+      "target": "tests_test_dashboard_make_story",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard_rationale_45",
+      "target": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_dashboard.py",
       "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_dashboard_test_llm_spec_api_failure_raises_dashboard_error",
+      "target": "tests_test_dashboard_py_monkeypatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_dashboard.py",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_llm_failure_falls_back",
@@ -32249,7 +32296,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_dashboard.py",
-      "source_location": "L58",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_dashboard_test_dashboard_endpoint",
@@ -33103,10 +33150,10 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L119",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_test_ppos_dashboard_test_dashboard_endpoint_404_when_file_missing",
+      "source": "tests_test_ppos_dashboard_test_dashboard_route_is_retired",
       "target": "testclient"
     },
     {
@@ -33115,19 +33162,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L106",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_ppos_dashboard_test_dashboard_endpoint_serves_html",
-      "target": "testclient"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L73",
+      "source_location": "L77",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_series_endpoint",
@@ -33139,7 +33174,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L96",
+      "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_services_endpoint_reports_down_without_raising",
@@ -36587,6 +36622,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L352",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_pinecone_store",
+      "target": "tests_test_pinecone_store_test_client_factories_unwrap_secret_keys",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_pinecone_store.py",
       "source_location": "L239",
       "weight": 1.0,
       "_origin": "ast",
@@ -36642,7 +36688,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L355",
+      "source_location": "L387",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_pinecone_store",
@@ -37317,7 +37363,19 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_pinecone_store.py",
-      "source_location": "L355",
+      "source_location": "L352",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_pinecone_store_test_client_factories_unwrap_secret_keys",
+      "target": "tests_test_pinecone_store_py_monkeypatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L387",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_pinecone_store_test_memory_upsert_routes_to_memory_namespace_with_fed_at",
@@ -37346,6 +37404,17 @@
       "_origin": "ast",
       "source": "tests_test_pinecone_store_test_query_requires_keys",
       "target": "tests_test_pinecone_store_py_monkeypatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_pinecone_store.py",
+      "source_location": "L353",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_pinecone_store_rationale_353",
+      "target": "tests_test_pinecone_store_test_client_factories_unwrap_secret_keys",
       "confidence_score": 1.0
     },
     {
@@ -37651,7 +37720,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37663,7 +37732,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L5",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37674,29 +37743,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L113",
+      "source_location": "L107",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
-      "target": "tests_test_ppos_dashboard_test_dashboard_endpoint_404_when_file_missing",
+      "target": "tests_test_ppos_dashboard_test_dashboard_route_is_retired",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L103",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_ppos_dashboard",
-      "target": "tests_test_ppos_dashboard_test_dashboard_endpoint_serves_html",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L66",
+      "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37707,7 +37765,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L84",
+      "source_location": "L88",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37718,7 +37776,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L29",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37729,7 +37787,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L49",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37740,7 +37798,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L42",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37751,7 +37809,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L56",
+      "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard",
@@ -37774,7 +37832,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_event_at",
@@ -37786,7 +37844,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L31",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_buckets_events_and_keeps_empty_buckets",
@@ -37798,7 +37856,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L44",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_timeseries_excludes_events_outside_window",
@@ -37810,7 +37868,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L66",
+      "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_series_endpoint",
@@ -37822,7 +37880,7 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L66",
+      "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_series_endpoint",
@@ -37834,35 +37892,22 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L113",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_ppos_dashboard_test_dashboard_endpoint_404_when_file_missing",
-      "target": "tests_test_ppos_dashboard_py_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L113",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "tests_test_ppos_dashboard_test_dashboard_endpoint_404_when_file_missing",
-      "target": "tests_test_ppos_dashboard_py_monkeypatch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "context": "parameter_type",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_ppos_dashboard.py",
-      "source_location": "L84",
+      "source_location": "L88",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_ppos_dashboard_test_services_endpoint_reports_down_without_raising",
       "target": "tests_test_ppos_dashboard_py_monkeypatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_ppos_dashboard.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_ppos_dashboard_rationale_108",
+      "target": "tests_test_ppos_dashboard_test_dashboard_route_is_retired",
       "confidence_score": 1.0
     },
     {
@@ -45169,7 +45214,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "n8n/COVERAGE.md",
-      "source_location": "L61",
+      "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
       "source": "n8n_coverage_n8n_endpoint_coverage_mesh_contract_map",
@@ -45641,5 +45686,5 @@
       "source_file": "prompts/incident-agent/LOG.md"
     }
   ],
-  "built_at_commit": "d4752d5e962093b634aa2093f343109c0821f31a"
+  "built_at_commit": "30e8d5c90d05e27aaff012e660ccd75b41491ce6"
 }

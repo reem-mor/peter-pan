@@ -1,4 +1,8 @@
-"""PETER PAN OS dashboard feeds: time series, mesh health sweep, dashboard page."""
+"""PETER PAN OS dashboard feeds: time series and mesh health sweep.
+
+(The legacy self-contained HTML page at /os/dashboard is retired — the
+canonical operator console is the React app in web/agent-os.)
+"""
 
 from __future__ import annotations
 
@@ -100,23 +104,9 @@ def test_services_endpoint_reports_down_without_raising(
     assert body["services"][0]["latency_ms"] >= 0
 
 
-def test_dashboard_endpoint_serves_html() -> None:
+def test_dashboard_route_is_retired() -> None:
+    """/os/dashboard must stay gone — the operator console is web/agent-os."""
     from peterpan.services import ppos
 
     client = TestClient(ppos.app)
-    resp = client.get("/os/dashboard")
-    assert resp.status_code == 200
-    assert "text/html" in resp.headers["content-type"]
-    assert "PETER PAN OS" in resp.text
-
-
-def test_dashboard_endpoint_404_when_file_missing(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from peterpan.services import ppos
-
-    monkeypatch.setattr(ppos, "DASHBOARD_PATH", tmp_path / "missing.html")
-    client = TestClient(ppos.app)
-    resp = client.get("/os/dashboard")
-    assert resp.status_code == 404
-    assert "not found" in resp.json()["error"]
+    assert client.get("/os/dashboard").status_code == 404

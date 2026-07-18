@@ -19,7 +19,7 @@ from typing import Literal
 
 import httpx
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ValidationError
 
 from peterpan import feedback_store, scoring
@@ -31,11 +31,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="peter-pan-os")
 settings = Settings()
-
-# Self-contained dashboard page, kept next to the Streamlit UI. Resolved
-# relative to CWD like `usage_log_path`, so it works from the repo root and
-# inside the container image.
-DASHBOARD_PATH = Path("ui/os_dashboard.html")
 
 _HEALTH_TIMEOUT_S = 1.5
 
@@ -190,17 +185,6 @@ def create_lead(lead: LeadRequest) -> dict[str, str]:
         f.write(json.dumps(record) + "\n")
     _notify_lead_webhook(record)
     return {"status": "stored", "id": str(record["id"])}
-
-
-@app.get("/os/dashboard", response_model=None)
-def dashboard_route() -> HTMLResponse | JSONResponse:
-    """Serve the self-contained monitoring dashboard."""
-    if not DASHBOARD_PATH.exists():
-        return JSONResponse(
-            status_code=404,
-            content={"error": f"dashboard file not found at {DASHBOARD_PATH}"},
-        )
-    return HTMLResponse(DASHBOARD_PATH.read_text(encoding="utf-8"))
 
 
 # --- feedback: closing the learning loop -------------------------------------

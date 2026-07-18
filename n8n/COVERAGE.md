@@ -56,7 +56,6 @@ Flows: **Triage** = `workflows/peter-pan-triage.json` ·
 | `GET /os/tips` | — not covered (deliberate) | Same family. Covered by `tests/test_ppos_usage.py`. |
 | `GET /os/agents` | — not covered (deliberate) | Static roster. Covered by `tests/test_ppos_usage.py`. |
 | `GET /os/services` | — not covered (deliberate) | Server-side health sweep — the Mesh flow *is* the n8n-side equivalent; probing the prober adds no signal. |
-| `GET /os/dashboard` | — not covered (deliberate) | HTML page for humans, not a JSON contract. Covered by `tests/test_ppos_dashboard.py`. |
 
 ## Repo-level assertions (`tests/test_n8n_contracts.py`)
 
