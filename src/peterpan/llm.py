@@ -20,13 +20,9 @@ from pydantic import BaseModel, Field, ValidationError
 
 from peterpan.config import Settings
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
-from peterpan.usage import log_usage, make_event
+from peterpan.usage import log_usage, make_event, model_rates
 
 _PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v6.txt"
-
-# Rough per-token USD for cost metering; override via PP OS config later.
-_COST_PER_INPUT_TOKEN = 3e-06
-_COST_PER_OUTPUT_TOKEN = 1.5e-05
 
 
 class LlmSynthesisError(Exception):
@@ -134,8 +130,8 @@ def synthesize(
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             cost_usd=round(
-                response.usage.input_tokens * _COST_PER_INPUT_TOKEN
-                + response.usage.output_tokens * _COST_PER_OUTPUT_TOKEN,
+                response.usage.input_tokens * model_rates(settings.anthropic_model)[0]
+                + response.usage.output_tokens * model_rates(settings.anthropic_model)[1],
                 6,
             ),
         ),

@@ -27,3 +27,26 @@ jobs:
         run: pytest -q
       - name: Compose config check
         run: docker compose config --quiet
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose build
+      - name: Boot ppos (and its mesh deps) and wait for healthy
+        run: |
+          docker compose up -d
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8005/healthz; then
+              echo "ppos is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "ppos never became healthy" >&2
+          docker compose logs
+          exit 1
+      - name: Compose down
+        if: always()
+        run: docker compose down -v

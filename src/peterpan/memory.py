@@ -15,7 +15,9 @@ evidence with a citation. Deterministic gates, enforced in the schema:
 
 from __future__ import annotations
 
+import os
 import re
+import tempfile
 from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator
@@ -39,6 +41,15 @@ KNOWN_CLASSES = frozenset(
 
 _ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
+# Windows-reserved device basenames: an id like "CON"/"NUL"/"COM1" (even with
+# a .md extension) OSErrors at write time. Rejected at parse, same path as
+# traversal ids — alert ids are attacker-controllable and become filenames.
+_RESERVED_NAMES = (
+    frozenset({"CON", "PRN", "AUX", "NUL"})
+    | frozenset(f"COM{i}" for i in range(1, 10))
+    | frozenset(f"LPT{i}" for i in range(1, 10))
+)
+
 
 class MemoryFeedError(Exception):
     """Pinecone-path failure. The local write is unaffected; callers report it."""
@@ -61,6 +72,10 @@ class MemoryRecord(BaseModel):
     def _safe_id(cls, v: str) -> str:
         if not _ID_PATTERN.match(v) or ".." in v:
             raise ValueError("incident_id must match [A-Za-z0-9][A-Za-z0-9._-]{0,63}, no '..'")
+        if v[-1] in ".-":  # trailing dot/hyphen: Windows strips it, breaking the path
+            raise ValueError("incident_id must not end with '.' or '-'")
+        if v.split(".", 1)[0].upper() in _RESERVED_NAMES:
+            raise ValueError(f"incident_id must not be a reserved device name: {v!r}")
         return v
 
     @field_validator("incident_class")
@@ -94,15 +109,34 @@ def to_markdown(record: MemoryRecord) -> str:
     )
 
 
+def _atomic_write(target: Path, text: str) -> None:
+    """Write via a temp file in the same dir + os.replace, so a reader never
+    sees a half-written doc and a crash can't leave a truncated file."""
+    fd, tmp = tempfile.mkstemp(dir=target.parent, prefix=f".{target.stem}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+        os.replace(tmp, target)  # atomic on the same filesystem; overwrites idempotently
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
 def feed(record: MemoryRecord, root: Path | None = None) -> str:
-    """Write the record into knowledge/incidents/. Idempotent by incident_id.
+    """Write the record under knowledge/incidents/memory/. Idempotent by
+    incident_id. Memory-fed docs are namespaced under memory/ so a fed id that
+    collides with a curated incident (e.g. INC-2231) can never overwrite the
+    committed doc; the recursive corpus walk still retrieves it as past_incident.
 
     Returns the repo-relative source path (what citations will use).
     """
     base = root or KNOWLEDGE_ROOT
-    target = base / "incidents" / f"{record.incident_id}.md"
+    target = base / "incidents" / "memory" / f"{record.incident_id}.md"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(to_markdown(record), encoding="utf-8")
+    _atomic_write(target, to_markdown(record))
     return target.relative_to(base.parent).as_posix()
 
 

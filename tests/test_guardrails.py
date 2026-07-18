@@ -41,8 +41,18 @@ def test_honest_report_passes_output_rail() -> None:
     assert v.passed
 
 
+def test_empty_output_fails_closed() -> None:
+    # Synthesis producing nothing must be blocked, not silently passed —
+    # the output rail should fail closed the same way the input rail does.
+    v = check_output("   ")
+    assert not v.passed
+    assert "empty" in v.flags
+
+
 def test_endpoints() -> None:
     client = TestClient(app)
     assert client.get("/healthz").json()["status"] == "ok"
     ok = client.post("/check/input", json={"text": "disk full on db-2"}).json()
     assert ok["passed"] is True
+    empty_out = client.post("/check/output", json={"text": ""}).json()
+    assert empty_out["passed"] is False

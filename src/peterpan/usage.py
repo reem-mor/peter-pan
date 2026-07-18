@@ -13,6 +13,21 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+# Rough USD-per-token (input, output) by model id for cost metering. One table
+# so every metering site prices the same way; "_default" catches unknown ids
+# with sonnet-tier pricing instead of crashing or silently metering $0.
+MODEL_RATES: dict[str, tuple[float, float]] = {
+    "claude-sonnet-5": (3e-06, 1.5e-05),
+    "claude-opus-4-8": (1.5e-05, 7.5e-05),
+    "claude-haiku-4-5-20251001": (1e-06, 5e-06),
+    "_default": (3e-06, 1.5e-05),
+}
+
+
+def model_rates(model: str) -> tuple[float, float]:
+    """(input_rate, output_rate) for a model id, defaulting loudly-visibly."""
+    return MODEL_RATES.get(model, MODEL_RATES["_default"])
+
 
 @dataclass(frozen=True)
 class UsageEvent:
@@ -46,6 +61,27 @@ def log_usage(event: UsageEvent, path: str | Path) -> None:
         f.write(json.dumps(asdict(event)) + "\n")
 
 
+def _is_valid_row(event: UsageEvent) -> bool:
+    """Schema-valid JSON can still be a poisoned row: an unparsable/naive ts,
+    or non-numeric token counts, load fine here but crash aggregate/window/
+    timeseries later at request time. Reject those up front."""
+    try:
+        ts = datetime.fromisoformat(event.ts)
+    except ValueError:
+        return False
+    if ts.tzinfo is None:
+        return False
+    # bool is an int subclass — exclude it explicitly so True/False tokens
+    # don't silently pass the isinstance(int) check.
+    if isinstance(event.input_tokens, bool) or not isinstance(event.input_tokens, int):
+        return False
+    if isinstance(event.output_tokens, bool) or not isinstance(event.output_tokens, int):
+        return False
+    if isinstance(event.cost_usd, bool) or not isinstance(event.cost_usd, int | float):
+        return False
+    return True
+
+
 def load_usage(path: str | Path) -> list[UsageEvent]:
     p = Path(path)
     if not p.exists():
@@ -54,12 +90,16 @@ def load_usage(path: str | Path) -> list[UsageEvent]:
     for line in p.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
-        # A torn append (crash mid-write) or schema drift must not take down
-        # PETER PAN OS — skip the bad row, keep serving the good ones.
+        # A torn append (crash mid-write), schema drift, or a poisoned-but-
+        # valid-JSON row must not take down PETER PAN OS — skip the bad row,
+        # keep serving the good ones.
         try:
-            events.append(UsageEvent(**json.loads(line)))
+            event = UsageEvent(**json.loads(line))
         except (ValueError, TypeError):
             continue
+        if not _is_valid_row(event):
+            continue
+        events.append(event)
     return events
 
 

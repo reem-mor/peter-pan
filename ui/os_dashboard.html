@@ -187,25 +187,6 @@
   .name-cell { display: flex; align-items: center; gap: 8px; }
   .name-cell .chip { width: 8px; height: 8px; border-radius: 2px; flex: none; }
 
-  /* ---------- services ---------- */
-  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .svc {
-    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
-    background: var(--bg-grid); font-family: var(--mono);
-  }
-  .svc .n { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .svc .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .svc.up .dot { background: var(--accent); box-shadow: 0 0 8px rgba(47, 230, 176, 0.7); }
-  .svc.down .dot { background: var(--red); box-shadow: 0 0 8px rgba(248, 113, 113, 0.7); }
-  .svc.unknown .dot { background: var(--faint); }
-  .svc .m { font-size: 11px; color: var(--muted); margin-top: 5px; }
-  .svc.down .m { color: var(--red); }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .svc.up .dot { animation: pulse 2.4s ease-in-out infinite; }
-    @keyframes pulse { 50% { box-shadow: 0 0 2px rgba(47, 230, 176, 0.25); } }
-  }
-
   /* ---------- tips ---------- */
   .tips li {
     list-style: none; display: flex; gap: 12px; align-items: flex-start;
@@ -218,6 +199,42 @@
 
   footer { margin-top: 28px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); display: flex; gap: 18px; flex-wrap: wrap; }
   footer code { color: var(--muted); }
+
+  /* ---------- mesh topology graph ---------- */
+  .topo-box { width: 100%; overflow-x: auto; position: relative; }
+  .topo-node { cursor: pointer; }
+  .topo-node rect { fill: var(--bg-grid); stroke: var(--border-hi); stroke-width: 1; transition: stroke 0.2s; }
+  .topo-node:hover rect, .topo-node:focus-visible rect { stroke: var(--accent); }
+  .topo-node.sel rect { stroke: var(--accent); stroke-width: 2; }
+  .topo-node text { fill: var(--text); font-size: 12px; font-weight: 600; }
+  .topo-node .sub { fill: var(--muted); font-size: 9.5px; font-weight: 400; }
+  .topo-node.down rect { stroke: var(--red); }
+  .topo-node.external rect { stroke-dasharray: 4 4; }
+  .topo-edge { stroke: var(--border-hi); stroke-width: 1.5; fill: none; }
+  .topo-edge.live { stroke: var(--accent); opacity: 0.55; }
+  @media (prefers-reduced-motion: no-preference) {
+    .topo-edge.live { stroke-dasharray: 6 10; animation: flow 1.6s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -16; } }
+  }
+
+  /* ---------- chart tooltip ---------- */
+  .tip {
+    position: absolute; z-index: var(--z-tooltip); pointer-events: none;
+    background: var(--panel-2); border: 1px solid var(--border-hi); border-radius: 8px;
+    padding: 8px 11px; font-family: var(--mono); font-size: 12px; color: var(--text);
+    white-space: nowrap; display: none; box-shadow: none;
+  }
+  .tip .t-when { color: var(--muted); font-size: 10.5px; }
+  .tip .t-k { color: var(--muted); }
+
+  tr.hl td { background: var(--accent-dim); }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip-cfg {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
+    border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; color: var(--muted);
+  }
+  .chip-cfg b { color: var(--text); font-weight: 600; }
 
   .skip-link {
     position: absolute; left: -9999px; top: 0; z-index: 100;
@@ -262,6 +279,7 @@
     <button class="icon-btn" id="refresh" aria-label="Refresh data" title="Refresh">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
     </button>
+    <div class="chips" id="cfg-chips" aria-label="Deployment configuration"></div>
   </header>
 
   <main id="main">
@@ -310,6 +328,15 @@
     </div>
   </section>
 
+  <section class="panel" style="margin-top:16px" aria-label="Mesh topology">
+    <h2>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10"/><path d="M6.3 7.7L10.7 16.3"/><path d="M17.7 7.7L13.3 16.3"/></svg>
+      Mesh topology · live flow
+      <span style="color:var(--faint);letter-spacing:0.06em;text-transform:none">· click a node to filter the tables</span>
+    </h2>
+    <div class="topo-box" id="topo"></div>
+  </section>
+
   <section class="grid mid">
     <div class="panel">
       <h2>
@@ -333,10 +360,13 @@
     </div>
     <div class="panel">
       <h2>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        Mesh health
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5"/><path d="M12 12v10"/><path d="M12 12L3 7"/></svg>
+        Models · cost &amp; efficiency
       </h2>
-      <div class="svc-grid" id="mesh-grid"></div>
+      <div style="overflow-x:auto"><table id="models-table" aria-label="Per-model usage">
+        <thead><tr><th>Model</th><th class="num">Calls</th><th class="num">Tokens</th><th class="num">Avg/call</th><th class="num">Cost</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
     </div>
   </section>
 
@@ -377,7 +407,7 @@
 /* ---------------- config + state ---------------- */
 const API = ''; // same-origin (served by PETER PAN OS at /os/dashboard)
 const PALETTE = ['#2fe6b0', '#4cc9f0', '#b794f6', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
-const state = { hours: 24, live: false, timer: null, seq: 0 };
+const state = { hours: 24, live: false, timer: null, seq: 0, filter: null, aborter: null };
 
 /* Demo fixture — keeps the page fully renderable with zero backends
    (mirage-mode invariant). Activated only when the API is unreachable. */
@@ -420,7 +450,9 @@ const DEMO = (() => {
       { name: 'guardrails', status: 'up', latency_ms: 4.1 },
       { name: 'agent', status: 'up', latency_ms: 12.4 }
     ] },
-    health: { env: 'mirage (demo)' }
+    health: { env: 'mirage (demo)' },
+    agents: { agents: ['predictor', 'rag', 'guardrails', 'incident-agent'] },
+    info: { service: 'peter-pan', env: 'mirage (demo)', llm: 'off', model: 'claude-sonnet-5', rag_backend: 'lexical', predictor: 'floor', daily_budget_usd: 5, repo: 'https://github.com/reem-mor/peter-pan' }
   };
 })();
 
@@ -431,8 +463,8 @@ const fmtInt = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits:
 const fmtTok = (n) => n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : fmtInt(n);
 const fmtUsd = (n) => '$' + Number(n).toFixed(n >= 10 ? 2 : 4);
 
-async function getJSON(path) {
-  const r = await fetch(API + path, { headers: { Accept: 'application/json' } });
+async function getJSON(path, signal) {
+  const r = await fetch(API + path, { headers: { Accept: 'application/json' }, signal });
   if (!r.ok) throw new Error(path + ' → ' + r.status);
   return r.json();
 }
@@ -440,28 +472,41 @@ async function getJSON(path) {
 /* ---------------- data load ---------------- */
 async function loadAll() {
   const seq = ++state.seq; // drop stale responses (timer vs window-switch races)
+  // Abort the previous cycle's in-flight requests — the seq guard drops stale
+  // responses, but pending fetches would still pile up during an outage.
+  if (state.aborter) state.aborter.abort();
+  const aborter = new AbortController();
+  state.aborter = aborter;
+  const timeout = setTimeout(() => aborter.abort(), 10000);
+  const sig = aborter.signal;
+
   document.getElementById('main').setAttribute('aria-busy', 'true');
   const h = state.hours;
   const q = h ? `?hours=${h}` : '';
   const seriesQ = `?hours=${h || 168}&buckets=48`;
   const wants = {
-    usageByAgent: getJSON(`/os/usage${q}${q ? '&' : '?'}by=agent`),
-    usageByModel: getJSON(`/os/usage${q}${q ? '&' : '?'}by=model`),
-    usageByService: getJSON(`/os/usage${q}${q ? '&' : '?'}by=service`),
-    series: getJSON(`/os/usage/series${seriesQ}`),
-    budget: getJSON('/os/budget'),
-    tips: getJSON('/os/tips'),
-    servicesHealth: getJSON('/os/services'),
-    health: getJSON('/healthz')
+    usageByAgent: getJSON(`/os/usage${q}${q ? '&' : '?'}by=agent`, sig),
+    usageByModel: getJSON(`/os/usage${q}${q ? '&' : '?'}by=model`, sig),
+    usageByService: getJSON(`/os/usage${q}${q ? '&' : '?'}by=service`, sig),
+    series: getJSON(`/os/usage/series${seriesQ}`, sig),
+    budget: getJSON('/os/budget', sig),
+    tips: getJSON('/os/tips', sig),
+    servicesHealth: getJSON('/os/services', sig),
+    health: getJSON('/healthz', sig),
+    info: getJSON('/os/info', sig),
+    agents: getJSON('/os/agents', sig)
   };
   const out = {};
   const settled = await Promise.allSettled(Object.values(wants));
+  clearTimeout(timeout);
   if (seq !== state.seq) return; // a newer load superseded this one
   Object.keys(wants).forEach((k, i) => { out[k] = settled[i].status === 'fulfilled' ? settled[i].value : null; });
 
   state.live = out.usageByAgent !== null;
   if (!state.live) {
-    Object.keys(DEMO).forEach(k => { if (out[k] === null) out[k] = DEMO[k]; });
+    // All-or-nothing: mixing real budget/tips with demo usage numbers would be
+    // indistinguishable from live data to an operator. Demo mode is total.
+    Object.keys(DEMO).forEach(k => { out[k] = DEMO[k]; });
   }
   render(out);
   document.getElementById('main').setAttribute('aria-busy', 'false');
@@ -482,10 +527,13 @@ function render(d) {
   renderBudget(d.budget);
   renderSeries((d.series && d.series.points) || []);
   renderDonut(d.usageByModel || {});
-  renderAgents(d.usageByAgent || {});
+  renderAgents(d.usageByAgent || {}, (d.agents && d.agents.agents) || []);
   renderServices(d.usageByService || {});
-  renderMesh(d.servicesHealth);
+  renderModels(d.usageByModel || {});
+  renderTopo(d.servicesHealth);
   renderTips(d.tips);
+  renderChips(d.info);
+  applyFilter();
 }
 
 function totals(agg) {
@@ -509,7 +557,13 @@ function renderKpis(agg) {
 
 function renderBudget(b) {
   const pill = $('#budget-pill'), fill = $('#budget-fill'), meta = $('#budget-meta');
-  if (!b) { pill.textContent = 'n/a'; meta.textContent = 'budget endpoint unavailable'; return; }
+  if (!b) {
+    // reset stale state — a dead endpoint must not leave the previous bar up
+    pill.textContent = 'n/a'; pill.className = 'pill';
+    fill.className = 'budget-fill'; fill.style.width = '0%';
+    meta.textContent = 'budget endpoint unavailable';
+    return;
+  }
   const pct = Math.min(100, (b.spent_usd / b.budget_usd) * 100);
   pill.textContent = b.status;
   pill.className = 'pill ' + b.status;
@@ -528,7 +582,8 @@ function renderSeries(points) {
 
   const maxCost = Math.max(...points.map(p => p.cost_usd), 1e-9);
   const maxCalls = Math.max(...points.map(p => p.calls), 1);
-  const x = (i) => padL + (i / (points.length - 1)) * iw;
+  const denom = Math.max(points.length - 1, 1); // single bucket must not divide by zero
+  const x = (i) => padL + (i / denom) * iw;
   const yc = (v) => padT + ih - (v / maxCost) * ih;
   const yn = (v) => padT + ih - (v / maxCalls) * ih;
 
@@ -564,8 +619,34 @@ function renderSeries(points) {
     <path d="${area}" fill="url(#costFill)"/>
     <path d="${line}" fill="none" stroke="#2fe6b0" stroke-width="2" stroke-linejoin="round"/>
     <path d="${callLine}" fill="none" stroke="#b794f6" stroke-width="1.4" stroke-dasharray="4 4" stroke-linejoin="round" opacity="0.85"/>
+    <line id="crosshair" x1="0" y1="${padT}" x2="0" y2="${padT + ih}" stroke="#29414f" stroke-width="1" visibility="hidden"/>
     ${ticks}
-  </svg>`;
+  </svg>
+  <div class="tip" id="series-tip"></div>`;
+
+  // hover tooltip: nearest bucket under the pointer
+  const svg = host.querySelector('svg'), tip = host.querySelector('#series-tip');
+  const cross = host.querySelector('#crosshair');
+  svg.addEventListener('mousemove', (ev) => {
+    const box = svg.getBoundingClientRect();
+    const px = (ev.clientX - box.left) * (W / box.width);
+    const i = Math.max(0, Math.min(points.length - 1, Math.round(((px - padL) / iw) * denom)));
+    const p = points[i], when = new Date(p.t);
+    cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i));
+    cross.setAttribute('visibility', 'visible');
+    tip.style.display = 'block';
+    tip.innerHTML = `<div class="t-when">${when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`
+      + `<div><span class="t-k">cost</span> ${fmtUsd(p.cost_usd)} · <span class="t-k">calls</span> ${fmtInt(p.calls)}</div>`
+      + `<div><span class="t-k">tok</span> ${fmtTok(p.input_tokens)} in / ${fmtTok(p.output_tokens)} out</div>`;
+    const hostBox = host.getBoundingClientRect();
+    const left = ev.clientX - hostBox.left + 14;
+    tip.style.left = Math.min(left, hostBox.width - tip.offsetWidth - 8) + 'px';
+    tip.style.top = (ev.clientY - hostBox.top - 10) + 'px';
+  });
+  svg.addEventListener('mouseleave', () => {
+    tip.style.display = 'none';
+    cross.setAttribute('visibility', 'hidden');
+  });
 }
 
 function renderDonut(byModel) {
@@ -594,26 +675,36 @@ function renderDonut(byModel) {
   ).join('');
 }
 
-function renderAgents(agg) {
+function renderAgents(agg, known) {
   const tbody = $('#agents-table tbody');
   const entries = Object.entries(agg).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
   const maxCost = Math.max(...entries.map(([, r]) => r.cost_usd), 1e-9);
+  // known-but-idle agents (from /os/agents) render as zero rows — an agent
+  // that logged nothing should be visible, not invisible
+  const idle = (known || []).filter(n => !(n in agg));
   tbody.innerHTML = entries.map(([name, r], i) => `
-    <tr>
+    <tr data-name="${esc(name)}">
       <td><span class="name-cell"><span class="chip" style="background:${PALETTE[i % PALETTE.length]}"></span>${esc(name)}</span></td>
       <td class="num">${fmtInt(r.calls)}</td>
       <td class="num">${fmtTok(r.input_tokens)}</td>
       <td class="num">${fmtTok(r.output_tokens)}</td>
       <td class="num">${fmtUsd(r.cost_usd)}</td>
       <td><div class="rowbar" style="width:${((r.cost_usd / maxCost) * 100).toFixed(1)}%"></div></td>
-    </tr>`).join('') || '<tr><td colspan="6" style="color:var(--faint)">no usage in window</td></tr>';
+    </tr>`).join('')
+    + idle.map(name => `
+    <tr data-name="${esc(name)}" style="color:var(--faint)">
+      <td><span class="name-cell"><span class="chip" style="background:var(--border-hi)"></span>${esc(name)}</span></td>
+      <td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">$0.0000</td>
+      <td><span style="font-size:10.5px">idle in window</span></td>
+    </tr>`).join('')
+    || '<tr><td colspan="6" style="color:var(--faint)">no usage in window</td></tr>';
 }
 
 function renderServices(agg) {
   const tbody = $('#services-table tbody');
   const entries = Object.entries(agg).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
   tbody.innerHTML = entries.map(([name, r]) => `
-    <tr>
+    <tr data-name="${esc(name)}">
       <td>${esc(name)}</td>
       <td class="num">${fmtInt(r.calls)}</td>
       <td class="num">${fmtTok(r.input_tokens + r.output_tokens)}</td>
@@ -621,15 +712,105 @@ function renderServices(agg) {
     </tr>`).join('') || '<tr><td colspan="4" style="color:var(--faint)">no usage in window</td></tr>';
 }
 
-function renderMesh(health) {
-  const grid = $('#mesh-grid');
-  const items = (health && health.services) || [];
-  const os = { name: 'peter-pan-os', status: state.live ? 'up' : 'down', latency_ms: null };
-  grid.innerHTML = [os, ...items].map(s => `
-    <div class="svc ${esc(s.status || 'unknown')}">
-      <div class="n"><span class="dot"></span>${esc(s.name)}</div>
-      <div class="m">${s.status === 'up' ? (s.latency_ms != null ? s.latency_ms + ' ms' : 'serving') : s.status === 'down' ? 'unreachable' : 'unknown'}</div>
-    </div>`).join('');
+/* Mesh topology — fixed layout matching the README architecture diagram.
+   Node status comes from /os/services; nodes not in the sweep render as
+   "external" (dashed). Click filters the agent/service tables. */
+const TOPO = {
+  nodes: [
+    { id: 'ui', label: 'streamlit ui', sub: ':8501', x: 60, y: 120, external: true },
+    { id: 'peter-pan-os', label: 'peter-pan-os', sub: ':8005 control plane', x: 220, y: 120 },
+    { id: 'n8n', label: 'n8n spine', sub: ':5678 orchestration', x: 400, y: 120, external: true },
+    { id: 'predictor', label: 'predictor', sub: ':8001 severity floor', x: 590, y: 30 },
+    { id: 'rag', label: 'rag', sub: ':8002 retrieval', x: 590, y: 90 },
+    { id: 'guardrails', label: 'guardrails', sub: ':8003 rails', x: 590, y: 150 },
+    { id: 'agent', label: 'agent', sub: ':8004 langgraph', x: 590, y: 210 }
+  ],
+  edges: [
+    ['ui', 'peter-pan-os'], ['peter-pan-os', 'n8n'],
+    ['n8n', 'predictor'], ['n8n', 'rag'], ['n8n', 'guardrails'], ['n8n', 'agent']
+  ]
+};
+const NODE_W = 150, NODE_H = 46;
+
+function renderTopo(health) {
+  const byName = {};
+  ((health && health.services) || []).forEach(s => { byName[s.name] = s; });
+  byName['peter-pan-os'] = { status: state.live ? 'up' : 'down', latency_ms: null };
+
+  const center = (n) => ({ cx: n.x + NODE_W / 2, cy: n.y + NODE_H / 2 });
+  const edges = TOPO.edges.map(([a, b]) => {
+    const na = TOPO.nodes.find(n => n.id === a), nb = TOPO.nodes.find(n => n.id === b);
+    const A = center(na), B = center(nb);
+    const upA = (byName[a] || {}).status === 'up', upB = (byName[b] || {}).status === 'up';
+    const midX = (A.cx + B.cx) / 2;
+    return `<path class="topo-edge ${upA && upB ? 'live' : ''}"
+      d="M ${A.cx + NODE_W / 2 - 6} ${A.cy} C ${midX} ${A.cy}, ${midX} ${B.cy}, ${B.cx - NODE_W / 2 + 6} ${B.cy}"/>`;
+  }).join('');
+
+  const nodes = TOPO.nodes.map(n => {
+    const h = byName[n.id];
+    const status = h ? h.status : 'unknown';
+    const cls = ['topo-node', status === 'down' ? 'down' : '', (!h && n.external) ? 'external' : '',
+      state.filter === n.id ? 'sel' : ''].join(' ');
+    const dotColor = status === 'up' ? 'var(--accent)' : status === 'down' ? 'var(--red)' : 'var(--faint)';
+    const meta = h ? (status === 'up' ? (h.latency_ms != null ? h.latency_ms + ' ms' : 'serving') : 'unreachable') : 'external';
+    return `<g class="${cls}" data-node="${esc(n.id)}" tabindex="0" role="button"
+      aria-label="${esc(n.label)}: ${esc(meta)}. Activate to filter tables.">
+      <rect x="${n.x}" y="${n.y}" width="${NODE_W}" height="${NODE_H}" rx="9"/>
+      <circle cx="${n.x + 16}" cy="${n.y + 16}" r="4" fill="${dotColor}"/>
+      <text x="${n.x + 28}" y="${n.y + 20}">${esc(n.label)}</text>
+      <text class="sub" x="${n.x + 28}" y="${n.y + 35}">${esc(n.sub)} · ${esc(meta)}</text>
+    </g>`;
+  }).join('');
+
+  $('#topo').innerHTML = `<svg viewBox="0 0 780 280" width="100%" style="min-width:640px" aria-hidden="false" role="img"
+    aria-label="Service mesh topology graph">${edges}${nodes}</svg>`;
+
+  $('#topo').querySelectorAll('.topo-node').forEach(g => {
+    const act = () => { state.filter = state.filter === g.dataset.node ? null : g.dataset.node; renderTopo(health); applyFilter(); };
+    g.addEventListener('click', act);
+    g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } });
+  });
+}
+
+/* Node → related table-row names (agents and services log under these keys). */
+const FILTER_MAP = {
+  'agent': ['incident-agent', 'agent'], 'rag': ['rag'], 'predictor': ['predictor'],
+  'guardrails': ['guardrails'], 'n8n': ['n8n'], 'peter-pan-os': [], 'ui': []
+};
+function applyFilter() {
+  const names = state.filter ? (FILTER_MAP[state.filter] || [state.filter]) : null;
+  document.querySelectorAll('#agents-table tbody tr, #services-table tbody tr, #models-table tbody tr').forEach(tr => {
+    const key = tr.dataset.name;
+    tr.classList.toggle('hl', !!(names && key && names.includes(key)));
+  });
+}
+
+function renderModels(byModel) {
+  const tbody = $('#models-table tbody');
+  const entries = Object.entries(byModel).sort((a, b) => b[1].cost_usd - a[1].cost_usd);
+  tbody.innerHTML = entries.map(([name, r]) => {
+    const tok = r.input_tokens + r.output_tokens;
+    return `<tr>
+      <td>${esc(name)}</td>
+      <td class="num">${fmtInt(r.calls)}</td>
+      <td class="num">${fmtTok(tok)}</td>
+      <td class="num">${r.calls ? fmtTok(Math.round(tok / r.calls)) : '0'}</td>
+      <td class="num">${fmtUsd(r.cost_usd)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="color:var(--faint)">no model usage in window</td></tr>';
+}
+
+function renderChips(info) {
+  const host = $('#cfg-chips');
+  if (!info) { host.innerHTML = ''; return; }
+  host.innerHTML = [
+    `<span class="chip-cfg">llm <b>${esc(info.llm)}</b></span>`,
+    `<span class="chip-cfg">model <b>${esc(info.model)}</b></span>`,
+    `<span class="chip-cfg">rag <b>${esc(info.rag_backend)}</b></span>`,
+    `<span class="chip-cfg">predictor <b>${esc(info.predictor)}</b></span>`,
+    `<a class="chip-cfg" href="${esc(info.repo)}" target="_blank" rel="noopener">repo ↗</a>`
+  ].join('');
 }
 
 function renderTips(t) {

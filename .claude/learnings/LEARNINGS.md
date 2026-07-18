@@ -7,7 +7,12 @@ incident data.
 
 ## Raw
 
-*(empty — capture the next lesson here)*
+### 2026-07-18 · parallel-agents-verify-cross-file-imports-after-merge
+- **Context:** Three fixer agents + orchestrator edited src/ concurrently (no worktrees); an import added to llm.py/dashboard.py for the new usage.model_rates was missing after the agents converged — caught by a fixer's full-repo mypy run, not by any single agent's scoped check.
+- **Lesson:** Scoped per-agent gates all pass while the combined tree is broken; cross-file imports are the seam parallel edits break at.
+- **Candidate rule:** After parallel agents finish on a shared tree, run the FULL gate (pytest + mypy on everything) before commit — never trust the union of scoped green runs; for wider overlaps use worktree isolation.
+- **Target:** CLAUDE.md
+- **Status:** raw
 
 ## Absorbed
 

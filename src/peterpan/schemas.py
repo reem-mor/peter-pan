@@ -38,7 +38,10 @@ class Evidence(BaseModel):
     kind: str  # metric | log | deploy | runbook | past_incident | screenshot
     summary: str
     source: str  # where this came from — URL, file, query. Never empty.
-    confidence: float = Field(ge=0.0, le=1.0)
+    # lt=1.0 (not le): retrieval/evidence never claims certainty. Every producer
+    # caps below 1.0 (predictor floors, rag scores capped at 0.99) — the bound
+    # makes the confidence < 1.0 invariant a type-level guarantee.
+    confidence: float = Field(ge=0.0, lt=1.0)
 
 
 class IncidentStory(BaseModel):

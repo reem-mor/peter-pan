@@ -1,8 +1,8 @@
 """PETER PAN WebUI — Dynamic Incident Dashboard + PETER PAN OS console.
 
 Run:  streamlit run ui/app.py
-Talks to the services in-process for the MVP (same package); switches to HTTP
-calls against the deployed services by setting PP_*_URL env vars later.
+Talks to the services in-process (same package). An HTTP mode against the
+deployed mesh is a possible future upgrade, not an existing switch.
 """
 
 from __future__ import annotations

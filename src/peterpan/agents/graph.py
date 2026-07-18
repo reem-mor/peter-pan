@@ -13,7 +13,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
-from peterpan.services.agent import _repair_options
+from peterpan.services.agent import _repair_options, search_query
 from peterpan.services.predictor import predict
 from peterpan.services.rag import search
 
@@ -32,7 +32,7 @@ def classify_node(state: StoryState) -> StoryState:
 
 def retrieve_node(state: StoryState) -> StoryState:
     alert = state["alert"]
-    return {"rag": search(f"{alert.title} {alert.description}", top_k=3)}
+    return {"rag": search(search_query(alert), top_k=3)}
 
 
 def synthesize_node(state: StoryState) -> StoryState:
@@ -77,5 +77,6 @@ def run_story_graph(alert: Alert) -> IncidentStory:
     compiled = build_graph()
     result = compiled.invoke({"alert": alert})  # type: ignore[attr-defined]
     story = result["story"]
-    assert isinstance(story, IncidentStory)
+    if not isinstance(story, IncidentStory):
+        raise RuntimeError("graph invariant violated: synthesize node produced no story")
     return story

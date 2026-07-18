@@ -1,0 +1,10 @@
+.git/
+.venv/
+__pycache__/
+.env
+tests/
+.claude/
+evals/
+docs/
+n8n/
+*.jsonl
