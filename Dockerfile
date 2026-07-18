@@ -1,5 +1,7 @@
 # Shared image for all PETER PAN services. SERVICE selects the app at runtime.
-FROM python:3.14-slim
+# Pinned to match CI's python-version (3.12); pyproject requires >=3.12. Plain
+# tag (not digest-pinned) so dependabot's docker ecosystem can bump it.
+FROM python:3.12-slim
 
 WORKDIR /app
 COPY pyproject.toml README.md ./
@@ -18,11 +20,19 @@ COPY ui/ ui/
 # the deterministic paths in cloud deploys (torch/ml stays out — image size).
 RUN pip install --no-cache-dir -e ".[llm,rag]"
 
-# Non-root, matching the security baseline. knowledge/ stays writable for the
-# memory feed (POST /memory writes incident docs); everything else stays root-owned.
-RUN useradd --create-home peterpan && chown -R peterpan /app/knowledge
+# Non-root, matching the security baseline. WORKDIR /app itself stays
+# root-owned; knowledge/ stays writable for the memory feed (POST /memory
+# writes incident docs), and usage-shared/ stays writable so log_usage()
+# (called on every metered LLM call) can append usage.jsonl without hitting
+# a PermissionError against the root-owned CWD.
+RUN useradd --create-home peterpan \
+    && mkdir -p /app/usage-shared \
+    && chown -R peterpan /app/knowledge /app/usage-shared
 USER peterpan
 
 ENV SERVICE=agent PORT=8000
+ENV PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl
 EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD ["python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/healthz',timeout=3)"]
 CMD ["sh", "-c", "uvicorn peterpan.services.${SERVICE}:app --host 0.0.0.0 --port ${PORT}"]

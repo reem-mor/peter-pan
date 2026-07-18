@@ -55,7 +55,6 @@ Resources:
             Principal: { Service: ec2.amazonaws.com }
             Action: sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
         - PolicyName: read-deploy-secret
@@ -65,6 +64,29 @@ Resources:
               - Effect: Allow
                 Action: secretsmanager:GetSecretValue
                 Resource: !Ref SecretArn
+        - PolicyName: ecr-pull-scoped
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # GetAuthorizationToken is account-scoped by the ECR API itself
+              # (no resource-level permissions exist for it) — "*" here is the
+              # correct/only form, not a broadening.
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: "*"
+              # Pull actions scoped to this stack's own repo only, derived from
+              # the ImageUri parameter (repo name = path segment after the
+              # registry host, tag stripped). Replaces the account-wide
+              # AmazonEC2ContainerRegistryReadOnly managed policy.
+              - Effect: Allow
+                Action:
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchCheckLayerAvailability
+                Resource:
+                  !Sub
+                    - "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${RepoName}"
+                    - RepoName: !Select [0, !Split [":", !Select [1, !Split ["/", !Ref ImageUri]]]]
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -72,6 +94,8 @@ Resources:
       Roles: [!Ref InstanceRole]
 
   Instance:
+    # Single EC2 instance running all five services — a documented demo-only
+    # SPOF (no ASG/multi-AZ); acceptable for this demo stack, not for prod.
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType

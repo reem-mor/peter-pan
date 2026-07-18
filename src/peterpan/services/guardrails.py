@@ -41,6 +41,10 @@ def check_input(text: str) -> GuardrailVerdict:
 
 
 def check_output(text: str) -> GuardrailVerdict:
+    if not text.strip():
+        # Fail closed like the input rail: an empty story/report is never a
+        # pass — it means synthesis produced nothing to review.
+        return GuardrailVerdict(passed=False, flags=["empty"], reason="empty output")
     flags = [flag for pattern, flag in _OUTPUT_BLOCK if re.search(pattern, text)]
     return GuardrailVerdict(
         passed=not flags,

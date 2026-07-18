@@ -32,6 +32,14 @@ settings = Settings()
 MAX_STEPS = 6  # bounded loop — the agent can never run away
 
 
+def search_query(alert: Alert) -> str:
+    """Build the RAG query from an alert. search() rejects blank queries, and
+    title/description are attacker-controllable and may be empty/whitespace —
+    fall back to id+source (always present) so the pipeline never 500s."""
+    query = f"{alert.title} {alert.description}".strip()
+    return query if query else f"{alert.id} {alert.source}"
+
+
 def build_story(alert: Alert) -> IncidentStory:
     """Planner → tools → synthesis. Deterministic by default; PP_LLM=anthropic
     upgrades the synthesis step to Claude, guarded by peterpan.llm's invariant
@@ -43,7 +51,7 @@ def build_story(alert: Alert) -> IncidentStory:
     steps += 1
 
     # Step 2: retrieve context (runbooks, past incidents).
-    rag = search(f"{alert.title} {alert.description}", top_k=3)
+    rag = search(search_query(alert), top_k=3)
     steps += 1
 
     # Step 3: synthesize — LLM if opted in, deterministic otherwise/on failure.
@@ -53,7 +61,8 @@ def build_story(alert: Alert) -> IncidentStory:
         steps += 1
         try:
             story = synthesize(alert, prediction, rag, settings)
-            assert steps <= MAX_STEPS
+            if steps > MAX_STEPS:
+                raise RuntimeError("loop budget invariant violated")
             return story
         except LlmSynthesisError:
             pass  # fall through to the deterministic synthesis below
@@ -68,7 +77,8 @@ def build_story(alert: Alert) -> IncidentStory:
         *[m for m in rag.matches if m.confidence > 0],
     ]
 
-    assert steps <= MAX_STEPS  # loop budget invariant
+    if steps > MAX_STEPS:  # loop budget invariant
+        raise RuntimeError("loop budget invariant violated")
 
     return IncidentStory(
         alert=alert,

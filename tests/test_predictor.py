@@ -34,6 +34,12 @@ def test_unknown_signal_falls_back_to_unclassified() -> None:
     assert p.confidence < 0.5
 
 
+def test_oom_substring_inside_another_word_does_not_false_positive() -> None:
+    # Bare substring matching used to let "oom" fire inside "zoom"/"room".
+    p = predict(make_alert("zoom meeting service degraded"))
+    assert p.incident_class != "resource_exhaustion"
+
+
 def test_healthz_and_predict_endpoint() -> None:
     client = TestClient(app)
     assert client.get("/healthz").json()["status"] == "ok"

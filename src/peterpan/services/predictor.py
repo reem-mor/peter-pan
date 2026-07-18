@@ -8,6 +8,8 @@ floor classification, and any model failure falls back to floor-only.
 
 from __future__ import annotations
 
+import re
+
 from fastapi import FastAPI
 
 from peterpan import ml
@@ -34,7 +36,13 @@ def predict(alert: Alert) -> Prediction:
     """Pure classification. Falls back to 'unclassified' at the alert's own severity."""
     text = f"{alert.title} {alert.description}".lower()
     for needle, incident_class, floor_severity in _FLOOR:
-        if needle in text:
+        # Leading word-boundary match: a bare substring check let "oom" fire
+        # inside "zoom"/"room" (false resource_exhaustion P1). Only anchor
+        # the *start* of the needle — real alert text glues suffixes on
+        # ("OOMKilled", "timeouts"), and requiring a trailing boundary too
+        # would reject those legitimate matches. Multi-word needles like
+        # "out of memory" still match as a phrase.
+        if re.search(rf"\b{re.escape(needle)}", text):
             # Never lower severity below what the alert already carries.
             severity = min(alert.severity, floor_severity, key=lambda s: s.value)
             return Prediction(incident_class=incident_class, severity=severity, confidence=0.75)

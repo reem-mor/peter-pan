@@ -147,6 +147,26 @@ def test_story_confidence_always_below_certainty() -> None:
         assert story["confidence"] < 1.0
 
 
+def test_story_survives_blank_title_and_description() -> None:
+    # An empty/whitespace title+description used to build a blank RAG query,
+    # which search() rejects with ValueError — an unhandled 500. The story
+    # pipeline must fall back to id+source and still answer.
+    client = TestClient(agent_app)
+    resp = client.post("/story", json=alert_body(title="   ", description=""))
+    assert resp.status_code == 200
+    story = resp.json()
+    assert story["probable_cause"]
+
+
+def test_dashboard_survives_blank_title_and_description() -> None:
+    client = TestClient(agent_app)
+    resp = client.post(
+        "/dashboard",
+        json={"problem": "what's going on", "alert": alert_body(title=" ", description="  ")},
+    )
+    assert resp.status_code == 200
+
+
 # --- usage / PP OS -----------------------------------------------------------
 
 
@@ -163,6 +183,30 @@ def test_load_usage_survives_corrupt_lines(tmp_path: Path) -> None:
     events = load_usage(log)
     assert len(events) == 2  # both good rows survive, all bad rows skipped
     assert {e.agent for e in events} == {"a", "b"}
+
+
+def test_load_usage_skips_poisoned_but_schema_valid_rows(tmp_path: Path) -> None:
+    """JSON-valid rows can still be poisoned: an unparsable ts, a naive ts, or
+    string token counts load fine as a dataclass but crash aggregate/window/
+    timeseries later. They must be skipped exactly like torn rows are."""
+    log = tmp_path / "usage.jsonl"
+    log_usage(make_event("agent", "good", "m", 10, 5, 0.001), log)
+    with log.open("a", encoding="utf-8") as f:
+        f.write(
+            '{"ts": "not-a-date", "service": "agent", "agent": "bad-ts", "model": "m", '
+            '"input_tokens": 1, "output_tokens": 1, "cost_usd": 0.0}\n'
+        )
+        f.write(
+            '{"ts": "2026-07-18T00:00:00", "service": "agent", "agent": "naive-ts", "model": "m", '
+            '"input_tokens": 1, "output_tokens": 1, "cost_usd": 0.0}\n'
+        )
+        f.write(
+            '{"ts": "2026-07-18T00:00:00+00:00", "service": "agent", "agent": "str-tokens", '
+            '"model": "m", "input_tokens": "100", "output_tokens": 5, "cost_usd": 0.0}\n'
+        )
+
+    events = load_usage(log)
+    assert {e.agent for e in events} == {"good"}
 
 
 def test_ppos_endpoints_reject_garbage_params(tmp_path: Path) -> None:

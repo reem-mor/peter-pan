@@ -1,28 +1,64 @@
 services:
   predictor:
     build: .
-    environment: { SERVICE: predictor, PP_ENV: "${PP_ENV:-mirage}" }
+    environment:
+      SERVICE: predictor
+      PP_ENV: "${PP_ENV:-mirage}"
+      PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
     ports: ["8001:8000"]
+    volumes: ["usage-data:/app/usage-shared"]
+    restart: unless-stopped
   rag:
     build: .
-    environment: { SERVICE: rag, PP_ENV: "${PP_ENV:-mirage}" }
+    environment:
+      SERVICE: rag
+      PP_ENV: "${PP_ENV:-mirage}"
+      PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
     ports: ["8002:8000"]
-    # Memory feed persistence: fed incident docs land on the host, not in the
-    # ephemeral container layer (POST /memory would otherwise vanish on restart).
-    volumes: ["./knowledge:/app/knowledge"]
+    volumes:
+      # Memory feed persistence: fed incident docs land on the host, not in the
+      # ephemeral container layer (POST /memory would otherwise vanish on restart).
+      - ./knowledge:/app/knowledge
+      - usage-data:/app/usage-shared
+    restart: unless-stopped
   guardrails:
     build: .
-    environment: { SERVICE: guardrails, PP_ENV: "${PP_ENV:-mirage}" }
+    environment:
+      SERVICE: guardrails
+      PP_ENV: "${PP_ENV:-mirage}"
+      PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
     ports: ["8003:8000"]
+    volumes: ["usage-data:/app/usage-shared"]
+    restart: unless-stopped
   agent:
     build: .
-    environment: { SERVICE: agent, PP_ENV: "${PP_ENV:-mirage}" }
+    environment:
+      SERVICE: agent
+      PP_ENV: "${PP_ENV:-mirage}"
+      PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
     ports: ["8004:8000"]
+    volumes: ["usage-data:/app/usage-shared"]
+    restart: unless-stopped
   ppos:
     build: .
     environment:
       SERVICE: ppos
       PP_ENV: "${PP_ENV:-mirage}"
+      PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
       # Mesh healthz targets for /os/services — compose DNS names, in-container port.
       PP_MESH: '{"predictor": "http://predictor:8000", "rag": "http://rag:8000", "guardrails": "http://guardrails:8000", "agent": "http://agent:8000"}'
     ports: ["8005:8000"]
+    volumes: ["usage-data:/app/usage-shared"]
+    restart: unless-stopped
+    depends_on:
+      predictor:
+        condition: service_started
+      rag:
+        condition: service_started
+      guardrails:
+        condition: service_started
+      agent:
+        condition: service_started
+
+volumes:
+  usage-data:

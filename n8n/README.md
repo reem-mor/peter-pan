@@ -1,8 +1,11 @@
 # n8n — orchestration spine
 
-`workflows/peter-pan-triage.json` is the versioned scaffold of the triage
-flow: **Webhook → Guardrails input → IF → Build Story → Guardrails output →
-Respond** (reject path responds with the guardrail reason).
+`workflows/peter-pan-triage.json` is the versioned triage flow (v3):
+**Webhook (header-auth) → Normalize Alert → Guardrails input → IF → Build
+Story → Guardrails output → IF → Respond**. Four terminal responses: story
+(200), `flagged_for_human_review` (200, output rail failed), `rejected`
+(422, input rail failed), `error` (502, an upstream service call failed —
+all three HTTP nodes carry an error branch).
 
 ## Live instance
 
@@ -26,9 +29,10 @@ services are reachable from n8n cloud:
   Any change made in the n8n editor gets exported back into this directory
   in the same PR that approves it — an unexported live edit is drift.
 - **No secret values ever leave n8n.** Exports carry credential *names* and
-  placeholder URLs only. Endpoints come from n8n environment variables
-  (`PP_SERVICES_BASE`-style), so one flow definition serves localhost,
-  Docker, and EC2.
+  placeholder URLs only. Endpoints come from n8n environment variables —
+  `PP_GUARDRAILS_BASE` (:8003) and `PP_AGENT_BASE` (:8004); guardrails and
+  agent are separate services on separate ports, so one base URL cannot
+  serve both — so one flow definition serves localhost, Docker, and EC2.
 - **New flows land inactive.** Same idea as the ActionPreview gate: nothing
   goes live without a human explicitly activating it after a pinned-data
   test run in the editor.
@@ -42,9 +46,12 @@ services are reachable from n8n cloud:
 
 ## Local test
 1. `docker compose up -d` (services on 8001–8005).
-2. Import the JSON into n8n (inactive), set `PP_SERVICES_BASE` to your host
-   (e.g. `http://host.docker.internal`), map ports per service — or front the
-   services with one gateway path.
+2. Import the JSON into n8n (inactive). Set env vars
+   `PP_GUARDRAILS_BASE=http://host.docker.internal:8003` and
+   `PP_AGENT_BASE=http://host.docker.internal:8004`, and bind a Header Auth
+   credential to the webhook node (the flow requires it).
 3. POST a fixture from `../data/synthetic/alerts.jsonl` to the webhook test
-   URL; expect an IncidentStory JSON back, or `{rejected: true}` for a
-   guardrail-failing input.
+   URL with the auth header; expect an IncidentStory JSON back,
+   `{rejected: true}` (422) for a rail-failing input,
+   `{flagged_for_human_review: true}` when the output rail rejects, or
+   `{error: true}` (502) when a service is down.

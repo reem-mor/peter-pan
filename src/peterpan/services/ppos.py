@@ -8,8 +8,8 @@ dashboard, pointed at the LLM layer instead of the app layer.
 from __future__ import annotations
 
 import time
-import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Literal
 
@@ -35,9 +35,13 @@ def healthz() -> dict[str, str]:
     return {"service": "peter-pan-os", "status": "ok", "env": settings.env.value}
 
 
+# One year. Unbounded floats (1e300, inf) overflow timedelta into a 500.
+_MAX_WINDOW_HOURS = 8760
+
+
 @app.get("/os/usage")
 def usage_route(
-    hours: float | None = Query(default=None, gt=0),
+    hours: float | None = Query(default=None, gt=0, le=_MAX_WINDOW_HOURS),
     by: Literal["agent", "model", "service"] = "agent",
 ) -> dict[str, dict[str, float]]:
     return aggregate(window(load_usage(settings.usage_log_path), hours), by=by)
@@ -45,7 +49,7 @@ def usage_route(
 
 @app.get("/os/usage/series")
 def usage_series_route(
-    hours: float = Query(default=24, gt=0),
+    hours: float = Query(default=24, gt=0, le=_MAX_WINDOW_HOURS),
     buckets: int = Query(default=48, gt=0, le=500),
 ) -> dict[str, object]:
     """Bucketed cost/token time series — feeds the OS dashboard charts."""
@@ -69,15 +73,35 @@ def agents_route() -> dict[str, list[str]]:
     return {"agents": ["predictor", "rag", "guardrails", "incident-agent"]}
 
 
+@app.get("/os/info")
+def info_route() -> dict[str, object]:
+    """Deployment identity for the dashboard header — env, backends, budget.
+
+    Config only, never secrets: values here render in a browser.
+    """
+    return {
+        "service": settings.service_name,
+        "env": settings.env.value,
+        "llm": settings.llm.value,
+        "model": settings.anthropic_model,
+        "rag_backend": settings.rag_backend.value,
+        "predictor": settings.predictor.value,
+        "daily_budget_usd": settings.daily_budget_usd,
+        "repo": "https://github.com/reem-mor/peter-pan",
+    }
+
+
 def _probe(name: str, base_url: str) -> dict[str, object]:
     """One healthz ping. Failures are data, not exceptions — the dashboard
-    renders a down service the same way an APM would."""
+    renders a down service the same way an APM would. Catch everything: a
+    malformed mesh URL or a garbage responder must not 500 the whole sweep.
+    """
     url = f"{base_url.rstrip('/')}/healthz"
     started = time.perf_counter()
     try:
         with urllib.request.urlopen(url, timeout=_HEALTH_TIMEOUT_S) as resp:  # noqa: S310
             ok = resp.status == 200
-    except (urllib.error.URLError, TimeoutError, OSError):
+    except Exception:  # noqa: BLE001 — failures are data here, by contract
         ok = False
     latency_ms = round((time.perf_counter() - started) * 1000, 1)
     return {
@@ -90,8 +114,18 @@ def _probe(name: str, base_url: str) -> dict[str, object]:
 
 @app.get("/os/services")
 def services_route() -> dict[str, list[dict[str, object]]]:
-    """Server-side health sweep of the mesh (browsers can't cross-origin poll it)."""
-    return {"services": [_probe(name, url) for name, url in settings.mesh.items()]}
+    """Server-side health sweep of the mesh (browsers can't cross-origin poll it).
+
+    Probes run concurrently so the sweep's wall time is one slow probe, not
+    the sum — sequential probes could starve the sync-route threadpool while
+    the dashboard polls every 30s.
+    """
+    mesh = list(settings.mesh.items())
+    if not mesh:
+        return {"services": []}
+    with ThreadPoolExecutor(max_workers=min(8, len(mesh))) as pool:
+        services = list(pool.map(lambda kv: _probe(kv[0], kv[1]), mesh))
+    return {"services": services}
 
 
 @app.get("/os/dashboard", response_model=None)

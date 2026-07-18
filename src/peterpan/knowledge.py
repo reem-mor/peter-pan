@@ -14,20 +14,42 @@ from peterpan.schemas import Evidence
 KNOWLEDGE_ROOT = Path(__file__).parent.parent.parent / "knowledge"
 
 _KIND_BY_DIR = {"runbooks": "runbook", "incidents": "past_incident"}
+_DETAIL_MARKERS = ("**Symptoms:**", "**What happened:**")
+
+
+def _kind_for(path: Path, base: Path) -> str:
+    """Classify by ancestor dir, not just the immediate parent — so incidents
+    fed under incidents/memory/ still index as past_incident, not document."""
+    parts = path.relative_to(base).parts
+    for dirname, kind in _KIND_BY_DIR.items():
+        if dirname in parts:
+            return kind
+    return "document"
 
 
 def _summarize(text: str) -> str:
-    """Title + the symptom/what-happened line — keyword-rich for retrieval."""
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    title = lines[0].lstrip("# ") if lines else ""
-    detail = next(
-        (
-            ln.replace("**Symptoms:**", "").replace("**What happened:**", "").strip()
-            for ln in lines
-            if ln.startswith(("**Symptoms:**", "**What happened:**"))
-        ),
-        "",
-    )
+    """Title + the symptom/what-happened paragraph — keyword-rich for retrieval.
+
+    Hard-wrapped paragraphs are joined up to the next blank line *before* the
+    300-char cut, so root-cause keywords on continuation lines (which retrieval
+    keys on) survive instead of being truncated to the first physical line."""
+    raw = text.splitlines()
+    nonblank = [ln.strip() for ln in raw if ln.strip()]
+    title = nonblank[0].lstrip("# ") if nonblank else ""
+
+    detail = ""
+    for i, ln in enumerate(raw):
+        if ln.strip().startswith(_DETAIL_MARKERS):
+            para = [ln.strip()]
+            for cont in raw[i + 1 :]:
+                if not cont.strip():  # blank line ends the paragraph
+                    break
+                para.append(cont.strip())
+            detail = " ".join(para)
+            for marker in _DETAIL_MARKERS:
+                detail = detail.replace(marker, "")
+            detail = detail.strip()
+            break
     return f"{title}: {detail}"[:300]
 
 
@@ -36,7 +58,7 @@ def load_corpus(root: Path | None = None) -> list[Evidence]:
     base = root or KNOWLEDGE_ROOT
     corpus: list[Evidence] = []
     for path in sorted(base.rglob("*.md")):
-        kind = _KIND_BY_DIR.get(path.parent.name, "document")
+        kind = _kind_for(path, base)
         rel = path.relative_to(base.parent).as_posix()
         corpus.append(
             Evidence(

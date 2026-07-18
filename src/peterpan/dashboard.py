@@ -14,7 +14,7 @@ from pydantic import ValidationError
 
 from peterpan.config import LlmProvider, Settings
 from peterpan.schemas import DashboardSpec, IncidentStory, Panel, PanelKind
-from peterpan.usage import log_usage, make_event
+from peterpan.usage import log_usage, make_event, model_rates
 
 _PROMPT_PATH = (
     Path(__file__).parent.parent.parent / "prompts" / "dashboard-builder" / "system-v1.txt"
@@ -107,6 +107,7 @@ def _llm_spec(problem: str, story: IncidentStory, settings: Settings) -> Dashboa
     except Exception as exc:
         raise DashboardError(f"anthropic API failure: {type(exc).__name__}") from exc
 
+    in_rate, out_rate = model_rates(settings.anthropic_model)
     log_usage(
         make_event(
             service="agent",
@@ -115,7 +116,7 @@ def _llm_spec(problem: str, story: IncidentStory, settings: Settings) -> Dashboa
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             cost_usd=round(
-                response.usage.input_tokens * 3e-06 + response.usage.output_tokens * 1.5e-05, 6
+                response.usage.input_tokens * in_rate + response.usage.output_tokens * out_rate, 6
             ),
         ),
         settings.usage_log_path,
