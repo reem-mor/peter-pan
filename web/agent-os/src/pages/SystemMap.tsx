@@ -40,9 +40,12 @@ export function SystemMap() {
         lives in the demo app, not here.
       </p>
 
+      {/* No allow-same-origin: the embedded page loads a CDN script
+          (vis-network) — sandboxing severs it from the console's origin. */}
       <iframe
         src="/system-map.html"
         title="Graphify repository map (static snapshot)"
+        sandbox="allow-scripts allow-popups"
         className="min-h-[540px] w-full flex-1 rounded-xl border border-edge bg-panel"
       />
     </div>
