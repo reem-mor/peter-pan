@@ -9,9 +9,14 @@ human approves.
 
 from __future__ import annotations
 
+import asyncio
+import json
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from typing import Literal
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 from peterpan.config import LlmProvider, Settings
@@ -22,6 +27,7 @@ from peterpan.schemas import (
     DashboardSpec,
     Evidence,
     IncidentStory,
+    Severity,
 )
 from peterpan.services.predictor import predict
 from peterpan.services.rag import search
@@ -30,6 +36,43 @@ app = FastAPI(title="peter-pan-agent")
 settings = Settings()
 
 MAX_STEPS = 6  # bounded loop — the agent can never run away
+
+# Synthetic delay between SSE frames so the demo "thinking" pace is visible
+# without any live LLM latency to wait on (CONTRACTS.md §5).
+_STREAM_STEP_DELAY_S = 0.05
+
+# Fixture-first alert catalog the SSE demo endpoint resolves `alert_id`
+# against. No live alert store exists yet (WS9 owns that); this is enough
+# surface for the demo app to drive the stream deterministically. Timestamp
+# is fixed so responses stay byte-for-byte reproducible across runs.
+_DEMO_RECEIVED_AT = datetime(2026, 1, 1, tzinfo=UTC)
+
+DEMO_ALERTS: dict[str, Alert] = {
+    "demo-oom": Alert(
+        id="demo-oom",
+        source="grafana",
+        title="checkout OOMKilled",
+        description="pod restarted twice, memory at limit",
+        severity=Severity.P1,
+        received_at=_DEMO_RECEIVED_AT,
+    ),
+    "demo-latency": Alert(
+        id="demo-latency",
+        source="pager",
+        title="timeout on payments API",
+        description="p99 latency breached SLO after the 14:00 deploy",
+        severity=Severity.P2,
+        received_at=_DEMO_RECEIVED_AT,
+    ),
+    "demo-5xx": Alert(
+        id="demo-5xx",
+        source="grafana",
+        title="checkout returning 5xx",
+        description="error rate spike correlates with the canary rollout",
+        severity=Severity.P2,
+        received_at=_DEMO_RECEIVED_AT,
+    ),
+}
 
 
 def search_query(alert: Alert) -> str:
@@ -144,3 +187,68 @@ def dashboard_route(body: DrawRequest) -> DashboardSpec:
 
     story = build_story(body.alert)
     return build_dashboard(body.problem, story, settings)
+
+
+class StepEvent(BaseModel):
+    """One reasoning-step notification — CONTRACTS.md §5 `step` event shape."""
+
+    name: str
+    detail: str
+    ts: str
+
+
+class SseEvent(BaseModel):
+    """Typed SSE frame envelope: one `event:`/`data:` pair (CONTRACTS.md §5).
+    `data` is the already-serialized JSON payload for the named event type
+    (StepEvent | Evidence | IncidentStory | the terminal done marker) — the
+    envelope only shapes the wire frame, it never re-validates the payload
+    (that already happened when the payload model was built)."""
+
+    event: Literal["step", "evidence", "story", "done"]
+    data: str
+
+    def encode(self) -> str:
+        return f"event: {self.event}\ndata: {self.data}\n\n"
+
+
+async def _stream_story(alert: Alert) -> AsyncIterator[str]:
+    """Narrate build_story()'s existing pipeline as CONTRACTS.md §5 SSE
+    frames: step+ -> evidence+ -> story -> done. Calls build_story() exactly
+    once — this never re-implements the classify/retrieve/synthesize logic,
+    it only describes it, so PP_LLM=anthropic streams the same shape around
+    the real LLM call (metered by peterpan.llm/usage as it already is)."""
+    plan = [
+        ("classify", "Classifying the alert against the deterministic floor."),
+        ("retrieve", "Retrieving runbooks and past incidents."),
+        (
+            "synthesize",
+            "Synthesizing the incident story via Claude."
+            if settings.llm is LlmProvider.ANTHROPIC
+            else "Synthesizing the incident story (deterministic).",
+        ),
+    ]
+    for name, detail in plan:
+        step = StepEvent(name=name, detail=detail, ts=datetime.now(UTC).isoformat())
+        yield SseEvent(event="step", data=step.model_dump_json()).encode()
+        await asyncio.sleep(_STREAM_STEP_DELAY_S)
+
+    story = build_story(alert)
+
+    for evidence in story.evidence:
+        yield SseEvent(event="evidence", data=evidence.model_dump_json()).encode()
+        await asyncio.sleep(_STREAM_STEP_DELAY_S)
+
+    yield SseEvent(event="story", data=story.model_dump_json()).encode()
+    await asyncio.sleep(_STREAM_STEP_DELAY_S)
+    yield SseEvent(event="done", data=json.dumps({"status": "done"})).encode()
+
+
+@app.get("/agent/stream", response_model=None)
+def stream_route(alert_id: str) -> StreamingResponse | JSONResponse:
+    """SSE incident-story stream (CONTRACTS.md §5) for the live demo app.
+    Fixture-first: resolves against the deterministic demo catalog, so the
+    default path needs zero external accounts or a live LLM."""
+    alert = DEMO_ALERTS.get(alert_id)
+    if alert is None:
+        return JSONResponse(status_code=404, content={"error": f"unknown alert_id: {alert_id!r}"})
+    return StreamingResponse(_stream_story(alert), media_type="text/event-stream")
