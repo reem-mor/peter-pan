@@ -151,7 +151,7 @@ def topical_llm_check(text: str, settings: Settings) -> bool:
         raise NemoCheckError("anthropic SDK not installed (pip install -e '.[llm]')") from exc
 
     try:
-        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         response = client.messages.create(
             model=settings.anthropic_model,
             max_tokens=8,

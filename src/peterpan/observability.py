@@ -207,7 +207,7 @@ def _start_langfuse_trace(service: str, model: str, settings: Settings) -> tuple
 
         client = Langfuse(
             public_key=settings.langfuse_public_key,
-            secret_key=settings.langfuse_secret_key,
+            secret_key=settings.langfuse_secret_key.get_secret_value(),
             host=settings.langfuse_host or None,
         )
         trace = client.trace(name=service)

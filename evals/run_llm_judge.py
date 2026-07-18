@@ -44,7 +44,8 @@ class Verdict(BaseModel):
 def judge(story_json: str, settings: Settings) -> Verdict:
     import anthropic
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+    assert settings.anthropic_api_key is not None  # main() exits early without it
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
     response = client.messages.create(
         model=settings.anthropic_model,
         max_tokens=1500,

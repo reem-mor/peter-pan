@@ -97,7 +97,8 @@ def _llm_spec(problem: str, story: IncidentStory, settings: Settings) -> Dashboa
         default=str,
     )
     try:
-        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        assert settings.anthropic_api_key is not None  # guarded by build_dashboard()
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         response = client.messages.create(
             model=settings.anthropic_model,
             max_tokens=2000,
