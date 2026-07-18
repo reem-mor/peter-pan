@@ -9,6 +9,8 @@ COPY src/ src/
 COPY knowledge/ knowledge/
 COPY prompts/ prompts/
 COPY data/models/ data/models/
+# PETER PAN OS serves the monitoring dashboard from ui/ (GET /os/dashboard).
+COPY ui/ ui/
 # Editable install keeps peterpan importing from /app/src, so the repo-root
 # asset paths above resolve; a site-packages install pointed them into the
 # interpreter tree and shipped an empty corpus (rag corpus_size=0).

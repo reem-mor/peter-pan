@@ -61,7 +61,7 @@ interfaces (`predict()`, `search()`, `check_*()`, `build_story()`).
 | `rag` (8002) | ✅ Two backends | Lexical retrieval over `knowledge/` (default); Pinecone + Voyage semantic backend (`PP_RAG_BACKEND=pinecone`), falls back to lexical on failure | RDS Postgres + pgvector (target) |
 | `guardrails` (8003) | ✅ Regex floor | Deterministic input/output rails in `services/guardrails.py`; floor always wins | NeMo Guardrails layered on top (planned) |
 | `agent` (8004) | ✅ Deterministic + opt-in LLM | `build_story()` deterministic by default; `PP_LLM=anthropic` enables Claude synthesis with citation/contradiction/confidence guards; LangGraph graph mirrors the same contract | LLM planner nodes inside the graph (planned) |
-| PETER PAN OS (8005) | ✅ MVP+ | Usage metering via `peterpan.usage`; `/os/usage` with time windows (`?hours=`) and grouping (`?by=agent\|model\|service`); `/os/budget` — deterministic daily-spend guard (`PP_DAILY_BUDGET_USD`, ok/warn/exceeded, report-only); `/os/agents`, `/os/tips` | Budget enforcement + routing analytics (planned) |
+| PETER PAN OS (8005) | ✅ MVP+ | Usage metering via `peterpan.usage`; `/os/usage` with time windows (`?hours=`) and grouping (`?by=agent\|model\|service`); `/os/usage/series` — bucketed cost/token time series; `/os/budget` — deterministic daily-spend guard (`PP_DAILY_BUDGET_USD`, ok/warn/exceeded, report-only); `/os/agents`, `/os/tips`; `/os/services` — server-side mesh healthz sweep (`PP_MESH`); `/os/dashboard` — self-contained monitoring dashboard (agents, models, services, token/cost graphs, budget bar, optimization tips; demo-data fallback) | Budget enforcement + routing analytics (planned) |
 | Streamlit UI | ✅ MVP | Incident dashboard + dynamic LLM-designed panels (`dashboard.py`) | — |
 | n8n spine | ✅ Live | `PETER PAN — Triage v2` active: webhook → input rail → LLM story → output rail → respond, wired to the EC2 mesh; SG allowlists the n8n egress IP | Self-hosted n8n in compose (target) |
 | AWS deploy | ✅ Live | `infra/aws/stack.yaml` — EC2 mesh with `PP_LLM=anthropic` + `PP_RAG_BACKEND=pinecone`, keys from Secrets Manager (per-service least privilege), shared usage log for PETER PAN OS | Private subnet + tunnel hardening (target) |
@@ -222,7 +222,7 @@ sequenceDiagram
 | `rag` | `8002` | LangChain and AWS RDS for PostgreSQL with pgvector | `GET /healthz`, `POST /query` | Retrieves and aggregates codebase maps, logs, runbooks, deployment context, and historical incidents. |
 | `guardrails` | `8003` | NeMo Guardrails and deterministic regular expressions | `GET /healthz`, `POST /check/input`, `POST /check/output` | Validates input patterns, output structure, and safety thresholds. |
 | `agent` | `8004` | LangGraph stateful planner | `GET /healthz`, `POST /story` | Coordinates bounded tool-use, planning, evidence synthesis, and incident-story generation. |
-| `PETER PAN OS` | `8005` | FastAPI and a thread-safe queue | `GET /healthz`, `GET /os/usage`, `GET /os/agents`, `GET /os/tips` | Provides the operational control plane for cost, token, agent, routing, and usage visibility. |
+| `PETER PAN OS` | `8005` | FastAPI and a thread-safe queue | `GET /healthz`, `GET /os/usage`, `GET /os/usage/series`, `GET /os/budget`, `GET /os/agents`, `GET /os/tips`, `GET /os/services`, `GET /os/dashboard` | Provides the operational control plane for cost, token, agent, routing, and usage visibility, plus the monitoring dashboard. |
 
 ---
 
@@ -425,7 +425,17 @@ Streamlit normally opens at:
 http://localhost:8501
 ```
 
-### 5. Open the n8n Orchestration Panel
+### 5. Open the PETER PAN OS Monitoring Dashboard
+
+```text
+http://localhost:8005/os/dashboard
+```
+
+Agents, models, services, token/cost graphs, the daily budget guard, mesh
+health, and optimization tips — fed by the `log_usage` metering. Renders with
+demo data when the control plane is unreachable (fixture-first).
+
+### 6. Open the n8n Orchestration Panel
 
 ```text
 http://localhost:5678
@@ -433,7 +443,7 @@ http://localhost:5678
 
 Use n8n to inspect the active JSON routing workflow between the user interface, control plane, and microservices.
 
-### 6. Verify Service Health
+### 7. Verify Service Health
 
 ```bash
 curl http://localhost:8001/healthz
