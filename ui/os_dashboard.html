@@ -25,7 +25,9 @@
     --border-hi: #29414f;
     --text: #e6f1f3;
     --muted: #7c93a3;
-    --faint: #4a5f6d;
+    /* smallest readable tier — must hold 4.5:1 on --bg (WCAG 1.4.3);
+       #4a5f6d looked right but measured ~2.9:1 */
+    --faint: #6b8296;
     --accent: #2fe6b0;
     --accent-dim: rgba(47, 230, 176, 0.12);
     --cyan: #4cc9f0;
@@ -98,7 +100,7 @@
     font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
     background: transparent; color: var(--muted); border: 0; padding: 8px 13px;
     cursor: pointer; transition: color 0.2s, background 0.2s;
-    min-width: 44px; min-height: 36px;
+    min-width: 44px; min-height: 44px;
   }
   .win-select button + button { border-left: 1px solid var(--border); }
   .win-select button:hover { color: var(--text); background: var(--panel-2); }
@@ -109,7 +111,7 @@
 
   .icon-btn {
     background: transparent; border: 1px solid var(--border-hi); border-radius: 8px;
-    color: var(--muted); width: 38px; height: 38px; display: grid; place-items: center;
+    color: var(--muted); width: 44px; height: 44px; display: grid; place-items: center;
     cursor: pointer; transition: color 0.2s, border-color 0.2s;
   }
   .icon-btn:hover { color: var(--accent); border-color: var(--accent); }
@@ -251,11 +253,11 @@
     <span class="badge" id="env-badge"><span class="dot"></span><span id="env-label">env: —</span></span>
     <span class="badge" id="source-badge" role="status" aria-live="polite"><span class="dot"></span><span id="source-label">connecting…</span></span>
     <nav class="win-select" aria-label="Time window">
-      <button data-hours="1">1H</button>
-      <button data-hours="6">6H</button>
-      <button data-hours="24" class="active">24H</button>
-      <button data-hours="168">7D</button>
-      <button data-hours="">ALL</button>
+      <button data-hours="1" aria-pressed="false">1H</button>
+      <button data-hours="6" aria-pressed="false">6H</button>
+      <button data-hours="24" class="active" aria-pressed="true">24H</button>
+      <button data-hours="168" aria-pressed="false">7D</button>
+      <button data-hours="" aria-pressed="false">ALL</button>
     </nav>
     <button class="icon-btn" id="refresh" aria-label="Refresh data" title="Refresh">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
@@ -438,6 +440,7 @@ async function getJSON(path) {
 /* ---------------- data load ---------------- */
 async function loadAll() {
   const seq = ++state.seq; // drop stale responses (timer vs window-switch races)
+  document.getElementById('main').setAttribute('aria-busy', 'true');
   const h = state.hours;
   const q = h ? `?hours=${h}` : '';
   const seriesQ = `?hours=${h || 168}&buckets=48`;
@@ -461,6 +464,7 @@ async function loadAll() {
     Object.keys(DEMO).forEach(k => { if (out[k] === null) out[k] = DEMO[k]; });
   }
   render(out);
+  document.getElementById('main').setAttribute('aria-busy', 'false');
 }
 
 /* ---------------- render ---------------- */
@@ -468,7 +472,9 @@ function render(d) {
   const src = $('#source-badge'), srcLabel = $('#source-label');
   src.classList.toggle('live', state.live);
   src.classList.toggle('demo', !state.live);
-  srcLabel.textContent = state.live ? 'live data' : 'demo data — OS offline';
+  // write only on change — an aria-live region re-announces every mutation
+  const srcText = state.live ? 'live data' : 'demo data — OS offline';
+  if (srcLabel.textContent !== srcText) srcLabel.textContent = srcText;
   $('#env-label').textContent = 'env: ' + ((d.health && d.health.env) || '—');
   $('#last-refresh').textContent = 'refreshed ' + new Date().toLocaleTimeString();
 
@@ -537,13 +543,13 @@ function renderSeries(points) {
   const gridLines = [0.25, 0.5, 0.75, 1].map(f => {
     const y = padT + ih - f * ih;
     return `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1b2831" stroke-dasharray="3 5"/>` +
-      `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#4a5f6d">$${(maxCost * f).toFixed(3)}</text>`;
+      `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#6b8296">$${(maxCost * f).toFixed(3)}</text>`;
   }).join('');
 
   const ticks = [0, Math.floor(points.length / 2), points.length - 1].map(i => {
     const t = new Date(points[i].t);
     const lbl = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
-    return `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#4a5f6d">${lbl}</text>`;
+    return `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#6b8296">${lbl}</text>`;
   }).join('');
 
   host.innerHTML = `
@@ -636,8 +642,12 @@ function renderTips(t) {
 /* ---------------- wiring ---------------- */
 document.querySelectorAll('.win-select button').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.win-select button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.win-select button').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     state.hours = btn.dataset.hours ? Number(btn.dataset.hours) : null;
     loadAll();
   });
