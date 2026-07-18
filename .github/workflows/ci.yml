@@ -14,7 +14,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install -e ".[dev]"
+        # llm + agents included so mypy strict sees real types for anthropic /
+        # langgraph (lazy imports in llm.py, dashboard.py, agents/graph.py).
+        run: pip install -e ".[dev,llm,agents]"
       - name: Lint
         run: ruff check .
       - name: Format check
