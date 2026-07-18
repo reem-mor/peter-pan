@@ -91,9 +91,14 @@ def test_module_level_enqueue_dequeue_roundtrip() -> None:
 # --- cache_key: sha256(model + payload), stable and collision-resistant ------
 
 
-def test_cache_key_is_sha256_of_model_plus_payload() -> None:
+def test_cache_key_is_sha256_of_length_prefixed_model_plus_payload() -> None:
     key = cache_mod.cache_key("claude-sonnet-5", "hello")
-    assert key == hashlib.sha256(b"claude-sonnet-5hello").hexdigest()
+    assert key == hashlib.sha256(b"15:claude-sonnet-5hello").hexdigest()
+
+
+def test_cache_key_is_collision_safe_across_model_payload_split() -> None:
+    # Without length-prefixing these two would hash identically.
+    assert cache_mod.cache_key("ab", "c") != cache_mod.cache_key("a", "bc")
 
 
 def test_cache_key_is_stable_across_calls() -> None:

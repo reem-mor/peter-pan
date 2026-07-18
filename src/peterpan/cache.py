@@ -38,8 +38,12 @@ DEFAULT_TTL_S = 86400  # 24h, per ADR-0001
 
 
 def cache_key(model: str, payload: str) -> str:
-    """The ADR-0001 key convention: sha256(model + payload)."""
-    return hashlib.sha256((model + payload).encode("utf-8")).hexdigest()
+    """The ADR-0001 key convention: sha256 over a length-prefixed encoding.
+
+    Length-prefixing the model makes the key structurally collision-safe:
+    ("ab", "c...") and ("a", "bc...") hash differently.
+    """
+    return hashlib.sha256(f"{len(model)}:{model}{payload}".encode()).hexdigest()
 
 
 class CacheBackend(ABC):

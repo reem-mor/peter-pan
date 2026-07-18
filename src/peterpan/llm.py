@@ -149,7 +149,9 @@ def synthesize(
         )
 
         raw = "".join(block.text for block in response.content if block.type == "text").strip()
-        cache_set(key, raw, ttl_s=DEFAULT_TTL_S)
+        fresh = True
+    else:
+        fresh = False
 
     try:
         draft = _LlmStoryDraft.model_validate_json(raw)
@@ -159,6 +161,13 @@ def synthesize(
         ) from exc
 
     _validate_draft(draft, prediction, allowed)
+
+    # Cache only fully validated completions (schema + floor checks) — a bad
+    # completion must fail once, not be replayed from the cache for 24h. The
+    # key covers model + system prompt + full payload, so a hit replays the
+    # exact validated context.
+    if fresh:
+        cache_set(key, raw, ttl_s=DEFAULT_TTL_S)
 
     return IncidentStory(
         alert=alert,
