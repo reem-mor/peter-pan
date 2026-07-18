@@ -1,0 +1,25 @@
+# Deterministic output rails — pattern-matching Python actions from
+# guardrails_config/actions.py (peterpan.nemo_rails.detect_fabricated_citation
+# / detect_secret_leak). No LLM call; see ../README.md.
+#
+# These flows only ever ADD a fail verdict on top of a floor PASS; the
+# regex floor in peterpan.services.guardrails has already run and always
+# wins.
+
+define bot refuse fabricated citation
+  "Response blocked by NeMo output rail: citation does not match a known evidence-source shape."
+
+define bot refuse secret leakage
+  "Response blocked by NeMo output rail: output matched a secret-like pattern."
+
+define flow check fabricated citation
+  $nemo_fabricated_citation = execute check_citation_action
+  if $nemo_fabricated_citation
+    bot refuse fabricated citation
+    stop
+
+define flow check secret leakage
+  $nemo_secret_leak = execute check_secret_action
+  if $nemo_secret_leak
+    bot refuse secret leakage
+    stop
