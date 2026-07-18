@@ -1,0 +1,10 @@
+{
+  "name": "@peterpan/types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript mirror of src/peterpan/schemas.py — the shared product contracts.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

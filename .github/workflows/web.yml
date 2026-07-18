@@ -1,0 +1,41 @@
+name: web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/web.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "packages/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/web.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [landing, demo, agent-os]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install workspaces
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck -w web/${{ matrix.app }}
+      - name: Lint
+        run: npm run lint -w web/${{ matrix.app }}
+      - name: Build
+        run: npm run build -w web/${{ matrix.app }}

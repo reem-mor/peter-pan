@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* PETER PAN demo — placeholder design tokens (dark ops-room look).
+   Real design language lands in a later workstream. */
+@theme {
+  --color-ink: #e6e9f0;
+  --color-ink-soft: #8b93a7;
+  --color-surface: #0d1117;
+  --color-surface-raised: #161b26;
+  --color-edge: #262d3d;
+  --color-accent: #4f8dfd;
+  --color-signal: #f2b544;
+  --font-display: "Inter", system-ui, sans-serif;
+}
