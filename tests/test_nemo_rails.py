@@ -85,10 +85,11 @@ def test_detect_fabricated_citation_false_on_real_source_shapes() -> None:
 @pytest.mark.parametrize(
     "text",
     [
-        "leaked key AKIAABCDEFGHIJKLMNOP in the log output",
-        "-----BEGIN PRIVATE KEY-----\nMIIBVQIBADANBgkq\n-----END PRIVATE KEY-----",
-        "api_key: sk-abcdefghijklmnopqrstuvwx1234",
-        "password=SuperSecretValue123",
+        # Synthetic detection vectors, not credentials (gitleaks:allow below).
+        "leaked key AKIAABCDEFGHIJKLMNOP in the log output",  # gitleaks:allow
+        "-----BEGIN PRIVATE KEY-----\nMIIB\n-----END PRIVATE KEY-----",  # gitleaks:allow
+        "api_key: sk-abcdefghijklmnopqrstuvwx1234",  # gitleaks:allow
+        "password=SuperSecretValue123",  # gitleaks:allow
     ],
 )
 def test_detect_secret_leak(text: str) -> None:
@@ -209,3 +210,133 @@ def test_scan_output_passes_honest_report() -> None:
         Settings(),
     )
     assert flags == []
+
+
+# --- engine wiring, covered keylessly via fakes (CI installs no nemo extra) --
+
+
+def test_topical_llm_check_import_error_becomes_nemo_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    from peterpan.nemo_rails import NemoCheckError, topical_llm_check
+
+    settings = Settings()
+    monkeypatch.setattr(settings, "nemo_topical_llm", True)
+    monkeypatch.setattr(settings, "anthropic_api_key", "test-not-real")
+    monkeypatch.setitem(sys.modules, "anthropic", None)
+    with pytest.raises(NemoCheckError, match="anthropic SDK not installed"):
+        topical_llm_check("some text", settings)
+
+
+def test_topical_llm_check_api_failure_becomes_nemo_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+    import types
+
+    from peterpan.nemo_rails import NemoCheckError, topical_llm_check
+
+    class _Boom:
+        def __init__(self, api_key: str) -> None:
+            raise ConnectionError("down")
+
+    fake = types.ModuleType("anthropic")
+    fake.Anthropic = _Boom  # type: ignore[attr-defined]
+    settings = Settings()
+    monkeypatch.setattr(settings, "nemo_topical_llm", True)
+    monkeypatch.setattr(settings, "anthropic_api_key", "test-not-real")
+    monkeypatch.setitem(sys.modules, "anthropic", fake)
+    with pytest.raises(NemoCheckError, match="anthropic API failure"):
+        topical_llm_check("some text", settings)
+
+
+def test_build_rails_import_error_becomes_nemo_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+
+    from peterpan.nemo_rails import NemoCheckError, _build_rails
+
+    monkeypatch.setitem(sys.modules, "nemoguardrails", None)
+    with pytest.raises(NemoCheckError, match="nemoguardrails not installed"):
+        _build_rails(Settings())
+
+
+def test_build_rails_config_failure_becomes_nemo_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+    import types
+
+    from peterpan.nemo_rails import NemoCheckError, _build_rails
+
+    fake = types.ModuleType("nemoguardrails")
+
+    class _BadConfig:
+        @staticmethod
+        def from_path(path: str) -> None:
+            raise ValueError("broken config")
+
+    fake.RailsConfig = _BadConfig  # type: ignore[attr-defined]
+    fake.LLMRails = object  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "nemoguardrails", fake)
+    with pytest.raises(NemoCheckError, match="failed to build NeMo rails"):
+        _build_rails(Settings())
+
+
+def test_build_rails_appends_semantic_flow_when_llm_rail_enabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+    import types
+    from types import SimpleNamespace
+
+    from peterpan.nemo_rails import _build_rails
+
+    flows: list[str] = ["check prompt injection"]
+    config = SimpleNamespace(rails=SimpleNamespace(input=SimpleNamespace(flows=flows)))
+    fake = types.ModuleType("nemoguardrails")
+    fake.RailsConfig = SimpleNamespace(from_path=lambda path: config)  # type: ignore[attr-defined]
+    fake.LLMRails = lambda cfg: ("engine", cfg)  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "nemoguardrails", fake)
+
+    settings = Settings()
+    monkeypatch.setattr(settings, "nemo_topical_llm", True)
+    engine = _build_rails(settings)
+    assert engine == ("engine", config)
+    assert "check topical drift semantic" in flows
+
+
+def test_run_rails_import_error_becomes_nemo_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+
+    from peterpan.nemo_rails import NemoCheckError, _run_rails
+
+    monkeypatch.setitem(sys.modules, "nemoguardrails.rails.llm.options", None)
+    with pytest.raises(NemoCheckError, match="nemoguardrails not installed"):
+        _run_rails(object(), [], "input")
+
+
+def test_run_rails_engine_failure_becomes_nemo_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+    import types
+    from types import SimpleNamespace
+
+    from peterpan.nemo_rails import NemoCheckError, _run_rails
+
+    opts = types.ModuleType("nemoguardrails.rails.llm.options")
+    opts.GenerationOptions = lambda **kw: SimpleNamespace(**kw)  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "nemoguardrails.rails.llm.options", opts)
+
+    class _FailingRails:
+        async def generate_async(self, **kw: object) -> None:
+            raise TimeoutError("engine hung")
+
+    with pytest.raises(NemoCheckError, match="scan failed"):
+        _run_rails(_FailingRails(), [{"role": "user", "content": "x"}], "input")
+
+
+def test_detect_fabricated_citation_skips_empty_claim() -> None:
+    from peterpan.nemo_rails import detect_fabricated_citation
+
+    # Quoted-empty claim: the citation regex matches but the claim is blank —
+    # skipped rather than treated as fabricated.
+    assert not detect_fabricated_citation('per ""')
