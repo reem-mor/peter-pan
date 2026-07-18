@@ -17,4 +17,8 @@ paths = [
     # Verified 2026-07-18 (PR #37): synthetic only, also marked gitleaks:allow
     # inline. A secret-leak detector's tests will always trip a secret scanner.
     '''tests/test_nemo_rails.py''',
+    # Same class of fixture: the prompt-log secret-scrubber's adversarial
+    # inputs (password=hunter2, sk-..., ghp_...) are secret-shaped synthetic
+    # strings by design. Verified 2026-07-18 (PR #41): synthetic only.
+    '''tests/test_observability.py''',
 ]

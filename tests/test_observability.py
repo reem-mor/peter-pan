@@ -234,10 +234,11 @@ def test_langfuse_generation_failure_never_breaks_the_prompt_log(
 @pytest.mark.parametrize(
     "secret_text",
     [
-        "please use password=hunter2 to log in",
-        "API_KEY: sk-abcdef1234567890",
-        "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.secretpayload",
-        "token=ghp_1234567890abcdef",
+        # Synthetic scrubber fixtures, not credentials (gitleaks:allow).
+        "please use password=hunter2 to log in",  # gitleaks:allow
+        "API_KEY: sk-abcdef1234567890",  # gitleaks:allow
+        "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.secretpayload",  # gitleaks:allow
+        "token=ghp_1234567890abcdef",  # gitleaks:allow
     ],
 )
 def test_preview_scrubs_secret_looking_content(secret_text: str, tmp_path: object) -> None:
