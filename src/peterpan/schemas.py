@@ -80,6 +80,35 @@ class ActionPreview(BaseModel):
         return not self.requires_approval or self.approved_by is not None
 
 
+class Deployment(BaseModel):
+    """A deployment event — the change-correlation signal for incident stories."""
+
+    id: str
+    service: str
+    version: str
+    deployed_at: datetime
+    author: str = ""
+    summary: str = ""
+    labels: dict[str, str] = Field(default_factory=dict)
+
+
+class FeedbackVerdict(StrEnum):
+    HELPFUL = "helpful"
+    WRONG = "wrong"
+    PARTIAL = "partial"
+
+
+class Feedback(BaseModel):
+    """Operator feedback on an agent output, keyed to its trace for the
+    learning loop. `trace_id` links back to usage/observability records."""
+
+    trace_id: str
+    verdict: FeedbackVerdict
+    comment: str = ""
+    submitted_by: str
+    submitted_at: datetime
+
+
 class GuardrailVerdict(BaseModel):
     passed: bool
     flags: list[str] = Field(default_factory=list)
