@@ -1,6 +1,6 @@
 ---
 name: peter-pan-design
-description: PETER PAN's private design system. Use before building or reviewing ANY UI in this repo — dashboards, Streamlit panels, HTML pages, charts, emails, decks. Defines the brand tokens, typography, component patterns, chart rules, and a numeric pre-delivery checklist. The canonical implementation is ui/os_dashboard.html.
+description: PETER PAN's private design system. Use before building or reviewing ANY UI in this repo — dashboards, Streamlit panels, HTML pages, charts, emails, decks. Defines the brand tokens, typography, component patterns, chart rules, and a numeric pre-delivery checklist. The canonical implementation is the web/agent-os React app.
 ---
 
 # PETER PAN Design System
@@ -14,8 +14,11 @@ Per repo CLAUDE.md: public products (incident.io, resolve.ai, Grafana) are
 pattern references only. Never copy screens, branding, copy, or icons —
 PETER PAN has its own design system. This file **is** that system.
 
-**Canonical implementation:** `ui/os_dashboard.html`. When in doubt, open it
-and match it. Broader research-backed rules (responsive, a11y, performance,
+**Canonical implementation:** the `web/agent-os` React app — tokens live in
+`web/agent-os/src/index.css` (mirrored in `web/demo/src/index.css`). When in
+doubt, open it and match it. The token block below stays authoritative over
+any implementation drift. Retiring a UI surface that a skill names as its
+reference requires an /evolve follow-up in the same cycle (PR #47 lesson). Broader research-backed rules (responsive, a11y, performance,
 forms): `~/.claude/skills/power-design/principles/web-principles.md` — the
 20 web rules apply here wherever this file doesn't override them.
 
@@ -86,7 +89,7 @@ Hard rules:
 - Data/labels = mono; prose = sans. Never mix within one element.
 - ALL-CAPS only at ≤12px label size with +0.12em tracking or more.
 
-## 3. Component patterns (match `os_dashboard.html`)
+## 3. Component patterns (match `web/agent-os`)
 
 - **Panel:** `--panel` bg, 1px `--border`, radius 12, padding 18. Hover →
   `--border-hi`. Titled by a section label with a 14px accent-colored SVG icon.
