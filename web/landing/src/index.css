@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
-/* PETER PAN landing — placeholder design tokens.
-   Real design language lands in a later workstream; keep tokens here so
-   components never hardcode colors. */
+/* PETER PAN landing — design tokens per docs/product-research/original-design-system.md.
+   Components never hardcode colors; they use these tokens.
+
+   Contrast rules (WCAG AA on light surfaces):
+   - text + interactive fills use `accent-strong` or darker (>= 4.5:1 on surface);
+   - `accent` is reserved for decorative strokes and large graphics only. */
 @theme {
   --color-ink: #0e1420;
   --color-ink-soft: #4b5567;
@@ -10,5 +13,26 @@
   --color-surface-raised: #ffffff;
   --color-accent: #2f6df6;
   --color-accent-strong: #1f4fc4;
+  --color-accent-deep: #16337d;
   --font-display: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  /* Visible focus everywhere — incident tooling principle "calm under
+     pressure" applies to the marketing page too. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-strong);
+    outline-offset: 2px;
+  }
+
+  /* No decorative motion for people who opted out. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
 }
