@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from peterpan import memory
 from peterpan.config import RagBackend, Settings
@@ -100,7 +100,8 @@ def search(query: str, top_k: int = 3) -> RagResult:
 
 class QueryIn(BaseModel):
     query: str
-    top_k: int = 3
+    # gt=0: top_k<=0 used to slice silently (ranked[:-1] = corpus minus one).
+    top_k: int = Field(default=3, gt=0)
 
 
 @app.get("/healthz")
