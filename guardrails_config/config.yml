@@ -1,0 +1,31 @@
+# NeMo Guardrails config — additive screening layered on top of the
+# deterministic regex floor in peterpan.services.guardrails. THE FLOOR
+# ALWAYS WINS: this config can only turn a floor PASS into a flagged
+# review; it can never turn a floor FAIL into a pass, and it is never
+# consulted at all once the floor has already failed. See
+# src/peterpan/nemo_rails.py for the wiring and README.md in this
+# directory for the deterministic vs LLM-backed rail inventory.
+#
+# `models: []` is deliberate. Every rail wired into `rails:` below is a
+# plain Python pattern-matching action (see actions.py, rails/input.co,
+# rails/output.co) — no LLM call is required to run them. That is what
+# keeps PP_GUARDRAILS=nemo on the fixture-first demo path with zero
+# external accounts and zero new required dependencies at import time.
+#
+# rails/topical.co defines an additional, LLM-backed semantic topical
+# check. It is intentionally NOT wired into the `rails:` list below, so
+# it never runs by default even when PP_GUARDRAILS=nemo. It is only
+# activated when peterpan.config.Settings.nemo_topical_llm is explicitly
+# set (which also requires PP_LLM=anthropic + a live API key) — see
+# src/peterpan/nemo_rails.py:_build_rails and README.md.
+models: []
+
+rails:
+  input:
+    flows:
+      - check prompt injection
+      - check topical drift
+  output:
+    flows:
+      - check fabricated citation
+      - check secret leakage
