@@ -1,15 +1,59 @@
 @import "tailwindcss";
 
-/* PETER PAN OS — placeholder design tokens (operator console).
-   Real design language lands in a later workstream. */
+/* PETER PAN OS design tokens — the "agentic control plane" language
+   established by ui/os_dashboard.html (design v2). Dark, mono-forward,
+   calm under pressure. Contrast notes carried over from the v2 audit:
+   --color-ink-faint is the smallest readable tier and must hold 4.5:1
+   on --color-bg (WCAG 1.4.3). */
 @theme {
-  --color-ink: #14181f;
-  --color-ink-soft: #5b6472;
-  --color-surface: #f4f5f7;
-  --color-surface-raised: #ffffff;
-  --color-sidebar: #101623;
-  --color-sidebar-ink: #c3cad8;
-  --color-edge: #e1e4ea;
-  --color-accent: #2f6df6;
-  --font-display: "Inter", system-ui, sans-serif;
+  --color-bg: #070b0e;
+  --color-bg-grid: #0c1216;
+  --color-panel: #0d141a;
+  --color-panel-2: #101a21;
+  --color-edge: #1b2831;
+  --color-edge-hi: #29414f;
+  --color-ink: #e6f1f3;
+  --color-ink-soft: #7c93a3;
+  --color-ink-faint: #6b8296;
+  --color-accent: #2fe6b0;
+  --color-accent-dim: rgba(47, 230, 176, 0.12);
+  --color-cyan: #4cc9f0;
+  --color-amber: #fbbf24;
+  --color-red: #f87171;
+  --color-violet: #b794f6;
+  --color-blue: #60a5fa;
+  /* Offline-first font stacks — no webfont fetch, fixture-first applies
+     to the UI too. JetBrains Mono renders when installed locally. */
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  --font-display: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  background:
+    linear-gradient(rgba(47, 230, 176, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 230, 176, 0.025) 1px, transparent 1px),
+    var(--color-bg);
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto;
+}
+
+/* Keyboard-first: one consistent focus treatment everywhere. */
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
+
+/* Calm under pressure — no decorative motion for users who opt out. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

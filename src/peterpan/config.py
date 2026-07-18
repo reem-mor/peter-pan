@@ -104,6 +104,10 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("VOYAGE_API_KEY", "PP_VOYAGE_API_KEY"),
     )
 
+    # n8n webhook notified on each landing-page lead (PP_N8N_LEAD_WEBHOOK).
+    # Unset (default) disables the notification; the lead is stored regardless.
+    n8n_lead_webhook: str | None = Field(default=None)
+
     # Cache/queue backend (ADR-0001) — opt-in Redis; unset (default) or any
     # connection failure falls back to the in-process cache/queue so the
     # fixture-first demo path never depends on a live Redis instance.

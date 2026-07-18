@@ -1,14 +1,75 @@
 @import "tailwindcss";
 
-/* PETER PAN demo — placeholder design tokens (dark ops-room look).
-   Real design language lands in a later workstream. */
+/* PETER PAN demo — design tokens per .claude/skills/peter-pan-design
+   (canonical implementation: ui/os_dashboard.html). Dark-only product;
+   hex values are copied verbatim from the design system — never invent new. */
 @theme {
-  --color-ink: #e6e9f0;
-  --color-ink-soft: #8b93a7;
-  --color-surface: #0d1117;
-  --color-surface-raised: #161b26;
-  --color-edge: #262d3d;
-  --color-accent: #4f8dfd;
-  --color-signal: #f2b544;
-  --font-display: "Inter", system-ui, sans-serif;
+  /* surfaces */
+  --color-surface: #070b0e; /* page */
+  --color-well: #0c1216; /* inset wells, skeleton base */
+  --color-panel: #0d141a; /* cards */
+  --color-panel-2: #101a21; /* raised: row hover, chips */
+  --color-edge: #1b2831; /* resting borders */
+  --color-edge-hi: #29414f; /* hover/active borders */
+
+  /* text */
+  --color-ink: #e6f1f3; /* primary — never pure #fff */
+  --color-muted: #7c93a3; /* labels, hints */
+  --color-faint: #6b8296; /* axis ticks, footers only */
+
+  /* the one accent */
+  --color-accent: #2fe6b0; /* signal green: live, active */
+
+  /* status */
+  --color-warn: #fbbf24; /* demo mode, blast radius */
+  --color-danger: #f87171; /* sev-1, affected service */
+
+  /* chart series order (after accent) */
+  --color-s2: #4cc9f0;
+  --color-s3: #b794f6;
+
+  /* type */
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --font-sans: "Inter", system-ui, "Segoe UI", sans-serif;
+}
+
+/* Streamed rows fade in as frames arrive — motion only when the user
+   hasn't asked for reduced motion (design system §5). */
+@media (prefers-reduced-motion: no-preference) {
+  .stream-in {
+    animation: stream-in 240ms ease-out both;
+  }
+  @keyframes stream-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .status-dot-live {
+    animation: dot-pulse 2s ease-in-out infinite;
+  }
+  @keyframes dot-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* React Flow chrome, restyled to tokens. */
+.react-flow__attribution {
+  background: transparent;
+}
+.react-flow__attribution a {
+  color: var(--color-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.animated path {
+    animation: none;
+  }
 }
