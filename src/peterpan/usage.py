@@ -52,8 +52,14 @@ def load_usage(path: str | Path) -> list[UsageEvent]:
         return []
     events: list[UsageEvent] = []
     for line in p.read_text(encoding="utf-8").splitlines():
-        if line.strip():
+        if not line.strip():
+            continue
+        # A torn append (crash mid-write) or schema drift must not take down
+        # PETER PAN OS — skip the bad row, keep serving the good ones.
+        try:
             events.append(UsageEvent(**json.loads(line)))
+        except (ValueError, TypeError):
+            continue
     return events
 
 
