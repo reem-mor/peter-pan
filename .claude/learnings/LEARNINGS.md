@@ -11,6 +11,13 @@ incident data.
 
 ## Absorbed
 
+### 2026-07-18 · quality-gate-missing-diff-cover
+- **Context:** PR #46 (SecretStr + lt=1.0 confidence): local quality-gate fully green, CI `test` job failed on `diff-cover --fail-under=80` — new `.get_secret_value()` lines in lazy optional-extra client factories (pinecone_store, dashboard._llm_spec) had 0% diff coverage.
+- **Lesson:** The quality-gate skill runs plain `pytest -q` while CI additionally gates changed-line coverage; a green local gate does not predict the CI coverage verdict, especially for lazy-import paths no test imports.
+- **Candidate rule:** Add to quality-gate SKILL.md: `pytest -q --cov=src/peterpan --cov-report=xml` then `git fetch origin main && diff-cover coverage.xml --compare-branch origin/main --fail-under=80` — same commands CI runs.
+- **Target:** quality-gate skill (repo)
+- **Status:** absorbed → quality-gate (PR #50)
+
 ### 2026-07-18 · design-skill-canonical-pointer-stale
 - **Context:** PR #47 retired `ui/os_dashboard.html` (+ `/os/dashboard` route); `web/agent-os` is now the only operator console.
 - **Lesson:** peter-pan-design SKILL.md names the deleted file as its "canonical implementation" — the design system's reference artifact must live somewhere that survives surface retirements.
