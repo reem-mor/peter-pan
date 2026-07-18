@@ -232,7 +232,10 @@ async def _stream_story(alert: Alert) -> AsyncIterator[str]:
         yield SseEvent(event="step", data=step.model_dump_json()).encode()
         await asyncio.sleep(_STREAM_STEP_DELAY_S)
 
-    story = build_story(alert)
+    # Off the event loop: build_story does blocking I/O (RAG search; a
+    # synchronous LLM call when PP_LLM=anthropic) and must not stall other
+    # requests mid-stream.
+    story = await asyncio.to_thread(build_story, alert)
 
     for evidence in story.evidence:
         yield SseEvent(event="evidence", data=evidence.model_dump_json()).encode()
@@ -250,5 +253,5 @@ def stream_route(alert_id: str) -> StreamingResponse | JSONResponse:
     default path needs zero external accounts or a live LLM."""
     alert = DEMO_ALERTS.get(alert_id)
     if alert is None:
-        return JSONResponse(status_code=404, content={"error": f"unknown alert_id: {alert_id!r}"})
+        return JSONResponse(status_code=404, content={"error": "unknown alert_id"})
     return StreamingResponse(_stream_story(alert), media_type="text/event-stream")
