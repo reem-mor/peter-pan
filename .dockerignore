@@ -8,3 +8,7 @@ evals/
 docs/
 n8n/
 *.jsonl
+node_modules/
+web/
+packages/
+package-lock.json

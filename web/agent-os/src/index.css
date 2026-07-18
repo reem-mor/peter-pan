@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* PETER PAN OS — placeholder design tokens (operator console).
+   Real design language lands in a later workstream. */
+@theme {
+  --color-ink: #14181f;
+  --color-ink-soft: #5b6472;
+  --color-surface: #f4f5f7;
+  --color-surface-raised: #ffffff;
+  --color-sidebar: #101623;
+  --color-sidebar-ink: #c3cad8;
+  --color-edge: #e1e4ea;
+  --color-accent: #2f6df6;
+  --font-display: "Inter", system-ui, sans-serif;
+}

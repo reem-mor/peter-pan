@@ -9,6 +9,7 @@ __pycache__/
 .ruff_cache/
 dist/
 build/
+node_modules/
 *.egg-info/
 usage.jsonl
 .deploy-secret.tmp.json
