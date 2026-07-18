@@ -336,9 +336,12 @@ def test_query_kind_filter_narrows_namespaces(monkeypatch: pytest.MonkeyPatch) -
 def test_query_requires_keys(monkeypatch: pytest.MonkeyPatch) -> None:
     from peterpan.config import Settings
 
-    monkeypatch.delenv("PINECONE_API_KEY", raising=False)
-    monkeypatch.delenv("VOYAGE_API_KEY", raising=False)
+    # delenv alone is not hermetic: pydantic-settings would still load keys
+    # from an ambient .env and this test would hit the live network. Blank the
+    # resolved fields directly so the no-key guard is exercised deterministically.
     settings = Settings()
+    monkeypatch.setattr(settings, "pinecone_api_key", None)
+    monkeypatch.setattr(settings, "voyage_api_key", None)
     with pytest.raises(RuntimeError):
         ps.query("q", top_k=3, max_score=0.99, settings=settings)
 

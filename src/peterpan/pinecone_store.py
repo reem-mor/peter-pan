@@ -20,6 +20,7 @@ Layout mirrors the contract:
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
@@ -74,6 +75,10 @@ def namespaces_for_kinds(kinds: Sequence[str] | None) -> list[str]:
     if not kinds:
         return list(NAMESPACES)
     ordered = [_KIND_TO_NAMESPACE[k] for k in kinds if k in _KIND_TO_NAMESPACE]
+    # Memory-fed incidents keep kind="past_incident" but live in the memory
+    # namespace — a past_incident query must search both or it misses them.
+    if "past_incident" in kinds:
+        ordered.append(MEMORY)
     # De-dupe while preserving order (two kinds can map to one namespace).
     seen: dict[str, None] = {}
     for ns in ordered:
@@ -209,8 +214,9 @@ def is_retryable(exc: Exception) -> bool:
     status = _status_of(exc)
     if status is not None:
         return status in _RETRYABLE_STATUS
+    # Word-boundary match — a message like "after 500ms" must not read as a 500.
     text = str(exc)
-    return any(str(code) in text for code in _RETRYABLE_STATUS)
+    return any(re.search(rf"\b{code}\b", text) for code in _RETRYABLE_STATUS)
 
 
 def _backoff_seconds(attempt: int) -> float:
