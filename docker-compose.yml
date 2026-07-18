@@ -20,5 +20,9 @@ services:
     ports: ["8004:8000"]
   ppos:
     build: .
-    environment: { SERVICE: ppos, PP_ENV: "${PP_ENV:-mirage}" }
+    environment:
+      SERVICE: ppos
+      PP_ENV: "${PP_ENV:-mirage}"
+      # Mesh healthz targets for /os/services — compose DNS names, in-container port.
+      PP_MESH: '{"predictor": "http://predictor:8000", "rag": "http://rag:8000", "guardrails": "http://guardrails:8000", "agent": "http://agent:8000"}'
     ports: ["8005:8000"]
