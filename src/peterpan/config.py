@@ -38,6 +38,11 @@ class PredictorBackend(StrEnum):
     TORCH = "torch"  # + local PyTorch classifier, guarded by the floor
 
 
+class GuardrailsBackend(StrEnum):
+    REGEX = "regex"  # fixture-first default: deterministic regex floor only
+    NEMO = "nemo"  # + NeMo Guardrails pattern rails layered on top, floor always wins
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PP_", env_file=".env", extra="ignore")
 
@@ -69,6 +74,17 @@ class Settings(BaseSettings):
     # Predictor backend — floor by default; torch adds the local classifier
     # behind the floor's veto and falls back to floor-only on any failure.
     predictor: PredictorBackend = Field(default=PredictorBackend.FLOOR)
+
+    # Guardrails backend — regex floor by default; nemo layers NeMo
+    # Guardrails pattern rails on top. The floor always wins: nemo can only
+    # turn a floor pass into a flagged fail, never a floor fail into a pass,
+    # and any nemo-path failure falls back to the floor's own verdict.
+    guardrails: GuardrailsBackend = Field(default=GuardrailsBackend.REGEX)
+    # The one NeMo rail that calls an LLM (semantic topical check) — OFF by
+    # default even when guardrails=nemo, so the fixture/demo path never
+    # depends on a live model. Enabling it also requires PP_LLM=anthropic
+    # and a live ANTHROPIC_API_KEY. See src/peterpan/nemo_rails.py.
+    nemo_topical_llm: bool = Field(default=False)
 
     # Retrieval backend — lexical by default; pinecone is the semantic upgrade
     # and falls back to lexical on any failure.

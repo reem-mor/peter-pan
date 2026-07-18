@@ -1,0 +1,20 @@
+# LLM-backed topical rail — OFF BY DEFAULT. See ../README.md.
+#
+# This flow is NOT referenced in config.yml's `rails:` list, so it never
+# runs even when PP_GUARDRAILS=nemo. It is only spliced into the active
+# input rails at runtime by peterpan.nemo_rails._build_rails, and only
+# when Settings.nemo_topical_llm is True (which also requires PP_LLM
+# =anthropic + a live ANTHROPIC_API_KEY). Every call to the underlying
+# action logs usage via peterpan.usage.log_usage (see
+# peterpan.nemo_rails.topical_llm_check) — this is the one NeMo rail in
+# this repo that can spend money, so it is metered like every other LLM
+# call in the codebase.
+
+define bot refuse topical drift semantic
+  "Request blocked by NeMo input rail: semantic topical check flagged this as outside the incident-response domain."
+
+define flow check topical drift semantic
+  $nemo_off_topic_llm = execute check_topical_llm_action
+  if $nemo_off_topic_llm
+    bot refuse topical drift semantic
+    stop
