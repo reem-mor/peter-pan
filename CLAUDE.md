@@ -25,6 +25,16 @@ external accounts needed to run the demo path.
 6. Branch flow: feature branch → PR → merge on green CI. Never merge
    automatically; the human merges.
 
+## Self-improving skills loop (4 levels)
+**L1 execute** (`quality-gate`, `peter-pan-design`) → **L2 capture** (`/learn`)
+→ **L3 distill** (`/reflect`) → **L4 amend** (`/evolve`).
+- On a user correction, a gate/CI failure a rule could have caught, or a bug
+  surviving review: invoke `/learn` immediately — capture is cheap.
+- When `.claude/learnings/LEARNINGS.md` has 3+ raw entries, offer `/reflect`
+  at the end of the session.
+- Skills are edited only through `/evolve` (branch → gate → PR). The hard
+  limits in `evolve/SKILL.md` are not amendable by the loop.
+
 ## Required workflow (every change)
 1. Inspect the existing implementation before editing.
 2. Feature branch; smallest relevant change.
@@ -48,6 +58,14 @@ This project is built from scratch. Other repositories — including
 `reem-mor/peter-pan.io` (the earlier project) — are never a source: not
 their code, docs, conventions, or schemas. Design from Reem's specs and
 first principles only.
+
+## Hard-won conventions (absorbed by the loop)
+- **PR branches:** before pushing additional commits to an open PR's branch,
+  check `gh pr view <n> --json state` — if MERGED, branch fresh from main and
+  open a follow-up PR (commits pushed after merge silently miss main).
+- **FastAPI:** routes returning `Response` subclasses (or unions of them)
+  declare `response_model=None` in the decorator — otherwise app import
+  fails and takes the whole test collection down with it.
 
 ## Commands
 - Test: `python -m pytest -q`

@@ -40,6 +40,16 @@ text and would otherwise self-trip the gate.)
 Optional (when services/Docker changed): `docker compose up -d`, curl every
 `/healthz` (ports 8001–8005), `docker compose down`.
 
+Container-asset check (when a service starts reading a NEW repo directory at
+runtime): tests run from repo root and will NOT catch a missing image asset —
+confirm the Dockerfile `COPY` list and compose env cover it (`ui/` was served
+fine locally but absent from the image — LEARNINGS 2026-07-18):
+
+```bash
+git diff origin/main --name-only | cut -d/ -f1 | sort -u   # dirs touched
+grep -n "^COPY" Dockerfile                                  # dirs shipped
+```
+
 ## Report format
 One line per step: `step — PASS/FAIL (real numbers: N tests, N files)`.
 If anything fails: the failing output verbatim, then the fix plan — never

@@ -106,6 +106,10 @@ Hard rules:
 - **Empty / loading / error states designed for every data region.** Empty =
   quiet mono `--faint` line ("no usage in window"). Failure = amber DEMO badge +
   fixture data, never a blank page (fixture-first invariant applies to UI too).
+- **Polled / refetching UI carries a sequence token.** Every fetch cycle takes
+  `++state.seq`; a completed cycle renders only if its token is still current.
+  Auto-refresh + user-switchable queries WILL interleave otherwise (stale 1H
+  response once rendered over fresh 24H data — see LEARNINGS 2026-07-18).
 - **Icons:** inline SVG (Lucide-style, 24 viewBox, stroke 2), 14–16px in
   labels. **No emoji icons.** Consistent set — don't mix families.
 
@@ -139,7 +143,11 @@ Hard rules:
 ## 7. Pre-delivery checklist (numeric, non-negotiable)
 
 - [ ] Tokens only — no new hex outside this file's palette
-- [ ] Text contrast ≥4.5:1 (`--muted` on `--panel` passes; `--faint` never for body)
+- [ ] Text contrast ≥4.5:1 — **computed** (WCAG relative luminance), never
+      eyeballed; a new token pair ships with its measured ratio noted here.
+      (`#4a5f6d` looked fine, measured 2.96:1 — LEARNINGS 2026-07-18.)
+      Current floors: text/panel 16.1 · muted/panel 5.8 · faint/bg 4.95 ·
+      faint/panel 4.65 · accent/bg 12.3 · warn/panel 11.1 · danger/panel 6.7
 - [ ] One accent-glow element max per viewport; accent coverage ≤10%
 - [ ] All numbers mono + tabular-nums; columns stable across refresh
 - [ ] Status = color + second cue (dot/icon/word)
