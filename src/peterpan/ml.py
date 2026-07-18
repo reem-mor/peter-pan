@@ -75,7 +75,16 @@ def apply_floor_guardrails(floor: Prediction, model: MlPrediction) -> Prediction
 
 
 def _tokenize(text: str) -> list[str]:
-    return [t for t in "".join(c if c.isalnum() else " " for c in text.lower()).split() if t]
+    """Words + char 3/4-grams per word. Pure word bag-of-words scored 28.6%
+    on the holdout — real alerts phrase the same failure differently, so
+    features must overlap across word forms ("saturated"/"saturation",
+    "memory"/"maxmemory"); character n-grams provide that overlap."""
+    words = [t for t in "".join(c if c.isalnum() else " " for c in text.lower()).split() if t]
+    features = list(words)
+    for w in words:
+        for n in (3, 4):
+            features.extend(w[i : i + n] for i in range(len(w) - n + 1) if len(w) > n)
+    return features
 
 
 def _vectorize(text: str, vocab: dict[str, int]) -> torch.Tensor:
@@ -139,23 +148,7 @@ def model_predict(alert: Alert, model_dir: Path = DEFAULT_MODEL_DIR) -> MlPredic
     )
 
 
-def train(
-    train_data: Path = _TRAIN_DATA,
-    model_dir: Path = DEFAULT_MODEL_DIR,
-    epochs: int = 300,
-) -> float:
-    """Train the linear bag-of-words classifier. Returns final train accuracy.
-
-    Deterministic (fixed seed), seconds-fast, and offline — the training set
-    is synthetic and labeled by hand, NOT by the floor (learning the floor's
-    keywords back would make the model pointless; its value is classifying
-    paraphrases the keywords miss).
-    """
-    try:
-        import torch
-    except ImportError as exc:
-        raise MlPredictError("torch not installed (pip install -e '.[ml]')") from exc
-
+def _load_rows(train_data: Path) -> list[dict[str, str]]:
     rows = [
         json.loads(line)
         for line in train_data.read_text(encoding="utf-8").splitlines()
@@ -163,6 +156,42 @@ def train(
     ]
     if not rows:
         raise MlPredictError(f"no training rows in {train_data}")
+    return rows
+
+
+def split_rows(
+    rows: list[dict[str, str]], holdout_fraction: float = 0.2
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Deterministic stratified split. Classes with <5 examples stay train-only
+    (a 1-example holdout of a tiny class measures noise, not accuracy)."""
+    if not 0.0 < holdout_fraction < 1.0:
+        raise ValueError("holdout_fraction must be in (0, 1)")
+    import random
+
+    by_class: dict[str, list[dict[str, str]]] = {}
+    for r in rows:
+        by_class.setdefault(r["incident_class"], []).append(r)
+
+    train_rows: list[dict[str, str]] = []
+    holdout: list[dict[str, str]] = []
+    for cls in sorted(by_class):
+        members = sorted(by_class[cls], key=lambda r: r["text"])
+        random.Random(_SEED).shuffle(members)
+        k = max(1, round(len(members) * holdout_fraction)) if len(members) >= 5 else 0
+        holdout.extend(members[:k])
+        train_rows.extend(members[k:])
+    return train_rows, holdout
+
+
+def _fit(
+    rows: list[dict[str, str]], epochs: int
+) -> tuple[torch.nn.Linear, dict[str, int], list[str]]:
+    """Fit the linear classifier on the given rows. Vocab is built from these
+    rows only, so a holdout evaluation can never leak through the features."""
+    try:
+        import torch
+    except ImportError as exc:
+        raise MlPredictError("torch not installed (pip install -e '.[ml]')") from exc
 
     classes = sorted({r["incident_class"] for r in rows})
     vocab: dict[str, int] = {}
@@ -182,7 +211,52 @@ def train(
         loss = loss_fn(linear(x), y)
         loss.backward()
         optimizer.step()
+    return linear, vocab, classes
 
+
+def evaluate_holdout(
+    train_data: Path = _TRAIN_DATA,
+    holdout_fraction: float = 0.2,
+    epochs: int = 300,
+) -> float:
+    """Accuracy on a stratified holdout the model never saw — the honest
+    number to quote (train accuracy on a memorizing-capacity model is ~1.0
+    by construction)."""
+    import torch
+
+    train_split, holdout = split_rows(_load_rows(train_data), holdout_fraction)
+    if not holdout:
+        raise MlPredictError("holdout is empty — not enough data to evaluate")
+    linear, vocab, classes = _fit(train_split, epochs)
+    hits = 0
+    with torch.no_grad():
+        for r in holdout:
+            logits = linear(_vectorize(r["text"], vocab))
+            if classes[int(logits.argmax())] == r["incident_class"]:
+                hits += 1
+    return hits / len(holdout)
+
+
+def train(
+    train_data: Path = _TRAIN_DATA,
+    model_dir: Path = DEFAULT_MODEL_DIR,
+    epochs: int = 300,
+) -> float:
+    """Train on ALL rows and save the artifacts. Returns train accuracy —
+    quote evaluate_holdout() for quality claims, never this number.
+
+    Deterministic (fixed seed), seconds-fast, and offline — the training set
+    is synthetic and labeled by hand, NOT by the floor (learning the floor's
+    keywords back would make the model pointless; its value is classifying
+    paraphrases the keywords miss).
+    """
+    import torch
+
+    rows = _load_rows(train_data)
+    linear, vocab, classes = _fit(rows, epochs)
+
+    x = torch.stack([_vectorize(r["text"], vocab) for r in rows])
+    y = torch.tensor([classes.index(r["incident_class"]) for r in rows])
     with torch.no_grad():
         accuracy = float((linear(x).argmax(dim=1) == y).float().mean())
 
