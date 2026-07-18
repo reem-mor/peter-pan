@@ -84,6 +84,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("VOYAGE_API_KEY", "PP_VOYAGE_API_KEY"),
     )
 
+    # Cache/queue backend (ADR-0001) — opt-in Redis; unset (default) or any
+    # connection failure falls back to the in-process cache/queue so the
+    # fixture-first demo path never depends on a live Redis instance.
+    redis_url: str | None = Field(default=None)
+
     @property
     def actions_allowed(self) -> bool:
         """Mutating actions may only auto-execute outside production."""

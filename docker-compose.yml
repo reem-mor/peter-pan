@@ -1,4 +1,11 @@
 services:
+  # Opt-in (ADR-0001): no other service depends_on this. Set PP_REDIS_URL on a
+  # service's environment (e.g. "redis://redis:6379/0") to use it; unset, the
+  # service falls back to its in-process cache/queue automatically.
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    restart: unless-stopped
   predictor:
     build: .
     environment:

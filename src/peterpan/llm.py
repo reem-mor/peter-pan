@@ -18,6 +18,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
 
+from peterpan.cache import DEFAULT_TTL_S, cache_get, cache_key, cache_set
 from peterpan.config import Settings
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
 from peterpan.usage import log_usage, make_event, model_rates
@@ -111,34 +112,45 @@ def synthesize(
         default=str,
     )
 
-    try:
-        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-        response = client.messages.create(
-            model=settings.anthropic_model,
-            max_tokens=1500,
-            system=load_system_prompt(),
-            messages=[{"role": "user", "content": user_content}],
-        )
-    except Exception as exc:
-        raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
+    # Response cache (ADR-0001): key = sha256(model + system prompt + user
+    # payload), so a hit only ever replays a completion for the exact same
+    # model+prompt+evidence. A hit skips the priced API call entirely — no
+    # log_usage entry — but is still counted via cache.cache_stats().
+    system_prompt = load_system_prompt()
+    key = cache_key(settings.anthropic_model, system_prompt + user_content)
+    raw = cache_get(key)
 
-    log_usage(
-        make_event(
-            service="agent",
-            agent="incident-agent",
-            model=settings.anthropic_model,
-            input_tokens=response.usage.input_tokens,
-            output_tokens=response.usage.output_tokens,
-            cost_usd=round(
-                response.usage.input_tokens * model_rates(settings.anthropic_model)[0]
-                + response.usage.output_tokens * model_rates(settings.anthropic_model)[1],
-                6,
+    if raw is None:
+        try:
+            client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+            response = client.messages.create(
+                model=settings.anthropic_model,
+                max_tokens=1500,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_content}],
+            )
+        except Exception as exc:
+            raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
+
+        log_usage(
+            make_event(
+                service="agent",
+                agent="incident-agent",
+                model=settings.anthropic_model,
+                input_tokens=response.usage.input_tokens,
+                output_tokens=response.usage.output_tokens,
+                cost_usd=round(
+                    response.usage.input_tokens * model_rates(settings.anthropic_model)[0]
+                    + response.usage.output_tokens * model_rates(settings.anthropic_model)[1],
+                    6,
+                ),
             ),
-        ),
-        settings.usage_log_path,
-    )
+            settings.usage_log_path,
+        )
 
-    raw = "".join(block.text for block in response.content if block.type == "text").strip()
+        raw = "".join(block.text for block in response.content if block.type == "text").strip()
+        cache_set(key, raw, ttl_s=DEFAULT_TTL_S)
+
     try:
         draft = _LlmStoryDraft.model_validate_json(raw)
     except ValidationError as exc:
