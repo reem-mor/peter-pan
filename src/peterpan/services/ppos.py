@@ -7,10 +7,12 @@ dashboard, pointed at the LLM layer instead of the app layer.
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from typing import Literal
+
+from fastapi import FastAPI, Query
 
 from peterpan.config import Settings
-from peterpan.usage import aggregate, load_usage, tips
+from peterpan.usage import aggregate, budget_status, load_usage, tips, window
 
 app = FastAPI(title="peter-pan-os")
 settings = Settings()
@@ -22,8 +24,17 @@ def healthz() -> dict[str, str]:
 
 
 @app.get("/os/usage")
-def usage_route() -> dict[str, dict[str, float]]:
-    return aggregate(load_usage(settings.usage_log_path))
+def usage_route(
+    hours: float | None = Query(default=None, gt=0),
+    by: Literal["agent", "model", "service"] = "agent",
+) -> dict[str, dict[str, float]]:
+    return aggregate(window(load_usage(settings.usage_log_path), hours), by=by)
+
+
+@app.get("/os/budget")
+def budget_route() -> dict[str, object]:
+    """Last-24h spend vs the PP_DAILY_BUDGET_USD budget. Report-only guard."""
+    return budget_status(load_usage(settings.usage_log_path), settings.daily_budget_usd)
 
 
 @app.get("/os/tips")

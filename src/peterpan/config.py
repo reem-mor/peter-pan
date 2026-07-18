@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     env: Env = Field(default=Env.MIRAGE)
     service_name: str = Field(default="peter-pan")
     usage_log_path: str = Field(default="usage.jsonl")
+    # Daily LLM spend budget surfaced by PETER PAN OS (/os/budget). Report-only.
+    daily_budget_usd: float = Field(default=5.0, gt=0)
 
     # LLM synthesis is opt-in (PP_LLM=anthropic); any failure falls back to
     # the deterministic path so the demo never hard-depends on a live model.
