@@ -8,6 +8,7 @@ fakes `anthropic`.
 from __future__ import annotations
 
 import json
+import pathlib
 import sys
 import types
 import uuid
@@ -320,3 +321,39 @@ def test_prompt_version_missing_file_returns_none(
 ) -> None:
     monkeypatch.setattr(obs_mod, "_VERSIONS_PATH", tmp_path / "nope.yaml")  # type: ignore[operator]
     assert obs_mod.prompt_version("incident-agent") is None
+
+
+def test_scrub_catches_json_quoted_and_compound_keys() -> None:
+    from peterpan.observability import _scrub
+
+    scrubbed = _scrub('{"api_key": "AKIA123SECRET", "password":"hunter2"}')
+    assert "AKIA123SECRET" not in scrubbed
+    assert "hunter2" not in scrubbed
+
+    scrubbed = _scrub("aws_secret_access_key=wJalrXUtnFEMI-not-real")
+    assert "wJalrXUtnFEMI-not-real" not in scrubbed
+
+
+def test_record_survives_unwritable_prompt_log_path(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+) -> None:
+    """Observability is never load-bearing: a failing JSONL write must not
+    raise out of record() and take down the LLM call it describes."""
+    from peterpan.config import Settings
+    from peterpan.observability import trace_run
+
+    blocker = tmp_path / "not-a-dir"
+    blocker.write_text("file, not a directory", encoding="utf-8")
+    monkeypatch.setenv("PP_PROMPT_LOG_PATH", str(blocker / "sub" / "prompt_log.jsonl"))
+    settings = Settings()
+
+    handle = trace_run(service="agent", model="m", settings=settings)
+    handle.record(
+        surface="incident-agent",
+        system_prompt="sys",
+        input_text="in",
+        output_text="out",
+        input_tokens=1,
+        output_tokens=1,
+        cost_usd=0.0,
+    )  # must not raise

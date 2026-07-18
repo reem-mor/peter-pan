@@ -46,8 +46,13 @@ _PREVIEW_MAX_CHARS = 200
 #  2. "key=value" / "key: value" — password=, api_key:, token=, etc.
 # Not a full secret-scanning dependency; good enough for a 200-char preview.
 _BEARER_PATTERN = re.compile(r"(?i)\bbearer\s+\S+")
+# Matches bare, quoted (JSON), and compound keys: password=x, "api_key": "y",
+# aws_secret_access_key=z. \w* on both sides catches underscore-embedded
+# keywords that \b would miss; the optional quotes catch the JSON shape the
+# alert payload is serialized in (attacker-controllable text).
 _SECRET_PATTERN = re.compile(
-    r"(?i)\b(api[_-]?key|secret|token|password|passwd|pwd|authorization)\b\s*[:=]\s*\S+"
+    r"(?i)[\"']?\w*(api[_-]?key|secret|token|password|passwd|pwd|authorization)\w*[\"']?"
+    r"\s*[:=]\s*[\"']?\S+"
 )
 
 
@@ -137,20 +142,23 @@ class TraceHandle:
             except Exception:  # noqa: BLE001 — tracing must never break the caller
                 logger.warning("langfuse generation logging failed", exc_info=True)
 
-        _append_prompt_log(
-            self.trace_id,
-            service=self.service,
-            model=self.model,
-            surface=surface,
-            system_prompt=system_prompt,
-            input_text=input_text,
-            output_text=output_text,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            cost_usd=cost_usd,
-            cached=cached,
-            path=self.settings.prompt_log_path,
-        )
+        try:
+            _append_prompt_log(
+                self.trace_id,
+                service=self.service,
+                model=self.model,
+                surface=surface,
+                system_prompt=system_prompt,
+                input_text=input_text,
+                output_text=output_text,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cost_usd=cost_usd,
+                cached=cached,
+                path=self.settings.prompt_log_path,
+            )
+        except Exception:  # noqa: BLE001 — observability is never load-bearing
+            logger.warning("prompt-log append failed", exc_info=True)
 
 
 def _append_prompt_log(
