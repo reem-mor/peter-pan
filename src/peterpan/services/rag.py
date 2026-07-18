@@ -91,30 +91,15 @@ def _search_lexical(query: str, top_k: int) -> list[Evidence]:
     return ranked[:top_k]
 
 
-def _search_pinecone(query: str, top_k: int) -> list[Evidence]:
-    """Semantic retrieval. Raises on any failure; search() falls back."""
-    import pinecone  # noqa: F401  # lazy: optional `rag` extra
-    import voyageai
+def _search_pinecone(query: str, top_k: int, kinds: list[str] | None = None) -> list[Evidence]:
+    """Semantic retrieval. Raises on any failure; search() falls back.
 
-    if not (settings.pinecone_api_key and settings.voyage_api_key):
-        raise RuntimeError("pinecone backend needs PINECONE_API_KEY and VOYAGE_API_KEY")
+    Fans out across the namespaces relevant to the query (all four for an
+    incident query; an explicit kind filter narrows). All network/embedding
+    logic lives in peterpan.pinecone_store so it can be exercised with mocks."""
+    from peterpan import pinecone_store
 
-    vector = (
-        voyageai.Client(api_key=settings.voyage_api_key)
-        .embed([query], model=settings.voyage_model, input_type="query")
-        .embeddings[0]
-    )
-    index = pinecone.Pinecone(api_key=settings.pinecone_api_key).Index(settings.pinecone_index)
-    result = index.query(vector=vector, top_k=top_k, include_metadata=True)
-    return [
-        Evidence(
-            kind=m["metadata"].get("kind", "document"),
-            summary=m["metadata"].get("summary", ""),
-            source=m["metadata"].get("source", ""),
-            confidence=round(max(0.0, min(_MAX_SCORE, m["score"])), 3),
-        )
-        for m in result["matches"]
-    ]
+    return pinecone_store.query(query, top_k, max_score=_MAX_SCORE, kinds=kinds, settings=settings)
 
 
 def search(query: str, top_k: int = 3) -> RagResult:

@@ -141,37 +141,32 @@ def feed(record: MemoryRecord, root: Path | None = None) -> str:
 
 
 def upsert_to_pinecone(record: MemoryRecord, source: str) -> None:
-    """Index the fed document in Pinecone. Raises MemoryFeedError on any failure."""
+    """Index the fed document in the `memory` namespace. Raises MemoryFeedError
+    on any failure — the local markdown file is the source of truth and the
+    caller reports the sync failure without rolling it back.
+
+    Delegates the network path (batched, idempotent, bounded retry) to
+    peterpan.pinecone_store so the memory feed and bulk ingest share one code
+    path and one stable id scheme (see scripts/ingest_kb.py)."""
+    from datetime import UTC, datetime
+
+    from peterpan import pinecone_store
     from peterpan.config import Settings
 
     settings = Settings()
     if not (settings.pinecone_api_key and settings.voyage_api_key):
         raise MemoryFeedError("pinecone upsert needs PINECONE_API_KEY and VOYAGE_API_KEY")
+    plan = pinecone_store.PlannedVector(
+        vector_id=source,  # same stable id scheme as scripts/ingest_kb.py
+        namespace=pinecone_store.MEMORY,
+        doc_id=record.incident_id,
+        kind="memory",
+        title=f"{record.incident_id} - {record.title}",
+        source=source,
+        text=to_markdown(record),
+        fed_at=datetime.now(UTC).isoformat(),
+    )
     try:
-        import voyageai
-        from pinecone import Pinecone
-
-        embedding = (
-            voyageai.Client(api_key=settings.voyage_api_key)
-            .embed([to_markdown(record)], model=settings.voyage_model, input_type="document")
-            .embeddings[0]
-        )
-        Pinecone(api_key=settings.pinecone_api_key).Index(settings.pinecone_index).upsert(
-            vectors=[
-                {
-                    "id": source,  # same stable id scheme as scripts/ingest_knowledge.py
-                    "values": embedding,
-                    "metadata": {
-                        "kind": "past_incident",
-                        "summary": f"{record.incident_id} - {record.title}: {record.what_happened}"[
-                            :300
-                        ],
-                        "source": source,
-                    },
-                }
-            ]
-        )
-    except MemoryFeedError:
-        raise
+        pinecone_store.upsert_one(plan, settings=settings)
     except Exception as exc:
         raise MemoryFeedError(f"pinecone upsert failed: {type(exc).__name__}") from exc

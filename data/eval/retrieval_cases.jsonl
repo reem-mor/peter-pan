@@ -1,0 +1,14 @@
+{"case_id": "ret-01", "query": "checkout database connection pool exhaustion 503 timeouts", "expected_doc_id": "INC-2401", "top_k": 3}
+{"case_id": "ret-02", "query": "expired TLS certificate on the payments gateway handshake rejected", "expected_doc_id": "INC-2412", "top_k": 3}
+{"case_id": "ret-03", "query": "bad deploy rolled back after error rate spike on orders API", "expected_doc_id": "INC-2423", "top_k": 3}
+{"case_id": "ret-04", "query": "notification queue backlog consumer stalled on poison message", "expected_doc_id": "INC-2434", "top_k": 3}
+{"case_id": "ret-05", "query": "disk full on the logging node halted ingestion rotation stopped", "expected_doc_id": "INC-2445", "top_k": 3}
+{"case_id": "ret-06", "query": "internal DNS resolution failure after network policy egress change", "expected_doc_id": "INC-2456", "top_k": 3}
+{"case_id": "ret-07", "query": "runbook steps for database connection pool utilization at 100 percent", "expected_doc_id": "db-connection-pool", "top_k": 3}
+{"case_id": "ret-08", "query": "runbook for disk pressure and volume exhaustion log rotation", "expected_doc_id": "disk-pressure", "top_k": 3}
+{"case_id": "ret-09", "query": "DNS resolution and network connectivity failures connection refused timeout", "expected_doc_id": "dns-and-network", "top_k": 3}
+{"case_id": "ret-10", "query": "queue backlog runbook drain consumers oldest message age", "expected_doc_id": "queue-backlog", "top_k": 3}
+{"case_id": "ret-11", "query": "5xx storm from a bad canary rollback restored availability", "expected_doc_id": "INC-2307", "top_k": 3}
+{"case_id": "ret-12", "query": "payment latency spike connection pool halved by config override", "expected_doc_id": "INC-2231", "top_k": 3}
+{"case_id": "ret-13", "query": "certificate rotation runbook renew leaf before expiry", "expected_doc_id": "cert-rotation", "top_k": 3}
+{"case_id": "ret-14", "query": "checkout service out of memory OOM killed pods", "expected_doc_id": "checkout-oom", "top_k": 3}
