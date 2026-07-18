@@ -1,7 +1,8 @@
 """Claude-backed story synthesis — opt-in, invariant-guarded, metered.
 
 The LLM refines the narrative; it never gets to break the invariants:
-- prompt comes from the versioned file prompts/incident-agent/system-v1.txt
+- prompt comes from the versioned file at _PROMPT_PATH (see prompts/versions.yaml
+  and prompts/incident-agent/LOG.md for the current version + eval trail)
 - output is pydantic-validated; every cited source must be in the allowlist
   of evidence actually collected (fabricated citations => rejection)
 - confidence is capped below 1.0; class/severity come from the predictor
@@ -21,7 +22,7 @@ from peterpan.config import Settings
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
 from peterpan.usage import log_usage, make_event
 
-_PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v2.txt"
+_PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v4.txt"
 
 # Rough per-token USD for cost metering; override via PP OS config later.
 _COST_PER_INPUT_TOKEN = 3e-06
