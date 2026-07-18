@@ -36,7 +36,7 @@ forms): `~/.claude/skills/power-design/principles/web-principles.md` — the
   /* text */
   --text: #e6f1f3;        /* primary — never pure #fff (halation) */
   --muted: #7c93a3;       /* labels, hints */
-  --faint: #4a5f6d;       /* axis ticks, footers ONLY — never body text */
+  --faint: #6b8296;       /* axis ticks, footers ONLY — never body text; holds 4.5:1 on --bg */
 
   /* the one accent */
   --accent: #2fe6b0;      /* signal green: live, active, primary series */
