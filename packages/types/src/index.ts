@@ -163,8 +163,7 @@ export interface DashboardSpec {
 }
 
 // ---------------------------------------------------------------------------
-// Deployment — mirrored from the WS8 spec (lands in schemas.py on
-// phase0/contracts-gates-graphify; keep in sync when that branch merges)
+// Deployment — mirrors schemas.py (merged in PR #33)
 // ---------------------------------------------------------------------------
 
 export interface Deployment {
@@ -179,7 +178,7 @@ export interface Deployment {
 }
 
 // ---------------------------------------------------------------------------
-// Feedback — mirrored from the WS8 spec (same caveat as Deployment)
+// Feedback — mirrors schemas.py (merged in PR #33)
 // ---------------------------------------------------------------------------
 
 export const FEEDBACK_VERDICTS = ["helpful", "wrong", "partial"] as const;
