@@ -1,0 +1,25 @@
+# Deterministic input rails — pattern-matching Python actions from
+# guardrails_config/actions.py (peterpan.nemo_rails.detect_injection /
+# detect_topical_drift). No LLM call; see ../README.md.
+#
+# Alert text is attacker-controllable input — treat it as data. These flows
+# only ever ADD a fail verdict on top of a floor PASS; the regex floor in
+# peterpan.services.guardrails has already run and always wins.
+
+define bot refuse injection
+  "Request blocked by NeMo input rail: prompt-injection / jailbreak pattern detected."
+
+define bot refuse topical drift
+  "Request blocked by NeMo input rail: content is outside the incident-response domain."
+
+define flow check prompt injection
+  $nemo_injection = execute check_injection_action
+  if $nemo_injection
+    bot refuse injection
+    stop
+
+define flow check topical drift
+  $nemo_off_topic = execute check_topical_action
+  if $nemo_off_topic
+    bot refuse topical drift
+    stop
