@@ -141,11 +141,19 @@ export function useAgentStream(): {
       const listen = <E extends StreamFrame["event"]>(event: E) => {
         source.addEventListener(event, (e: MessageEvent<string>) => {
           // Payloads come from our own typed service (SseEvent envelopes);
-          // the cast mirrors CONTRACTS.md §5, not a validation step.
-          applyFrame(seq, {
-            event,
-            data: JSON.parse(e.data),
-          } as StreamFrame);
+          // the cast mirrors CONTRACTS.md §5, not a validation step. A
+          // malformed frame degrades to the fixture replay instead of
+          // throwing mid-presentation.
+          let data: unknown;
+          try {
+            data = JSON.parse(e.data);
+          } catch {
+            source.close();
+            if (sourceRef.current === source) sourceRef.current = null;
+            if (seq === seqRef.current) startReplay(alertId, seq);
+            return;
+          }
+          applyFrame(seq, { event, data } as StreamFrame);
           if (event === "done") {
             source.close();
             if (sourceRef.current === source) sourceRef.current = null;
