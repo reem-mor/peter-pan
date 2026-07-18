@@ -1,0 +1,432 @@
+{
+  "name": "PETER PAN — Mesh Exercise (v1)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "peter-pan-mesh-exercise",
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
+      },
+      "name": "Exercise Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "notes": "headerAuth: bind an n8n Header Auth credential before activating. This flow fans a synthetic alert through every service; unauthenticated triggering lets anyone drive the mesh."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Synthetic exercise fixture — schema-valid Alert (see peterpan.schemas.Alert).\n// Deterministic text so the predictor floor classifies it and the guardrails\n// input rail passes it; no caller-controlled fields reach the services.\nreturn [{ json: {\n  id: 'mesh-exercise-' + $execution.id,\n  source: 'n8n-mesh-exercise',\n  title: 'checkout timeout after deploy',\n  description: 'p99 latency breached SLO following the 14:00 rollout',\n  severity: 'P2',\n  received_at: new Date().toISOString()\n} }];"
+      },
+      "name": "Seed Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [180, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_PREDICTOR_BASE }}/healthz"
+      },
+      "name": "Predictor Healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [360, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_PREDICTOR_BASE }}/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Seed Alert').item.json }}"
+      },
+      "name": "Predict",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [540, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.incident_class }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.confidence }}",
+              "rightValue": 1,
+              "operator": { "type": "number", "operation": "lt" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Prediction Shape?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 0],
+      "notes": "Contract: peterpan.schemas.Prediction — incident_class + severity present, confidence < 1.0 (never claims certainty)."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_RAG_BASE }}/healthz"
+      },
+      "name": "Rag Healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_RAG_BASE }}/query",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"query\": $('Seed Alert').item.json.title + ' ' + $('Seed Alert').item.json.description, \"top_k\": 3 } }}"
+      },
+      "name": "Rag Query",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1080, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.query }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.matches }}",
+              "rightValue": "",
+              "operator": { "type": "array", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.insight }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "RagResult Shape?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1260, 0],
+      "notes": "Contract: peterpan.schemas.RagResult — query echoed, matches array (citation trail), insight text."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_GUARDRAILS_BASE }}/healthz"
+      },
+      "name": "Guardrails Healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1440, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_GUARDRAILS_BASE }}/check/input",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Seed Alert').item.json.title }} {{ $('Seed Alert').item.json.description }}"
+            }
+          ]
+        }
+      },
+      "name": "Guardrails Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1620, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.passed }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true" }
+            },
+            {
+              "leftValue": "={{ $json.flags }}",
+              "rightValue": "",
+              "operator": { "type": "array", "operation": "exists", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Verdict Shape?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1800, 0],
+      "notes": "Contract: peterpan.schemas.GuardrailVerdict — the deterministic ops fixture must pass the input rail with a flags array present."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_AGENT_BASE }}/healthz"
+      },
+      "name": "Agent Healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1980, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PP_AGENT_BASE }}/story",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Seed Alert').item.json }}"
+      },
+      "name": "Agent Story",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2160, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.probable_cause }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.evidence }}",
+              "rightValue": "",
+              "operator": { "type": "array", "operation": "notEmpty", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.repair_options }}",
+              "rightValue": "",
+              "operator": { "type": "array", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.confidence }}",
+              "rightValue": 1,
+              "operator": { "type": "number", "operation": "lt" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Story Shape?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2340, 0],
+      "notes": "Contract: peterpan.schemas.IncidentStory — probable_cause present, non-empty evidence (citation trail invariant), repair_options array, confidence < 1.0."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_PPOS_BASE }}/healthz"
+      },
+      "name": "Ppos Healthz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2520, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.PP_PPOS_BASE }}/os/info"
+      },
+      "name": "Ppos Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2700, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.service }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.env }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            },
+            {
+              "leftValue": "={{ $json.daily_budget_usd }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Info Shape?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2880, 0],
+      "notes": "Contract: /os/info deployment identity — service + env named, positive daily budget. Config only, never secrets."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"mesh\": \"ok\", \"services\": [\"predictor\", \"rag\", \"guardrails\", \"agent\", \"ppos\"], \"prediction\": $('Predict').item.json, \"guardrail_passed\": $('Guardrails Check').item.json.passed, \"story_confidence\": $('Agent Story').item.json.confidence } }}"
+      },
+      "name": "Respond Mesh Ok",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [3060, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"mesh\": \"contract_breach\", \"stage\": $prevNode.name, \"detail\": \"response is missing a schema field the contract requires\" } }}",
+        "options": { "responseCode": 502 }
+      },
+      "name": "Respond Contract Breach",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1620, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"mesh\": \"unreachable\", \"stage\": $prevNode.name, \"detail\": \"service call failed or returned an error status\" } }}",
+        "options": { "responseCode": 502 }
+      },
+      "name": "Respond Unreachable",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1620, 400]
+    }
+  ],
+  "connections": {
+    "Exercise Webhook": { "main": [[{ "node": "Seed Alert", "type": "main", "index": 0 }]] },
+    "Seed Alert": { "main": [[{ "node": "Predictor Healthz", "type": "main", "index": 0 }]] },
+    "Predictor Healthz": {
+      "main": [
+        [{ "node": "Predict", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Predict": {
+      "main": [
+        [{ "node": "Prediction Shape?", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prediction Shape?": {
+      "main": [
+        [{ "node": "Rag Healthz", "type": "main", "index": 0 }],
+        [{ "node": "Respond Contract Breach", "type": "main", "index": 0 }]
+      ]
+    },
+    "Rag Healthz": {
+      "main": [
+        [{ "node": "Rag Query", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Rag Query": {
+      "main": [
+        [{ "node": "RagResult Shape?", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "RagResult Shape?": {
+      "main": [
+        [{ "node": "Guardrails Healthz", "type": "main", "index": 0 }],
+        [{ "node": "Respond Contract Breach", "type": "main", "index": 0 }]
+      ]
+    },
+    "Guardrails Healthz": {
+      "main": [
+        [{ "node": "Guardrails Check", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Guardrails Check": {
+      "main": [
+        [{ "node": "Verdict Shape?", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Verdict Shape?": {
+      "main": [
+        [{ "node": "Agent Healthz", "type": "main", "index": 0 }],
+        [{ "node": "Respond Contract Breach", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agent Healthz": {
+      "main": [
+        [{ "node": "Agent Story", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Agent Story": {
+      "main": [
+        [{ "node": "Story Shape?", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Story Shape?": {
+      "main": [
+        [{ "node": "Ppos Healthz", "type": "main", "index": 0 }],
+        [{ "node": "Respond Contract Breach", "type": "main", "index": 0 }]
+      ]
+    },
+    "Ppos Healthz": {
+      "main": [
+        [{ "node": "Ppos Info", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Ppos Info": {
+      "main": [
+        [{ "node": "Info Shape?", "type": "main", "index": 0 }],
+        [{ "node": "Respond Unreachable", "type": "main", "index": 0 }]
+      ]
+    },
+    "Info Shape?": {
+      "main": [
+        [{ "node": "Respond Mesh Ok", "type": "main", "index": 0 }],
+        [{ "node": "Respond Contract Breach", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}
