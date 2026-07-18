@@ -11,6 +11,13 @@ incident data.
 
 ## Absorbed
 
+### 2026-07-18 · design-skill-canonical-pointer-stale
+- **Context:** PR #47 retired `ui/os_dashboard.html` (+ `/os/dashboard` route); `web/agent-os` is now the only operator console.
+- **Lesson:** peter-pan-design SKILL.md names the deleted file as its "canonical implementation" — the design system's reference artifact must live somewhere that survives surface retirements.
+- **Candidate rule:** Repoint SKILL.md canonical implementation to `web/agent-os` (tokens in `web/agent-os/src/index.css`) and state that retiring a UI surface requires an /evolve follow-up when a skill references it.
+- **Target:** peter-pan-design skill (via /evolve)
+- **Status:** absorbed → peter-pan-design (PR #49)
+
 ### 2026-07-18 · parallel-agents-verify-cross-file-imports-after-merge
 - **Context:** Three fixer agents + orchestrator edited src/ concurrently (no worktrees); an import added to llm.py/dashboard.py for the new usage.model_rates was missing after the agents converged — caught by a fixer's full-repo mypy run, not by any single agent's scoped check.
 - **Lesson:** Scoped per-agent gates all pass while the combined tree is broken; cross-file imports are the seam parallel edits break at.
