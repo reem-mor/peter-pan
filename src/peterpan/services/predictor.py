@@ -1,14 +1,17 @@
 """Predictor service — classifies inbound alerts and assigns severity.
 
-MVP: a deterministic keyword/z-score floor. The PyTorch model slots in
-*behind* this floor later — the deterministic path always has final say on
-severity escalation (a model may raise severity, never silently lower it).
+A deterministic keyword floor with final say, plus an opt-in local PyTorch
+classifier behind it (PP_PREDICTOR=torch). The model may refine an
+unclassified alert or raise severity — never lower it, never override a
+floor classification, and any model failure falls back to floor-only.
 """
 
 from __future__ import annotations
 
 from fastapi import FastAPI
 
+from peterpan import ml
+from peterpan.config import PredictorBackend, Settings
 from peterpan.schemas import Alert, Prediction, Severity
 
 app = FastAPI(title="peter-pan-predictor")
@@ -38,6 +41,17 @@ def predict(alert: Alert) -> Prediction:
     return Prediction(incident_class="unclassified", severity=alert.severity, confidence=0.3)
 
 
+def predict_full(alert: Alert, settings: Settings) -> Prediction:
+    """Floor verdict, optionally refined by the local model under its guardrails."""
+    floor = predict(alert)
+    if settings.predictor is not PredictorBackend.TORCH:
+        return floor
+    try:
+        return ml.apply_floor_guardrails(floor, ml.model_predict(alert))
+    except ml.MlPredictError:
+        return floor  # fail-safe: the deterministic path always answers
+
+
 @app.get("/healthz")
 def healthz() -> dict[str, str]:
     return {"service": "predictor", "status": "ok"}
@@ -45,4 +59,4 @@ def healthz() -> dict[str, str]:
 
 @app.post("/predict")
 def predict_route(alert: Alert) -> Prediction:
-    return predict(alert)
+    return predict_full(alert, Settings())

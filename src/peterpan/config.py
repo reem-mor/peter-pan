@@ -33,6 +33,11 @@ class RagBackend(StrEnum):
     PINECONE = "pinecone"  # semantic: Voyage embeddings + Pinecone index
 
 
+class PredictorBackend(StrEnum):
+    FLOOR = "floor"  # fixture-first default: deterministic keyword floor only
+    TORCH = "torch"  # + local PyTorch classifier, guarded by the floor
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PP_", env_file=".env", extra="ignore")
 
@@ -48,6 +53,10 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("ANTHROPIC_API_KEY", "PP_ANTHROPIC_API_KEY"),
     )
+
+    # Predictor backend — floor by default; torch adds the local classifier
+    # behind the floor's veto and falls back to floor-only on any failure.
+    predictor: PredictorBackend = Field(default=PredictorBackend.FLOOR)
 
     # Retrieval backend — lexical by default; pinecone is the semantic upgrade
     # and falls back to lexical on any failure.

@@ -57,7 +57,7 @@ interfaces (`predict()`, `search()`, `check_*()`, `build_story()`).
 
 | Component | Status | What exists today | Live upgrade path |
 |---|---|---|---|
-| `predictor` (8001) | ✅ Deterministic floor | Keyword/severity floor in `services/predictor.py`; model may raise severity, never lower it | PyTorch classifier behind the floor (next wave) |
+| `predictor` (8001) | ✅ Floor + local model | Keyword/severity floor in `services/predictor.py` with final say; opt-in PyTorch bag-of-words classifier (`PP_PREDICTOR=torch`, `ml` extra) refines unclassified alerts and may raise severity, never lower it | Train on verified-incident feedback (offline loop) |
 | `rag` (8002) | ✅ Two backends | Lexical retrieval over `knowledge/` (default); Pinecone + Voyage semantic backend (`PP_RAG_BACKEND=pinecone`), falls back to lexical on failure | RDS Postgres + pgvector (target) |
 | `guardrails` (8003) | ✅ Regex floor | Deterministic input/output rails in `services/guardrails.py`; floor always wins | NeMo Guardrails layered on top (planned) |
 | `agent` (8004) | ✅ Deterministic + opt-in LLM | `build_story()` deterministic by default; `PP_LLM=anthropic` enables Claude synthesis with citation/contradiction/confidence guards; LangGraph graph mirrors the same contract | LLM planner nodes inside the graph (planned) |
