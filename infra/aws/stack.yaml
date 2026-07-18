@@ -98,6 +98,11 @@ Resources:
           VOYAGE_API_KEY=$(echo "$SECRET_JSON" | jq -r '.VOYAGE_API_KEY // empty')
           unset SECRET_JSON
 
+          # Shared usage log: every service meters LLM calls into the same
+          # host-mounted file so PETER PAN OS actually sees cross-service usage
+          # (per-container files made /os/usage empty by construction).
+          mkdir -p /opt/peterpan/usage && chmod 777 /opt/peterpan/usage
+
           # Least privilege per service: only agent sees the Anthropic key,
           # only rag sees the retrieval keys. Everything else runs key-less.
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
@@ -111,7 +116,9 @@ Resources:
                       -e "VOYAGE_API_KEY=$VOYAGE_API_KEY")
             fi
             docker run -d --restart unless-stopped --name "$svc" \
-              -e SERVICE="$svc" -e PP_ENV=mirage "${!extra[@]}" \
+              -e SERVICE="$svc" -e PP_ENV=mirage \
+              -e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl \
+              -v /opt/peterpan/usage:/app/usage-shared "${!extra[@]}" \
               -p "$port":8000 ${ImageUri}
           done
 
