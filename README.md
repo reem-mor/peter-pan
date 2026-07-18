@@ -1,7 +1,7 @@
 # PETER PAN - Predictive, Agentic Navigator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![Agent Orchestration: LangGraph](https://img.shields.io/badge/Agent-LangGraph-7B3FE4.svg)](https://github.com/langchain-ai/langgraph)
 [![Workflow Orchestration: n8n](https://img.shields.io/badge/Orchestration-n8n-EA4B71.svg)](https://n8n.io/)
 [![Infrastructure: Docker](https://img.shields.io/badge/Infrastructure-Docker-2496ED.svg)](https://www.docker.com/)
@@ -31,6 +31,7 @@ PETER PAN is not a Grafana replacement or a thin Grafana wrapper. Grafana remain
 
 ## Table of Contents
 
+- [Implementation Status](#implementation-status)
 - [Core Capabilities](#core-capabilities)
 - [Business Value and Efficiency Targets](#business-value-and-efficiency-targets)
 - [Architecture](#architecture)
@@ -43,6 +44,29 @@ PETER PAN is not a Grafana replacement or a thin Grafana wrapper. Grafana remain
 - [Enterprise AWS Deployment Target](#enterprise-aws-deployment-target)
 - [Evolution Roadmap and Reference Baselines](#evolution-roadmap-and-reference-baselines)
 - [License](#license)
+
+---
+
+## Implementation Status
+
+This README describes the full target architecture. The table below maps each
+component to what is actually implemented today, so the docs never overstate
+the code. The MVP is **fixture-first by design**: every path runs with zero
+external accounts; live backends are opt-in upgrades behind existing
+interfaces (`predict()`, `search()`, `check_*()`, `build_story()`).
+
+| Component | Status | What exists today | Live upgrade path |
+|---|---|---|---|
+| `predictor` (8001) | ✅ Deterministic floor | Keyword/severity floor in `services/predictor.py`; model may raise severity, never lower it | PyTorch classifier behind the floor (next wave) |
+| `rag` (8002) | ✅ Two backends | Lexical retrieval over `knowledge/` (default); Pinecone + Voyage semantic backend (`PP_RAG_BACKEND=pinecone`), falls back to lexical on failure | RDS Postgres + pgvector (target) |
+| `guardrails` (8003) | ✅ Regex floor | Deterministic input/output rails in `services/guardrails.py`; floor always wins | NeMo Guardrails layered on top (planned) |
+| `agent` (8004) | ✅ Deterministic + opt-in LLM | `build_story()` deterministic by default; `PP_LLM=anthropic` enables Claude synthesis with citation/contradiction/confidence guards; LangGraph graph mirrors the same contract | LLM planner nodes inside the graph (planned) |
+| PETER PAN OS (8005) | ✅ MVP | Usage metering via `peterpan.usage` (thread-safe queue), `/os/usage`, `/os/agents`, `/os/tips` | Cost dashboards + routing analytics (planned) |
+| Streamlit UI | ✅ MVP | Incident dashboard + dynamic LLM-designed panels (`dashboard.py`) | — |
+| n8n spine | ✅ Cloud workflow | `PETER PAN — Triage v2` triage flow (webhook → rails → story); currently deactivated pending EC2 redeploy | Self-hosted n8n in compose (target) |
+| AWS deploy | ✅ CloudFormation | `infra/aws/stack.yaml` — EC2 + Docker mesh (~4 min create/teardown) | Private subnet + tunnel hardening (target) |
+| Prompt versioning + evals | ✅ Active | `prompts/versions.yaml`, per-surface LOG, deterministic story eval + LLM-judge (`evals/`) | Ragas metrics + Langfuse tracing (planned) |
+| Offline training loop | 🔜 Planned | Verified-incident dataset export design | PyTorch training pipeline |
 
 ---
 
@@ -354,7 +378,7 @@ The evaluation layer is organized around the following responsibilities:
 
 ### Prerequisites
 
-- Python `3.11` or newer
+- Python `3.12` or newer
 - Docker Engine or Docker Desktop
 - Docker Compose v2
 - Git
@@ -363,8 +387,8 @@ The evaluation layer is organized around the following responsibilities:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/reem-mor/peter-pan.io.git
-cd peter-pan.io
+git clone https://github.com/reem-mor/peter-pan.git
+cd peter-pan
 ```
 
 ### 2. Select the Safe Local Environment
