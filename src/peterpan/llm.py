@@ -20,10 +20,12 @@ from pydantic import BaseModel, Field, ValidationError
 
 from peterpan.cache import DEFAULT_TTL_S, cache_get, cache_key, cache_set
 from peterpan.config import Settings
+from peterpan.observability import trace_run
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
 from peterpan.usage import log_usage, make_event, model_rates
 
 _PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v6.txt"
+_SURFACE = "incident-agent"
 
 
 class LlmSynthesisError(Exception):
@@ -73,6 +75,8 @@ def synthesize(
         import anthropic  # lazy: optional `llm` extra
     except ImportError as exc:
         raise LlmSynthesisError("anthropic SDK not installed (pip install -e '.[llm]')") from exc
+
+    trace = trace_run(service="agent", model=settings.anthropic_model, settings=settings)
 
     # The alert itself is first-class, citable evidence (source alert:<origin>)
     # — v2 prompt-log finding: the model rightly kept citing it, so it belongs
@@ -132,18 +136,19 @@ def synthesize(
         except Exception as exc:
             raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
 
+        input_tokens = response.usage.input_tokens
+        output_tokens = response.usage.output_tokens
+        rate_in, rate_out = model_rates(settings.anthropic_model)
+        cost_usd = round(input_tokens * rate_in + output_tokens * rate_out, 6)
+
         log_usage(
             make_event(
                 service="agent",
                 agent="incident-agent",
                 model=settings.anthropic_model,
-                input_tokens=response.usage.input_tokens,
-                output_tokens=response.usage.output_tokens,
-                cost_usd=round(
-                    response.usage.input_tokens * model_rates(settings.anthropic_model)[0]
-                    + response.usage.output_tokens * model_rates(settings.anthropic_model)[1],
-                    6,
-                ),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cost_usd=cost_usd,
             ),
             settings.usage_log_path,
         )
@@ -152,6 +157,24 @@ def synthesize(
         fresh = True
     else:
         fresh = False
+        input_tokens = 0
+        output_tokens = 0
+        cost_usd = 0.0
+
+    # Structured prompt/completion log (§6.6): every call — cached or fresh,
+    # whether or not the completion below passes schema/floor validation —
+    # gets one row keyed by trace.trace_id. Hashes + a scrubbed preview only,
+    # never raw prompt/completion text.
+    trace.record(
+        surface=_SURFACE,
+        system_prompt=system_prompt,
+        input_text=user_content,
+        output_text=raw,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cost_usd=cost_usd,
+        cached=not fresh,
+    )
 
     try:
         draft = _LlmStoryDraft.model_validate_json(raw)

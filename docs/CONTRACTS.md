@@ -61,6 +61,7 @@ to lexical on failure.
 | `PP_MESH` | ppos | healthz sweep targets |
 | `PP_REDIS_URL` | services (WS11) | cache/queue (see ADR-0001) |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` | observability (WS6) | tracing (opt-in; fixture path runs without) |
+| `PP_PROMPT_LOG_PATH` | observability (WS6) | structured prompt/completion JSONL (hashes + scrubbed preview only) |
 | `GRAPHIFY_API_KEY` | agent-os graph serve | MCP HTTP auth |
 
 ## 5. Streaming contract (demo app, WS9)

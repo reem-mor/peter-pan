@@ -89,6 +89,25 @@ class Settings(BaseSettings):
     # fixture-first demo path never depends on a live Redis instance.
     redis_url: str | None = Field(default=None)
 
+    # Observability (§6.6) — Langfuse tracing is opt-in; unset (default) or
+    # any Langfuse failure falls back to no-op (but still uuid'd) tracing so
+    # the fixture-first demo path never depends on a live Langfuse instance.
+    langfuse_public_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("LANGFUSE_PUBLIC_KEY", "PP_LANGFUSE_PUBLIC_KEY"),
+    )
+    langfuse_secret_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("LANGFUSE_SECRET_KEY", "PP_LANGFUSE_SECRET_KEY"),
+    )
+    langfuse_host: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("LANGFUSE_HOST", "PP_LANGFUSE_HOST"),
+    )
+    # Structured prompt/completion log (§6.6) — hashes + scrubbed previews
+    # only, never raw text. Queryable by trace_id via observability.py.
+    prompt_log_path: str = Field(default="data/prompt_log.jsonl")
+
     @property
     def actions_allowed(self) -> bool:
         """Mutating actions may only auto-execute outside production."""
