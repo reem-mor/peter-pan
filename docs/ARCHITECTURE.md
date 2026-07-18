@@ -47,4 +47,45 @@ every mutating ActionPreview through named human approval.
 Docker on AWS EC2, one container per service, ports 8001–8005; n8n (cloud or
 self-hosted) reaches services over HTTP with security groups restricted to
 the n8n egress IP and the developer IP — never 0.0.0.0/0. Secrets via env /
-Secrets Manager only.
+Secrets Manager only. Full local + AWS reference: [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Incident processing flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Engineer
+    participant UI as Streamlit UI
+    participant N as n8n
+    participant P as Predictor
+    participant R as RAG
+    participant G as Guardrails
+    participant A as LangGraph Agent
+    participant O as PETER PAN OS
+
+    U->>UI: Submit alert or incident description
+    UI->>N: Start triage workflow
+    N->>G: Validate input
+    G-->>N: Allow or block
+    N->>P: Classify anomaly and severity floor
+    N->>R: Retrieve logs, metrics, deploys, runbooks, and incidents
+    N->>A: Provide normalized evidence and bounded task
+    A->>G: Validate generated incident story
+    G-->>A: Approved structured output
+    A-->>N: Timeline, hypothesis, confidence, citations, and actions
+    N->>O: Record usage, traces, routing, and feedback context
+    N-->>UI: Render dynamic incident dashboard
+    UI-->>U: Show evidence and action previews
+    U->>UI: Approve, reject, or correct recommendation
+    UI->>O: Store audited human feedback
+```
+
+## Microservice grid and API mapping
+
+| Service | Port | Core Technology | Primary Endpoints | Responsibility |
+|---|---:|---|---|---|
+| `predictor` | `8001` | PyTorch and deterministic keyword floors | `GET /healthz`, `POST /predict` | Classifies anomaly vectors and enforces minimum severity boundaries. |
+| `rag` | `8002` | LangChain and AWS RDS for PostgreSQL with pgvector | `GET /healthz`, `POST /query` | Retrieves and aggregates codebase maps, logs, runbooks, deployment context, and historical incidents. |
+| `guardrails` | `8003` | NeMo Guardrails and deterministic regular expressions | `GET /healthz`, `POST /check/input`, `POST /check/output` | Validates input patterns, output structure, and safety thresholds. |
+| `agent` | `8004` | LangGraph stateful planner | `GET /healthz`, `POST /story` | Coordinates bounded tool-use, planning, evidence synthesis, and incident-story generation. |
+| `PETER PAN OS` | `8005` | FastAPI and a thread-safe queue | `GET /healthz`, `GET /os/usage`, `GET /os/usage/series`, `GET /os/budget`, `GET /os/agents`, `GET /os/tips`, `GET /os/services` | Provides the operational control plane for cost, token, agent, routing, and usage visibility. The operator console rendering these feeds is the `web/agent-os` React app. |
