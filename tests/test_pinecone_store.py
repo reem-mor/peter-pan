@@ -349,6 +349,38 @@ def test_query_requires_keys(monkeypatch: pytest.MonkeyPatch) -> None:
         ps.query("q", top_k=3, max_score=0.99, settings=settings)
 
 
+def test_client_factories_unwrap_secret_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    """SecretStr unwraps exactly at the client-construction boundary —
+    the SDK receives the raw key, never the masked wrapper."""
+    import sys
+    import types
+
+    from pydantic import SecretStr
+
+    from peterpan.config import Settings
+
+    captured: dict[str, str] = {}
+
+    class _FakeVoyageClient:
+        def __init__(self, api_key: str) -> None:
+            captured["voyage"] = api_key
+
+    class _FakePinecone:
+        def __init__(self, api_key: str) -> None:
+            captured["pinecone"] = api_key
+
+    monkeypatch.setitem(sys.modules, "voyageai", types.SimpleNamespace(Client=_FakeVoyageClient))
+    monkeypatch.setitem(sys.modules, "pinecone", types.SimpleNamespace(Pinecone=_FakePinecone))
+
+    settings = Settings()
+    monkeypatch.setattr(settings, "voyage_api_key", SecretStr("voyage-test-not-real"))
+    monkeypatch.setattr(settings, "pinecone_api_key", SecretStr("pinecone-test-not-real"))
+
+    ps._voyage_client(settings)
+    ps._pinecone(settings)
+    assert captured == {"voyage": "voyage-test-not-real", "pinecone": "pinecone-test-not-real"}
+
+
 # --- memory feed routes to the memory namespace ------------------------------
 
 
