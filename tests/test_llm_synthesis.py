@@ -134,11 +134,15 @@ def test_synthesize_caches_response_and_skips_second_llm_call(
     monkeypatch.setitem(sys.modules, "anthropic", fake_anthropic)
 
     usage_log = tmp_path / "usage.jsonl"  # type: ignore[operator]
+    prompt_log = tmp_path / "prompt_log.jsonl"  # type: ignore[operator]
     # anthropic_api_key has a validation_alias (env var name), so it must be
     # set via that alias — a plain `anthropic_api_key=` kwarg is silently
     # ignored by pydantic-settings without populate_by_name=True.
     settings = Settings(
-        llm="anthropic", PP_ANTHROPIC_API_KEY="test-not-real", usage_log_path=str(usage_log)
+        llm="anthropic",
+        PP_ANTHROPIC_API_KEY="test-not-real",
+        usage_log_path=str(usage_log),
+        prompt_log_path=str(prompt_log),
     )
     alert = Alert(
         id="cache-1",
@@ -159,6 +163,21 @@ def test_synthesize_caches_response_and_skips_second_llm_call(
     assert story1 == story2
     assert len(load_usage(str(usage_log))) == 1  # cache hit logged no cost entry
     assert cache_mod.cache_stats() == {"hits": 1, "misses": 1}
+
+    from peterpan.observability import read_prompt_log
+
+    rows = [json.loads(line) for line in prompt_log.read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 2  # one row per synthesize() call, fresh AND cache hit
+    fresh_row, cached_row = rows
+    assert fresh_row["cached"] is False
+    assert fresh_row["input_tokens"] == 10
+    assert cached_row["cached"] is True
+    assert cached_row["input_tokens"] == 0
+    assert cached_row["cost_usd"] == 0.0
+    # both calls share a trace_id per invocation, and rows are queryable by it
+    assert read_prompt_log(fresh_row["trace_id"], str(prompt_log)) == [fresh_row]
+    assert read_prompt_log(cached_row["trace_id"], str(prompt_log)) == [cached_row]
+    assert fresh_row["trace_id"] != cached_row["trace_id"]
 
     cache_mod.reset_backend()
 

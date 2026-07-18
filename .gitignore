@@ -12,6 +12,7 @@ build/
 node_modules/
 *.egg-info/
 usage.jsonl
+data/prompt_log.jsonl
 data/leads.jsonl
 data/feedback.jsonl
 .deploy-secret.tmp.json
