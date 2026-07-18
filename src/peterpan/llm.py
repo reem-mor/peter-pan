@@ -22,7 +22,7 @@ from peterpan.config import Settings
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
 from peterpan.usage import log_usage, make_event
 
-_PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v5.txt"
+_PROMPT_PATH = Path(__file__).parent.parent.parent / "prompts" / "incident-agent" / "system-v6.txt"
 
 # Rough per-token USD for cost metering; override via PP OS config later.
 _COST_PER_INPUT_TOKEN = 3e-06

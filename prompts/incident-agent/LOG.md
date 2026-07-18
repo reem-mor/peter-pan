@@ -86,3 +86,23 @@ and the judge flagged the team name as a fabricated specific.
 Same caveat as v4: single nondeterministic judge run. v6 candidate
 target: repair options must not name teams, owners, or escalation paths
 that no evidence item mentions — suggest the action, not the addressee.
+
+## v6 — action, not addressee (`system-v6.txt`, current)
+Implements the v6 target: repair options may not name teams, owners,
+on-call rotations, or escalation paths unless an evidence item names them
+("recycle stuck connections" valid; "escalate to the DB team" is
+fabricated routing).
+
+**Judge run (10 cases, full LLM pipeline): 9/10 grounded.** The v5
+refutation (eval-07's team name) is gone. A new, previously-grounded case
+flipped: eval-04's repair option presupposed that a certificate rotation
+had already happened, which no evidence stated.
+
+**Plateau observation:** two consecutive versions at 9/10 with a
+*different* single failure each — we are now at the noise floor of a
+single nondeterministic judge run. Next quality step is NOT another
+prompt rule; it is eval infrastructure: N-run majority voting per case
+(or a larger case set) so a 0.9 vs 1.0 claim is statistically meaningful.
+v7 prompt candidate (low priority): repair options must not presuppose
+events/state no evidence item establishes — phrase conditionally ("if the
+cert was rotated, confirm...").
