@@ -13,10 +13,13 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import ValidationError
 
+from peterpan import feedback_store, scoring
 from peterpan.config import Settings
+from peterpan.schemas import Feedback
 from peterpan.usage import aggregate, budget_status, load_usage, timeseries, tips, window
 
 app = FastAPI(title="peter-pan-os")
@@ -137,3 +140,72 @@ def dashboard_route() -> HTMLResponse | JSONResponse:
             content={"error": f"dashboard file not found at {DASHBOARD_PATH}"},
         )
     return HTMLResponse(DASHBOARD_PATH.read_text(encoding="utf-8"))
+
+
+# --- feedback: closing the learning loop -------------------------------------
+
+# Bounded last-N for the summary endpoint — same rationale as usage/series
+# buckets: a caller can never force an unbounded response.
+_MAX_SUMMARY_ENTRIES = 200
+
+
+@app.post("/feedback", response_model=None, status_code=201)
+async def feedback_route(request: Request) -> JSONResponse:
+    """Record one operator verdict on an agent output.
+
+    Reads the raw body first so an oversized payload (feedback text is
+    attacker-controllable, same as alert text) is rejected before it's ever
+    parsed into a model. `submitted_by` non-blank is enforced here, not in
+    the shared Feedback schema, so this stays a route-level policy.
+    """
+    # Early reject on declared size — before buffering the body at all.
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > feedback_store.MAX_FEEDBACK_BYTES:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "error": f"feedback payload exceeds {feedback_store.MAX_FEEDBACK_BYTES} bytes"
+            },
+        )
+    raw = await request.body()
+    if len(raw) > feedback_store.MAX_FEEDBACK_BYTES:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "error": f"feedback payload exceeds {feedback_store.MAX_FEEDBACK_BYTES} bytes"
+            },
+        )
+    try:
+        feedback = Feedback.model_validate_json(raw)
+    except ValidationError as exc:
+        return JSONResponse(
+            status_code=422,
+            content={"error": "invalid feedback", "detail": exc.errors(include_url=False)},
+        )
+    if not feedback.submitted_by.strip():
+        return JSONResponse(
+            status_code=422,
+            content={"error": "submitted_by must be non-empty"},
+        )
+    count = feedback_store.append_feedback(feedback, settings.feedback_log_path)
+    return JSONResponse(status_code=201, content={"stored": True, "count": count})
+
+
+@app.get("/feedback/summary")
+def feedback_summary_route(
+    limit: int = Query(default=20, gt=0, le=_MAX_SUMMARY_ENTRIES),
+    trace_id: str | None = Query(default=None),
+) -> dict[str, object]:
+    """Counts by verdict, a bounded tail of recent entries, and a deterministic
+    accuracy score (peterpan.scoring). ?trace_id= narrows to one trace's
+    feedback history (e.g. every verdict recorded against one incident run)."""
+    records = feedback_store.load_feedback(settings.feedback_log_path)
+    if trace_id is not None:
+        records = [r for r in records if r.trace_id == trace_id]
+    recent = records[-limit:]
+    return {
+        "counts": scoring.verdict_counts(records),
+        "total": len(records),
+        "accuracy": round(scoring.accuracy(records), 4),
+        "entries": [r.model_dump(mode="json") for r in recent],
+    }

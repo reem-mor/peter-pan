@@ -12,6 +12,7 @@ build/
 node_modules/
 *.egg-info/
 usage.jsonl
+data/feedback.jsonl
 .deploy-secret.tmp.json
 .coverage
 coverage.xml
