@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -23,10 +25,52 @@ jobs:
         run: ruff format --check .
       - name: Types
         run: mypy src
-      - name: Tests
-        run: pytest -q
+      - name: Tests (with coverage)
+        run: pytest -q --cov=src/peterpan --cov-report=xml
+      - name: Coverage gate — >=80% on changed lines
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          diff-cover coverage.xml --compare-branch origin/${{ github.base_ref }} --fail-under=80
       - name: Compose config check
         run: docker compose config --quiet
+
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev,agents]"
+      - name: Deterministic story eval (fixture path, no keys)
+        run: python evals/run_story_eval.py
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Secret scan (gitleaks)
+        # v2.3.9, pinned by SHA for supply-chain integrity
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_SUMMARY: "true"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependency vulnerability scan (pip-audit)
+        run: |
+          pip install pip-audit
+          pip install -e ".[dev,llm,agents,rag,ui]"
+          pip-audit --skip-editable
 
   docker-smoke:
     runs-on: ubuntu-latest

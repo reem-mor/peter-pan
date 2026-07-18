@@ -5,3 +5,4 @@
 *.jpg binary
 *.pth binary
 *.gguf binary
+graphify-out/graph.json merge=graphify
