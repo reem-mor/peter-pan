@@ -158,6 +158,15 @@ async def feedback_route(request: Request) -> JSONResponse:
     parsed into a model. `submitted_by` non-blank is enforced here, not in
     the shared Feedback schema, so this stays a route-level policy.
     """
+    # Early reject on declared size — before buffering the body at all.
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > feedback_store.MAX_FEEDBACK_BYTES:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "error": f"feedback payload exceeds {feedback_store.MAX_FEEDBACK_BYTES} bytes"
+            },
+        )
     raw = await request.body()
     if len(raw) > feedback_store.MAX_FEEDBACK_BYTES:
         return JSONResponse(

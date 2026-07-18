@@ -81,6 +81,7 @@ def run() -> int:
     print(
         f"feedback eval · {len(replayed)} records ({len(recorded)} recorded, {len(seed)} seeded)\n"
     )
+    print("(synthetic seed — illustrative plumbing check, not a measured result)")
     print(f"{'prompt_version':<32} {'n':>4} {'accuracy':>10}")
     for version in sorted(by_version):
         n = sum(1 for f in replayed if prompt_version_by_trace.get(f.trace_id) == version)
