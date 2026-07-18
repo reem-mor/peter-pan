@@ -14,13 +14,20 @@ Never report green without running. Stop at nothing — collect all failures
 in one pass so they can be fixed together.
 
 ```powershell
-.\.venv\Scripts\python -m pytest -q
+.\.venv\Scripts\python -m pytest -q --cov=src/peterpan --cov-report=xml
 .\.venv\Scripts\python -m ruff check .
 .\.venv\Scripts\python -m ruff format --check .
 .\.venv\Scripts\python -m mypy src
 .\.venv\Scripts\python evals\run_story_eval.py
 docker compose config --quiet
+git fetch origin main
+.\.venv\Scripts\python -m diff_cover.diff_cover_tool coverage.xml --compare-branch origin/main --fail-under=80
 ```
+
+The last two lines are CI's changed-line coverage gate, verbatim — a plain
+green `pytest -q` does NOT predict it (PR #46: local gate fully green, CI
+failed at 60% on uncovered lazy-import client factories). Docs-only diffs
+report "No lines with coverage information" and pass.
 
 Secrets scan (last, always). Two hard rules learned the hard way:
 scan only what git will actually ship (`git grep` over tracked files — the
