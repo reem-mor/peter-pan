@@ -113,9 +113,11 @@ def test_query_rejects_empty_and_nonpositive_top_k() -> None:
 
 
 def test_query_with_absurd_top_k_returns_at_most_corpus() -> None:
+    from peterpan.services.rag import _CORPUS
+
     client = TestClient(rag_app)
     matches = client.post("/query", json={"query": "memory", "top_k": 1_000_000}).json()["matches"]
-    assert len(matches) <= 25  # corpus-bounded, no blowup
+    assert len(matches) <= len(_CORPUS)  # corpus-bounded, no blowup as the KB grows
 
 
 def test_query_unicode_and_regex_metachars() -> None:
