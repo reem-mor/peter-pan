@@ -42,6 +42,33 @@ docker compose up --build
 
 This starts the core service mesh and its required dependencies according to the repository's Compose configuration.
 
+#### Optional: real LLM synthesis through Compose
+
+The agent service passes `PP_LLM` through (default `off` — fixture-first).
+Any failure on either provider falls back to the deterministic story path.
+
+Preferred: put the variables in the gitignored repo-root `.env` — Compose
+interpolates it automatically and pydantic-settings reads the same file for
+non-Docker runs, keeping keys out of your shell history. `export` works as
+the ephemeral alternative:
+
+```bash
+# Direct Anthropic API
+export PP_LLM=anthropic ANTHROPIC_API_KEY=sk-ant-...   # never commit keys
+docker compose up --build
+
+# AWS Bedrock (no Anthropic key; boto3 credential chain)
+export PP_LLM=bedrock AWS_REGION=eu-west-1
+export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_SESSION_TOKEN=...
+docker compose up --build
+```
+
+PowerShell: `$env:PP_LLM = "bedrock"` etc. Override the model with
+`PP_BEDROCK_MODEL_ID` (defaults to the known-good Sonnet id from
+`src/peterpan/config.py`). Confirm the live path is actually taken by
+checking for bedrock-model rows in the usage log (`/os/usage`); without
+credentials the mesh stays healthy and stories are deterministic.
+
 ### 4. Start the Streamlit Interface
 
 ```bash

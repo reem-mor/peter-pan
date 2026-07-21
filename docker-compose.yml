@@ -42,6 +42,23 @@ services:
       SERVICE: agent
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
+      # LLM opt-in passthrough — default off keeps the demo path fixture-first.
+      # anthropic: export ANTHROPIC_API_KEY before `docker compose up`.
+      # bedrock:   export AWS_REGION + credentials (or use an SSO profile via
+      #            an ~/.aws read-only bind mount — AWS_REGION must still be
+      #            exported: the empty passthrough below shadows the profile's
+      #            region). No Anthropic key needed.
+      # Empty values are safe: boto3 skips empty AWS_* vars, and an empty
+      # ANTHROPIC_API_KEY fails closed into the deterministic fallback.
+      PP_LLM: "${PP_LLM:-off}"
+      # Keep in sync with the config.py default — compose must re-state it
+      # because an empty passthrough would otherwise override the default.
+      PP_BEDROCK_MODEL_ID: "${PP_BEDROCK_MODEL_ID:-anthropic.claude-sonnet-4-5-20250929-v1:0}"
+      AWS_REGION: "${AWS_REGION:-}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_SESSION_TOKEN: "${AWS_SESSION_TOKEN:-}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
     ports: ["8004:8000"]
     volumes: ["usage-data:/app/usage-shared"]
     restart: unless-stopped
