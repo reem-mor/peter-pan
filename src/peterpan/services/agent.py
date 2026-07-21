@@ -98,8 +98,9 @@ def build_story(alert: Alert) -> IncidentStory:
     rag = search(search_query(alert), top_k=3)
     steps += 1
 
-    # Step 3: synthesize — LLM if opted in, deterministic otherwise/on failure.
-    if settings.llm is LlmProvider.ANTHROPIC:
+    # Step 3: synthesize — LLM if opted in (anthropic OR bedrock),
+    # deterministic otherwise/on failure.
+    if settings.llm is not LlmProvider.OFF:
         from peterpan.llm import LlmSynthesisError, synthesize
 
         steps += 1
@@ -236,7 +237,7 @@ async def _stream_story(alert: Alert) -> AsyncIterator[str]:
         (
             "synthesize",
             "Synthesizing the incident story via Claude."
-            if settings.llm is LlmProvider.ANTHROPIC
+            if settings.llm is not LlmProvider.OFF
             else "Synthesizing the incident story (deterministic).",
         ),
     ]
