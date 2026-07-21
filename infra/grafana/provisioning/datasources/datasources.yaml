@@ -1,0 +1,22 @@
+# Datasource provisioning for a DISPOSABLE Grafana used to import PETER PAN
+# dashboard previews (peterpan.grafana). UIDs must match the exporter's
+# allowlist — defaults below mirror config.py (PP_GRAFANA_PROMETHEUS_UID /
+# PP_GRAFANA_LOKI_UID). URLs are deliberate placeholders: the preview-import
+# check verifies the JSON model loads; panels render "no data", which is the
+# expected result without a live telemetry stack.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus (PETER PAN demo)
+    type: prometheus
+    uid: ds-prometheus
+    access: proxy
+    url: http://prometheus.invalid:9090
+    isDefault: true
+    editable: false
+  - name: Loki (PETER PAN demo)
+    type: loki
+    uid: ds-loki
+    access: proxy
+    url: http://loki.invalid:3100
+    editable: false
