@@ -1,16 +1,16 @@
-# Graph Report - peter-pan-review-98a66f  (2026-07-18)
+# Graph Report - peter-pan-review-98a66f  (2026-07-21)
 
 ## Corpus Check
-- 184 files · ~123,244 words
+- 186 files · ~125,100 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1478 nodes · 2593 edges · 102 communities (70 shown, 32 thin omitted)
-- Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 432 edges (avg confidence: 0.73)
+- 1506 nodes · 2656 edges · 114 communities (83 shown, 31 thin omitted)
+- Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 449 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `967e2cb7`
+- Built from commit: `f4f39f8e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -107,22 +107,34 @@
 - .actions_allowed
 - ui.tsx
 - n8n endpoint coverage — mesh contract map
+- TokenUsage.tsx
 - ServiceDetailPanel.tsx
+- test_memory_feed.py
 - guardrails_config/
 - test_config_secrets.py
 - Deployment
+- os.ts
+- usage.py
+- format.ts
+- NemoCheckError
+- search
+- Prediction
+- test_ml_holdout.py
+- test_predictor.py
+- knowledge.py
+- OnCall.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `Settings` - 97 edges
-2. `build_story()` - 21 edges
+2. `build_story()` - 26 edges
 3. `synthesize()` - 19 edges
 4. `Alert` - 19 edges
 5. `predict()` - 18 edges
 6. `LlmSynthesisError` - 17 edges
-7. `Evidence` - 16 edges
-8. `SseEvent` - 15 edges
-9. `load_usage()` - 15 edges
-10. `compilerOptions` - 15 edges
+7. `Evidence` - 17 edges
+8. `SseEvent` - 16 edges
+9. `DrawRequest` - 15 edges
+10. `StepEvent` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `test_llm_off_by_default_keeps_deterministic_path()` --calls--> `Settings`  [INFERRED]
@@ -143,23 +155,23 @@
 - **Self-Improving Skills Loop Implementation** — claude_skills_learn_skill, claude_skills_reflect_skill, claude_skills_evolve_skill, claude_learnings_learnings_md [EXTRACTED 1.00]
 - **Prompt Engineering Lifecycle** — prompt_incident_agent_system_v1_txt, prompt_incident_agent_system_v2_txt, prompt_incident_agent_system_v4_txt, prompt_incident_agent_system_v5_txt, prompt_incident_agent_system_v6_txt, prompt_incident_agent_log_md [EXTRACTED 1.00]
 
-## Communities (102 total, 32 thin omitted)
+## Communities (114 total, 31 thin omitted)
 
 ### Community 0 - "Budget Tracking"
-Cohesion: 0.12
-Nodes (30): budget_route(), Last-24h spend vs the PP_DAILY_BUDGET_USD budget. Report-only guard., tips_route(), _is_valid_row(), load_usage(), log_usage(), make_event(), Path (+22 more)
+Cohesion: 0.15
+Nodes (20): log_usage(), make_event(), Path, Path, A torn write (crash mid-append) must not take down PETER PAN OS., JSON-valid rows can still be poisoned: an unparsable ts, a naive ts, or     stri, test_load_usage_skips_poisoned_but_schema_valid_rows(), test_load_usage_survives_corrupt_lines() (+12 more)
 
 ### Community 1 - "LLM Story Evaluation"
-Cohesion: 0.05
-Nodes (68): Linear, main(), Train the local predictor classifier and report accuracy.  Usage:  python script, apply_floor_guardrails(), evaluate_holdout(), _fit(), _load_rows(), MlPredictError (+60 more)
+Cohesion: 0.16
+Nodes (22): Linear, main(), Train the local predictor classifier and report accuracy.  Usage:  python script, evaluate_holdout(), _fit(), _load_rows(), MlPredictError, model_predict() (+14 more)
 
 ### Community 2 - "Knowledge Base Ingestion"
-Cohesion: 0.08
-Nodes (42): _kind_for(), load_corpus(), load_full_text(), Evidence, Path, Knowledge base loader — the files under knowledge/ ARE the corpus.  Both retriev, Classify by ancestor dir, not just the immediate parent — so incidents     fed u, Title + the symptom/what-happened paragraph — keyword-rich for retrieval.      H (+34 more)
+Cohesion: 0.14
+Nodes (16): _atomic_write(), feed(), MemoryFeedError, MemoryRecord, BaseModel, Exception, Path, Memory feed — resolved incidents become retrievable knowledge.  Closes the learn (+8 more)
 
 ### Community 3 - "Predictor Training"
-Cohesion: 0.12
-Nodes (31): TestClient, alert_body(), Edge-case sweep across every service surface — pre-deploy hardening.  Alert text, test_dashboard_survives_blank_title_and_description(), test_ppos_endpoints_reject_garbage_params(), test_predict_endpoint_rejects_bad_severity_and_missing_fields(), test_predict_survives_100kb_title(), test_predict_survives_unicode_hebrew_emoji() (+23 more)
+Cohesion: 0.08
+Nodes (46): ActionPreview, ActionRisk, approve(), propose_action(), Every mutating action goes through here. In production, HIGH risk always     req, TestClient, make_alert(), Alert (+38 more)
 
 ### Community 4 - "LLM Story Synthesis"
 Cohesion: 0.11
@@ -174,8 +186,8 @@ Cohesion: 0.11
 Nodes (32): GuardrailVerdict, _apply_nemo(), check_input(), check_input_full(), check_input_route(), check_output(), check_output_full(), check_output_route() (+24 more)
 
 ### Community 7 - "RAG Retrieval Service"
-Cohesion: 0.11
-Nodes (27): _lexical_confidence(), _load_corpus_and_text(), memory_route(), _overlap(), Evidence, Path, RagResult, query_route() (+19 more)
+Cohesion: 0.18
+Nodes (15): _lexical_confidence(), _load_corpus_and_text(), memory_route(), _overlap(), Evidence, Path, RAG service — retrieves runbooks and past incidents relevant to an alert.  The c, Feed a resolved, human-approved incident into the knowledge base.      The local (+7 more)
 
 ### Community 8 - "Tool Permissions"
 Cohesion: 0.07
@@ -186,8 +198,8 @@ Cohesion: 0.29
 Nodes (7): incident-agent/LOG.md — Prompt Engineering Log, incident-agent/system-v1.txt — Agent Prompt v1, incident-agent/system-v2.txt — Agent Prompt v2, incident-agent/system-v4.txt — Agent Prompt v4, incident-agent/system-v5.txt — Agent Prompt v5, incident-agent/system-v6.txt — Agent Prompt v6, versions.yaml — Prompt Versions
 
 ### Community 10 - "Story Graph Orchestration"
-Cohesion: 0.15
-Nodes (18): build_graph(), classify_node(), Alert, IncidentStory, The story-builder as a LangGraph graph: classify → retrieve → synthesize.  Same, Deterministic floor — always first; its severity may only be argued up., Fixture synthesiser. A real LLM (prompts/incident-agent/v1.md) replaces     this, Run the compiled graph end-to-end. Bounded by construction: the graph     is a D (+10 more)
+Cohesion: 0.14
+Nodes (19): build_graph(), classify_node(), Alert, IncidentStory, The story-builder as a LangGraph graph: classify → retrieve → synthesize.  Same, Deterministic floor — always first; its severity may only be argued up., Fixture synthesiser. A real LLM (prompts/incident-agent/v1.md) replaces     this, Run the compiled graph end-to-end. Bounded by construction: the graph     is a D (+11 more)
 
 ### Community 11 - "Learning & Governance"
 Cohesion: 0.12
@@ -195,7 +207,7 @@ Nodes (18): Action Preview Gate, architecture-guardian — Invariant Reviewer, s
 
 ### Community 12 - "Operations Console"
 Cohesion: 0.09
-Nodes (24): Request, agents_route(), create_lead(), feedback_route(), feedback_summary_route(), info_route(), LeadRequest, _notify_lead_webhook() (+16 more)
+Nodes (24): Request, agents_route(), budget_route(), create_lead(), feedback_route(), feedback_summary_route(), info_route(), LeadRequest (+16 more)
 
 ### Community 13 - "Action Approval Gate"
 Cohesion: 0.07
@@ -214,36 +226,36 @@ Cohesion: 0.33
 Nodes (6): alert-extraction/v1.md — Extraction Prompt, assistant/v1.md — Conversational Prompt, guardrails/v1.md — Safety Prompts, incident-agent/v1.md — Agent Surface v1, rag-injection/v1.md — RAG Injection Prompt, prompts/README.md — Prompt Versioning
 
 ### Community 41 - "BaseModel"
-Cohesion: 0.14
-Nodes (23): ActionPreview, ActionRisk, AgentRun, DashboardSpec, Deployment, Feedback, FeedbackVerdict, GuardrailVerdict (+15 more)
+Cohesion: 0.13
+Nodes (21): ActionPreview, ActionRisk, AgentRun, DashboardSpec, Deployment, Feedback, FeedbackVerdict, GuardrailVerdict (+13 more)
 
 ### Community 42 - "StrEnum"
 Cohesion: 0.09
 Nodes (27): _Embeddings, FakeIndex, FakeVoyage, _match(), _no_sleep(), _plan(), Any, MonkeyPatch (+19 more)
 
 ### Community 43 - "build_story"
-Cohesion: 0.18
-Nodes (16): ActionPreview, ActionRisk, approve(), propose_action(), Every mutating action goes through here. In production, HIGH risk always     req, make_alert(), Alert, Agent: story building and the ActionPreview approval gate. (+8 more)
+Cohesion: 0.16
+Nodes (21): _deploy_annotations(), export_grafana_preview(), _panel_json(), DashboardSpec, IncidentStory, Grafana dashboard JSON exporter — deterministic, catalog-bound, preview-only.  T, Deploy evidence becomes dashboard annotations — citation carried in     the anno, Return every problem found; empty list means safe to import. (+13 more)
 
 ### Community 44 - "test_ppos_budget.py"
-Cohesion: 0.18
-Nodes (19): usage_route(), aggregate(), budget_status(), Events from the last N hours (None = everything)., Cost and token totals grouped by agent/model/service — the OS headline table., Spend over the last 24h vs the configured daily budget.      Report-only: PETER, window(), event_at() (+11 more)
+Cohesion: 0.27
+Nodes (13): budget_status(), Spend over the last 24h vs the configured daily budget.      Report-only: PETER, event_at(), datetime, PETER PAN OS: time windows, groupings, and the deterministic budget guard., test_aggregate_by_model_and_service(), test_budget_counts_last_24h_only(), test_budget_exceeded_over_100_percent() (+5 more)
 
 ### Community 45 - "IncidentStory"
-Cohesion: 0.13
-Nodes (24): build_dashboard(), DashboardError, deterministic_spec(), _llm_spec(), DashboardSpec, Exception, IncidentStory, Draw me the problem' — LLM-designed dashboards as a typed, validated spec.  Same (+16 more)
+Cohesion: 0.14
+Nodes (22): build_dashboard(), DashboardError, deterministic_spec(), _llm_spec(), DashboardSpec, Exception, IncidentStory, Draw me the problem' — LLM-designed dashboards as a typed, validated spec.  Same (+14 more)
 
 ### Community 46 - "test_ppos_dashboard.py"
-Cohesion: 0.18
-Nodes (15): Bucketed cost/token series over the last N hours — the OS chart feed.      Empty, timeseries(), event_at(), datetime, MonkeyPatch, Path, PETER PAN OS dashboard feeds: time series and mesh health sweep.  (The legacy se, /os/dashboard must stay gone — the operator console is web/agent-os. (+7 more)
+Cohesion: 0.16
+Nodes (17): Bucketed cost/token time series — feeds the OS dashboard charts., usage_series_route(), Bucketed cost/token series over the last N hours — the OS chart feed.      Empty, timeseries(), event_at(), datetime, MonkeyPatch, Path (+9 more)
 
 ### Community 47 - "run_retrieval_eval.py"
 Cohesion: 0.27
 Nodes (12): _doc_id(), _lexical_retriever(), _load_cases(), main(), _pinecone_retriever(), Evidence, Path, _rank_of() (+4 more)
 
 ### Community 48 - "tips"
-Cohesion: 0.15
-Nodes (32): BaseSettings, Settings, _build_rails(), NemoCheckError, Any, Exception, NeMo Guardrails layer — additive screening behind the regex floor.  `peterpan.se, Semantic topical check via the configured LLM. OFF by default — only     called (+24 more)
+Cohesion: 0.16
+Nodes (18): BaseSettings, check_topical_llm_action(), Mutating actions may only auto-execute outside production., Settings, Semantic topical check via the configured LLM. OFF by default — only     called, Run the NeMo input rails. Returns flags (empty = nothing flagged).     Raises Ne, Run the NeMo output rails against already-generated text. Returns     flags (emp, scan_input() (+10 more)
 
 ### Community 49 - "test_dashboard.py"
 Cohesion: 0.05
@@ -294,8 +306,8 @@ Cohesion: 0.14
 Nodes (28): _code_fields(), _load(), _node(), _nodes(), Any, Path, Contract tests for the versioned n8n workflow exports (n8n/workflows/).  CI has, (b) No hardcoded hosts: every HTTP URL resolves through $env.PP_*_BASE. (+20 more)
 
 ### Community 67 - "build_story"
-Cohesion: 0.13
-Nodes (20): build_story(), dashboard_route(), Alert, DashboardSpec, IncidentStory, JSONResponse, Agent service — builds the IncidentStory and proposes gated actions.  MVP: a det, Draw me the problem': story pipeline + dashboard spec generation. (+12 more)
+Cohesion: 0.11
+Nodes (27): GrafanaDashboardPreview, A validated Grafana dashboard JSON model — preview/dry-run ONLY.      Publishing, build_story(), dashboard_route(), DrawRequest, grafana_preview_route(), Alert, BaseModel (+19 more)
 
 ### Community 68 - "test_ppos_leads.py"
 Cohesion: 0.29
@@ -314,24 +326,24 @@ Cohesion: 0.33
 Nodes (4): _parse_sse(), Contract test for the SSE incident-story stream (CONTRACTS.md §5).  GET /agent/s, Parse `event:`/`data:` frames (separated by a blank line) into     (event, data), test_stream_event_order_and_payloads()
 
 ### Community 72 - "App.tsx"
-Cohesion: 0.05
-Nodes (65): SECTIONS, AreaChart(), BarList(), Donut(), PALETTE, HealthStrip(), loadServices(), PageHeader() (+57 more)
+Cohesion: 0.15
+Nodes (11): SECTIONS, PageHeader(), SeverityPill(), StatusPill(), FIXTURE_POSTMORTEMS, PostMortem, fmtDate(), Deployments() (+3 more)
 
 ### Community 80 - "test_observability.py"
 Cohesion: 0.11
-Nodes (21): _clean_langfuse_env(), _install_fake_langfuse(), MonkeyPatch, Path, Langfuse tracing + structured prompt/completion log (§6.6).  No live Langfuse de, Every test starts unconfigured; opt-in tests set the env explicitly., Observability is never load-bearing: a failing JSONL write must not     raise ou, The `obs` extra must stay optional: importing peterpan.observability     and usi (+13 more)
+Nodes (20): _clean_langfuse_env(), _install_fake_langfuse(), MonkeyPatch, Path, Langfuse tracing + structured prompt/completion log (§6.6).  No live Langfuse de, Every test starts unconfigured; opt-in tests set the env explicitly., Observability is never load-bearing: a failing JSONL write must not     raise ou, The `obs` extra must stay optional: importing peterpan.observability     and usi (+12 more)
 
 ### Community 81 - "test_scoring.py"
 Cohesion: 0.14
 Nodes (23): accuracy(), Feedback, FeedbackVerdict, Deterministic feedback scoring — closes the learning loop measurably.  verdict -, The one place verdict -> score is decided. Every aggregate below is     built fr, Counts by verdict, zero-filled for every FeedbackVerdict member so a     summary, Mean deterministic score over items. An empty set scores 0.0 — "no     feedback, Accuracy grouped by the prompt version that produced each trace.      Feedback ( (+15 more)
 
 ### Community 82 - "test_nemo_rails.py"
-Cohesion: 0.10
-Nodes (19): check_citation_action(), check_injection_action(), check_secret_action(), check_topical_action(), check_topical_llm_action(), NeMo Guardrails action bindings for this config directory.  Auto-discovered by `, detect_fabricated_citation(), detect_injection() (+11 more)
+Cohesion: 0.14
+Nodes (20): check_citation_action(), check_injection_action(), check_secret_action(), check_topical_action(), NeMo Guardrails action bindings for this config directory.  Auto-discovered by `, detect_fabricated_citation(), detect_injection(), detect_secret_leak() (+12 more)
 
 ### Community 83 - "observability.py"
-Cohesion: 0.14
-Nodes (19): _append_prompt_log(), _preview(), prompt_version(), Any, Path, Langfuse tracing + structured prompt/completion logging (§6.6).  Opt-in, fixture, One LLM call's tracing context. Always has a `trace_id`, tracing     backend or, Log this call: a Langfuse generation span (if configured) and         always a s (+11 more)
+Cohesion: 0.13
+Nodes (20): _append_prompt_log(), _preview(), prompt_version(), Any, Path, Langfuse tracing + structured prompt/completion logging (§6.6).  Opt-in, fixture, One LLM call's tracing context. Always has a `trace_id`, tracing     backend or, Log this call: a Langfuse generation span (if configured) and         always a s (+12 more)
 
 ### Community 84 - "append_feedback"
 Cohesion: 0.21
@@ -350,8 +362,8 @@ Cohesion: 0.21
 Nodes (10): Evidence, IncidentStory, ReasoningPanel(), REPLAY_STREAMS, INITIAL_STATE, StepEvent, StreamFrame, StreamMode (+2 more)
 
 ### Community 88 - "format.ts"
-Cohesion: 0.38
-Nodes (4): App(), EvidencePanel(), StoryPanel(), useAgentStream()
+Cohesion: 0.27
+Nodes (6): App(), EvidencePanel(), StoryPanel(), DEMO_ALERTS, DemoAlertRef, useAgentStream()
 
 ### Community 89 - "os.ts"
 Cohesion: 0.33
@@ -377,6 +389,10 @@ Nodes (9): feedback_eval(), MonkeyPatch, Path, evals/run_feedback_eval.py: repla
 Cohesion: 0.31
 Nodes (8): make_alert(), make_evidence(), Alert, Evidence, Contract-level enforcement of the confidence < 1.0 invariant.  Every producer al, test_evidence_rejects_certainty(), test_incident_story_rejects_certainty(), test_prediction_rejects_certainty()
 
+### Community 95 - ".actions_allowed"
+Cohesion: 0.16
+Nodes (19): predict(), predict_full(), predict_route(), Alert, Prediction, Predictor service — classifies inbound alerts and assigns severity.  A determini, Pure classification. Falls back to 'unclassified' at the alert's own severity., Floor verdict, optionally refined by the local model under its guardrails. (+11 more)
+
 ### Community 96 - "ui.tsx"
 Cohesion: 0.44
 Nodes (5): ConfidenceMeter(), EmptyState(), Panel(), SectionLabel(), SeverityBadge()
@@ -385,9 +401,17 @@ Nodes (5): ConfidenceMeter(), EmptyState(), Panel(), SectionLabel(), SeverityBad
 Cohesion: 0.25
 Nodes (7): agent (:8004 · `PP_AGENT_BASE`), guardrails (:8003 · `PP_GUARDRAILS_BASE`), n8n endpoint coverage — mesh contract map, ppos (:8005 · `PP_PPOS_BASE`), predictor (:8001 · `PP_PREDICTOR_BASE`), rag (:8002 · `PP_RAG_BASE`), Repo-level assertions (`tests/test_n8n_contracts.py`)
 
+### Community 98 - "TokenUsage.tsx"
+Cohesion: 0.19
+Nodes (17): FIXTURE_BUDGET, FIXTURE_BY_AGENT, FIXTURE_BY_MODEL, FIXTURE_BY_SERVICE, FIXTURE_TIPS, fixtureSeries(), getJSON(), BudgetStatus (+9 more)
+
 ### Community 99 - "ServiceDetailPanel.tsx"
-Cohesion: 0.38
-Nodes (5): Severity, IncidentStatus, IncidentSummary, DEMO_ALERTS, DemoAlertRef
+Cohesion: 0.21
+Nodes (10): Severity, BUDGET_STYLE, BudgetPill(), SEVERITY_STYLE, SourceBadge(), STATUS_STYLE, FIXTURE_INCIDENTS, IncidentStatus (+2 more)
+
+### Community 100 - "test_memory_feed.py"
+Cohesion: 0.23
+Nodes (18): load_corpus(), Evidence, One Evidence entry per knowledge document, source = repo-relative path., MonkeyPatch, Path, Memory feed: resolved incidents become retrievable knowledge — gated, safe.  Det, record(), test_feed_is_idempotent_by_incident_id() (+10 more)
 
 ### Community 101 - "guardrails_config/"
 Cohesion: 0.33
@@ -401,25 +425,65 @@ Nodes (5): _clear_key_env(), MonkeyPatch, Credentials in Settings are SecretStr 
 Cohesion: 0.50
 Nodes (4): Deployment, DeploymentRow, FIXTURE_DEPLOYMENTS, ServiceDetail
 
+### Community 104 - "os.ts"
+Cohesion: 0.18
+Nodes (13): HealthStrip(), loadServices(), EvalScore, FIXTURE_EVAL_SCORES, FIXTURE_SERVICES, LiveData, useLiveData(), Anomaly (+5 more)
+
+### Community 105 - "usage.py"
+Cohesion: 0.23
+Nodes (14): tips_route(), usage_route(), aggregate(), _is_valid_row(), load_usage(), Token/cost usage logging — the data source for PETER PAN OS.  Every LLM call in, Events from the last N hours (None = everything)., Cost and token totals grouped by agent/model/service — the OS headline table. (+6 more)
+
+### Community 106 - "format.ts"
+Cohesion: 0.35
+Nodes (11): AreaChart(), BarList(), Donut(), PALETTE, fmtInt(), fmtTime(), fmtTok(), fmtUsd() (+3 more)
+
+### Community 107 - "NemoCheckError"
+Cohesion: 0.24
+Nodes (14): _build_rails(), NemoCheckError, Any, Exception, Load guardrails_config/ into an LLMRails engine. Raises NemoCheckError     on an, Any NeMo-path failure. Callers must catch this and fall back to the     floor's, _run_rails(), MonkeyPatch (+6 more)
+
+### Community 108 - "search"
+Cohesion: 0.21
+Nodes (12): RagResult, query_route(), search(), RAG: retrieval with mandatory citation trail., test_body_only_term_retrieves_its_doc(), test_empty_query_rejected(), test_endpoint_rejects_empty_query_with_422(), test_every_match_carries_a_source() (+4 more)
+
+### Community 109 - "Prediction"
+Cohesion: 0.36
+Nodes (11): apply_floor_guardrails(), MlPrediction, Prediction, Raw model output — NOT a Prediction until the floor guardrails ran., Merge model output into the floor's verdict. The floor always wins:      - class, Prediction, test_low_confidence_model_output_is_discarded(), test_model_confidence_is_capped_below_certainty() (+3 more)
+
+### Community 110 - "test_ml_holdout.py"
+Cohesion: 0.36
+Nodes (9): Deterministic stratified split. Classes with <5 examples stay train-only     (a, split_rows(), load_rows(), Honest predictor evaluation: stratified holdout, no train/test overlap.  The shi, test_holdout_accuracy_is_honest_and_passes_floor(), test_split_is_deterministic(), test_split_is_disjoint_and_complete(), test_split_is_stratified_every_class_in_both_halves() (+1 more)
+
+### Community 111 - "test_predictor.py"
+Cohesion: 0.29
+Nodes (9): make_alert(), Alert, Severity, Predictor: deterministic floor behavior., test_floor_never_lowers_existing_severity(), test_healthz_and_predict_endpoint(), test_oom_classified_as_resource_exhaustion_and_escalated_to_p1(), test_oom_substring_inside_another_word_does_not_false_positive() (+1 more)
+
+### Community 112 - "knowledge.py"
+Cohesion: 0.22
+Nodes (8): _kind_for(), load_full_text(), Path, Knowledge base loader — the files under knowledge/ ARE the corpus.  Both retriev, Classify by ancestor dir, not just the immediate parent — so incidents     fed u, Title + the symptom/what-happened paragraph — keyword-rich for retrieval.      H, Fetch a cited document's full text (UI drill-down / LLM context)., _summarize()
+
+### Community 113 - "OnCall.tsx"
+Cohesion: 0.31
+Nodes (6): Panel(), EscalationStep, FIXTURE_ESCALATION, FIXTURE_OWNERS, ServiceOwner, OnCall()
+
 ## Knowledge Gaps
 - **301 isolated node(s):** `$schema`, `Read`, `Glob`, `Grep`, `Bash(git status)` (+296 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Settings` connect `tips` to `LLM Story Evaluation`, `Knowledge Base Ingestion`, `build_story`, `LLM Story Synthesis`, `Environment Configuration`, `Input/Output Guardrails`, `test_config_secrets.py`, `BaseModel`, `StrEnum`, `Operations Console`, `Action Approval Gate`, `IncidentStory`, `test_observability.py`, `run_llm_judge.py`, `test_nemo_rails.py`, `observability.py`, `cache.py`, `.actions_allowed`?**
-  _High betweenness centrality (0.095) - this node is a cross-community bridge._
+- **Why does `Settings` connect `tips` to `Knowledge Base Ingestion`, `build_story`, `LLM Story Synthesis`, `Environment Configuration`, `Input/Output Guardrails`, `test_config_secrets.py`, `StrEnum`, `NemoCheckError`, `Operations Console`, `IncidentStory`, `Action Approval Gate`, `test_observability.py`, `run_llm_judge.py`, `observability.py`, `cache.py`, `.actions_allowed`?**
+  _High betweenness centrality (0.091) - this node is a cross-community bridge._
 - **Why does `synthesize()` connect `LLM Story Synthesis` to `Budget Tracking`, `build_story`, `IncidentStory`, `tips`, `observability.py`, `cache.py`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+- **Why does `build_story()` connect `build_story` to `Predictor Training`, `LLM Story Synthesis`, `Story Graph Orchestration`, `build_story`, `search`, `IncidentStory`, `run_llm_judge.py`, `.actions_allowed`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Why does `StepEvent` connect `BaseModel` to `build_story`, `LLM Story Synthesis`, `Environment Configuration`, `tips`, `run_llm_judge.py`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Are the 70 inferred relationships involving `Settings` (e.g. with `Verdict` and `check_topical_llm_action()`) actually correct?**
   _`Settings` has 70 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 26 inferred relationships involving `TestClient` (e.g. with `test_story_endpoint()` and `test_dashboard_endpoint()`) actually correct?**
-  _`TestClient` has 26 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 13 inferred relationships involving `build_story()` (e.g. with `main()` and `run()`) actually correct?**
-  _`build_story()` has 13 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 27 inferred relationships involving `TestClient` (e.g. with `test_story_endpoint()` and `test_dashboard_endpoint()`) actually correct?**
+  _`TestClient` has 27 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 17 inferred relationships involving `build_story()` (e.g. with `main()` and `run()`) actually correct?**
+  _`build_story()` has 17 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 9 inferred relationships involving `synthesize()` (e.g. with `cache_get()` and `cache_key()`) actually correct?**
   _`synthesize()` has 9 INFERRED edges - model-reasoned connections that need verification._

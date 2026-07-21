@@ -21,4 +21,9 @@ paths = [
     # inputs (password=hunter2, sk-..., ghp_...) are secret-shaped synthetic
     # strings by design. Verified 2026-07-18 (PR #41): synthetic only.
     '''tests/test_observability.py''',
+    # Grafana-preview validator fixture: one synthetic AKIA-shaped string
+    # ("AKIA" + 16×"A") drives test_validator_flags_secret_shaped_query —
+    # the dashboard-JSON secret check's own adversarial input. Verified
+    # 2026-07-18: constructed in-test, synthetic only.
+    '''tests/test_grafana_preview.py''',
 ]
