@@ -55,7 +55,7 @@ export interface IncidentStory {
   alert: Alert;
   what_changed: string;
   probable_cause: string;
-  /** 0.0 <= confidence <= 1.0 */
+  /** 0.0 <= confidence < 1.0 — the system never claims certainty. */
   confidence: number;
   evidence: Evidence[];
   repair_options: string[];
@@ -104,7 +104,7 @@ export interface GuardrailVerdict {
 export interface Prediction {
   incident_class: string;
   severity: Severity;
-  /** 0.0 <= confidence <= 1.0 */
+  /** 0.0 <= confidence < 1.0 — the floor never claims certainty. */
   confidence: number;
 }
 
@@ -160,6 +160,30 @@ export interface DashboardSpec {
   /** "llm" | "deterministic-fallback" */
   generated_by: string;
   panels: Panel[];
+}
+
+// ---------------------------------------------------------------------------
+// GrafanaDashboardPreview — validated Grafana JSON model, preview/dry-run ONLY
+// ---------------------------------------------------------------------------
+
+/**
+ * A validated Grafana dashboard JSON model — preview/dry-run ONLY.
+ * Publishing to a live Grafana is a separate, explicit production action
+ * that does not exist in this codebase; nothing behind this shape talks to
+ * a network. `validated === false` means the preview failed a safety check
+ * and must not be imported — `warnings` says why.
+ */
+export interface GrafanaDashboardPreview {
+  title: string;
+  /** The operator's problem statement, verbatim (data, not code). */
+  objective: string;
+  /** "grafana-exporter/<spec.generated_by>" */
+  generated_by: string;
+  panel_titles: string[];
+  warnings: string[];
+  validated: boolean;
+  /** Importable Grafana model (schemaVersion 39). */
+  dashboard_json: Record<string, unknown>;
 }
 
 // ---------------------------------------------------------------------------
