@@ -692,8 +692,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "evals_run_story_eval",
-      "community": 104,
-      "community_name": "os.ts",
+      "community": 50,
+      "community_name": "run_llm_judge.py",
       "norm_label": "run_story_eval.py"
     },
     {
@@ -703,8 +703,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "evals_run_story_eval_load_jsonl",
-      "community": 104,
-      "community_name": "os.ts",
+      "community": 50,
+      "community_name": "run_llm_judge.py",
       "norm_label": "_load_jsonl()"
     },
     {
@@ -714,8 +714,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "evals_run_story_eval_py_path",
-      "community": 104,
-      "community_name": "os.ts",
+      "community": 50,
+      "community_name": "run_llm_judge.py",
       "norm_label": "path"
     },
     {
@@ -725,8 +725,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "evals_run_story_eval_run",
-      "community": 104,
-      "community_name": "os.ts",
+      "community": 50,
+      "community_name": "run_llm_judge.py",
       "norm_label": "run()"
     },
     {
@@ -736,8 +736,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "evals_run_story_eval_rationale_1",
-      "community": 104,
-      "community_name": "os.ts",
+      "community": 50,
+      "community_name": "run_llm_judge.py",
       "norm_label": "story-pipeline eval: run every eval case through build_story and score it.  scor"
     },
     {
@@ -2136,8 +2136,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "src_peterpan_config_settings",
-      "community": 80,
-      "community_name": "test_observability.py",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "settings"
     },
     {
@@ -2147,8 +2147,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "basesettings",
-      "community": 80,
-      "community_name": "test_observability.py",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "basesettings"
     },
     {
@@ -2158,8 +2158,8 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "src_peterpan_config_settings_actions_allowed",
-      "community": 80,
-      "community_name": "test_observability.py",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": ".actions_allowed()"
     },
     {
@@ -2180,8 +2180,8 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "src_peterpan_config_rationale_151",
-      "community": 80,
-      "community_name": "test_observability.py",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "mutating actions may only auto-execute outside production."
     },
     {
@@ -2587,8 +2587,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "src_peterpan_knowledge_load_corpus",
-      "community": 100,
-      "community_name": "test_memory_feed.py",
+      "community": 112,
+      "community_name": "knowledge.py",
       "norm_label": "load_corpus()"
     },
     {
@@ -2598,8 +2598,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_knowledge_py_evidence",
-      "community": 100,
-      "community_name": "test_memory_feed.py",
+      "community": 112,
+      "community_name": "knowledge.py",
       "norm_label": "evidence"
     },
     {
@@ -2653,8 +2653,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "src_peterpan_knowledge_rationale_57",
-      "community": 100,
-      "community_name": "test_memory_feed.py",
+      "community": 112,
+      "community_name": "knowledge.py",
       "norm_label": "one evidence entry per knowledge document, source = repo-relative path."
     },
     {
@@ -2752,8 +2752,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_llm_py_prediction",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "prediction"
     },
     {
@@ -2785,8 +2785,8 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "src_peterpan_llm_resolve_model",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "resolve_model()"
     },
     {
@@ -2796,8 +2796,8 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "src_peterpan_llm_synthesize",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "synthesize()"
     },
     {
@@ -2807,8 +2807,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_llm_py_alert",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "alert"
     },
     {
@@ -2818,8 +2818,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_llm_py_ragresult",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "ragresult"
     },
     {
@@ -2829,8 +2829,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_llm_py_incidentstory",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "incidentstory"
     },
     {
@@ -2895,8 +2895,8 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "src_peterpan_llm_rationale_117",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "the model id that meters, caches, and traces this call."
     },
     {
@@ -2906,8 +2906,8 @@
       "source_location": "L129",
       "_origin": "ast",
       "id": "src_peterpan_llm_rationale_129",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "real-llm synthesis. raises llmsynthesiserror on any failure."
     },
     {
@@ -3445,8 +3445,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "nemo_rails.py"
     },
     {
@@ -3500,8 +3500,8 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_detect_fabricated_citation",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "detect_fabricated_citation()"
     },
     {
@@ -3566,8 +3566,8 @@
       "source_location": "L233",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_scan_input",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "scan_input()"
     },
     {
@@ -3577,8 +3577,8 @@
       "source_location": "L245",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_scan_output",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "scan_output()"
     },
     {
@@ -3588,8 +3588,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_1",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "nemo guardrails layer \u2014 additive screening behind the regex floor.  `peterpan.se"
     },
     {
@@ -3632,8 +3632,8 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_234",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "run the nemo input rails. returns flags (empty = nothing flagged).     raises ne"
     },
     {
@@ -3643,8 +3643,8 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "src_peterpan_nemo_rails_rationale_246",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "run the nemo output rails against already-generated text. returns     flags (emp"
     },
     {
@@ -4479,8 +4479,8 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "src_peterpan_schemas_actionpreview",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "actionpreview"
     },
     {
@@ -4490,8 +4490,8 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "src_peterpan_schemas_actionpreview_executable",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": ".executable()"
     },
     {
@@ -4531,7 +4531,7 @@
       "label": "GuardrailVerdict",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L114",
+      "source_location": "L132",
       "_origin": "ast",
       "id": "src_peterpan_schemas_guardrailverdict",
       "community": 41,
@@ -4542,7 +4542,7 @@
       "label": "Prediction",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L120",
+      "source_location": "L138",
       "_origin": "ast",
       "id": "src_peterpan_schemas_prediction",
       "community": 1,
@@ -4553,18 +4553,18 @@
       "label": "RagResult",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L127",
+      "source_location": "L145",
       "_origin": "ast",
       "id": "src_peterpan_schemas_ragresult",
-      "community": 50,
-      "community_name": "run_llm_judge.py",
+      "community": 4,
+      "community_name": "LLM Story Synthesis",
       "norm_label": "ragresult"
     },
     {
       "label": "AgentRun",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L133",
+      "source_location": "L151",
       "_origin": "ast",
       "id": "src_peterpan_schemas_agentrun",
       "community": 41,
@@ -4575,7 +4575,7 @@
       "label": "PanelKind",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L141",
+      "source_location": "L159",
       "_origin": "ast",
       "id": "src_peterpan_schemas_panelkind",
       "community": 41,
@@ -4586,33 +4586,33 @@
       "label": "Panel",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L148",
+      "source_location": "L166",
       "_origin": "ast",
       "id": "src_peterpan_schemas_panel",
-      "community": 45,
-      "community_name": "IncidentStory",
+      "community": 41,
+      "community_name": "BaseModel",
       "norm_label": "panel"
     },
     {
       "label": "DashboardSpec",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L159",
+      "source_location": "L177",
       "_origin": "ast",
       "id": "src_peterpan_schemas_dashboardspec",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "dashboardspec"
     },
     {
       "label": "GrafanaDashboardPreview",
       "file_type": "code",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L172",
+      "source_location": "L190",
       "_origin": "ast",
       "id": "src_peterpan_schemas_grafanadashboardpreview",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "grafanadashboardpreview"
     },
     {
@@ -4666,8 +4666,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "src_peterpan_schemas_rationale_70",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "a proposed action. high-risk actions are never auto-executed \u2014     they require"
     },
     {
@@ -4696,33 +4696,33 @@
       "label": "One dashboard panel. `source` (when set) must cite real evidence \u2014     the dashb",
       "file_type": "rationale",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L149",
+      "source_location": "L167",
       "_origin": "ast",
-      "id": "src_peterpan_schemas_rationale_149",
-      "community": 45,
-      "community_name": "IncidentStory",
+      "id": "src_peterpan_schemas_rationale_167",
+      "community": 41,
+      "community_name": "BaseModel",
       "norm_label": "one dashboard panel. `source` (when set) must cite real evidence \u2014     the dashb"
     },
     {
       "label": "A renderable dashboard: the answer to 'draw me the problem'.      Rendered by th",
       "file_type": "rationale",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L160",
+      "source_location": "L178",
       "_origin": "ast",
-      "id": "src_peterpan_schemas_rationale_160",
-      "community": 41,
-      "community_name": "BaseModel",
+      "id": "src_peterpan_schemas_rationale_178",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "a renderable dashboard: the answer to 'draw me the problem'.      rendered by th"
     },
     {
       "label": "A validated Grafana dashboard JSON model \u2014 preview/dry-run ONLY.      Publishing",
       "file_type": "rationale",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L173",
+      "source_location": "L191",
       "_origin": "ast",
-      "id": "src_peterpan_schemas_rationale_173",
-      "community": 41,
-      "community_name": "BaseModel",
+      "id": "src_peterpan_schemas_rationale_191",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "a validated grafana dashboard json model \u2014 preview/dry-run only.      publishing"
     },
     {
@@ -4897,7 +4897,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_search_query",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "search_query()"
     },
@@ -4908,7 +4908,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_py_alert",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "alert"
     },
@@ -4919,7 +4919,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_build_story",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "build_story()"
     },
@@ -4930,7 +4930,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_py_incidentstory",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "incidentstory"
     },
@@ -4941,7 +4941,7 @@
       "source_location": "L138",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_repair_options",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "_repair_options()"
     },
@@ -5007,7 +5007,7 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_story_route",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "story_route()"
     },
@@ -5018,8 +5018,8 @@
       "source_location": "L180",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_drawrequest",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "drawrequest"
     },
     {
@@ -5029,8 +5029,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_py_basemodel",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "basemodel"
     },
     {
@@ -5073,8 +5073,8 @@
       "source_location": "L206",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_stepevent",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "stepevent"
     },
     {
@@ -5161,7 +5161,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_rationale_80",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "build the rag query from an alert. search() rejects blank queries, and     title"
     },
@@ -5172,7 +5172,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_rationale_88",
-      "community": 67,
+      "community": 106,
       "community_name": "build_story",
       "norm_label": "planner \u2192 tools \u2192 synthesis. deterministic by default; pp_llm=anthropic     upgr"
     },
@@ -5216,8 +5216,8 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "src_peterpan_services_agent_rationale_207",
-      "community": 41,
-      "community_name": "BaseModel",
+      "community": 67,
+      "community_name": "build_story",
       "norm_label": "one reasoning-step notification \u2014 contracts.md \u00a75 `step` event shape."
     },
     {
@@ -5458,8 +5458,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_usage_route",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "usage_route()"
     },
     {
@@ -5469,8 +5469,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_usage_series_route",
-      "community": 46,
-      "community_name": "test_ppos_dashboard.py",
+      "community": 12,
+      "community_name": "Operations Console",
       "norm_label": "usage_series_route()"
     },
     {
@@ -5480,8 +5480,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_budget_route",
-      "community": 12,
-      "community_name": "Operations Console",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "budget_route()"
     },
     {
@@ -5491,8 +5491,8 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_tips_route",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "tips_route()"
     },
     {
@@ -5645,8 +5645,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_rationale_60",
-      "community": 46,
-      "community_name": "test_ppos_dashboard.py",
+      "community": 12,
+      "community_name": "Operations Console",
       "norm_label": "bucketed cost/token time series \u2014 feeds the os dashboard charts."
     },
     {
@@ -5656,8 +5656,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "src_peterpan_services_ppos_rationale_66",
-      "community": 12,
-      "community_name": "Operations Console",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "last-24h spend vs the pp_daily_budget_usd budget. report-only guard."
     },
     {
@@ -6008,8 +6008,8 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "src_peterpan_services_rag_queryin",
-      "community": 5,
-      "community_name": "Environment Configuration",
+      "community": 108,
+      "community_name": "search",
       "norm_label": "queryin"
     },
     {
@@ -6019,8 +6019,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_peterpan_services_rag_py_basemodel",
-      "community": 5,
-      "community_name": "Environment Configuration",
+      "community": 108,
+      "community_name": "search",
       "norm_label": "basemodel"
     },
     {
@@ -6107,8 +6107,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_usage",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "usage.py"
     },
     {
@@ -6118,8 +6118,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "src_peterpan_usage_model_rates",
-      "community": 45,
-      "community_name": "IncidentStory",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "model_rates()"
     },
     {
@@ -6129,8 +6129,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "src_peterpan_usage_usageevent",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "usageevent"
     },
     {
@@ -6173,8 +6173,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "src_peterpan_usage_is_valid_row",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "_is_valid_row()"
     },
     {
@@ -6184,8 +6184,8 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "src_peterpan_usage_load_usage",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "load_usage()"
     },
     {
@@ -6195,8 +6195,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "src_peterpan_usage_window",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "window()"
     },
     {
@@ -6206,8 +6206,8 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "src_peterpan_usage_aggregate",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "aggregate()"
     },
     {
@@ -6239,8 +6239,8 @@
       "source_location": "L204",
       "_origin": "ast",
       "id": "src_peterpan_usage_tips",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "tips()"
     },
     {
@@ -6250,8 +6250,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_1",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "token/cost usage logging \u2014 the data source for peter pan os.  every llm call in"
     },
     {
@@ -6261,8 +6261,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_30",
-      "community": 45,
-      "community_name": "IncidentStory",
+      "community": 105,
+      "community_name": "usage.py",
       "norm_label": "(input_rate, output_rate) for a model id, defaulting loudly-visibly."
     },
     {
@@ -6272,8 +6272,8 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_67",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "schema-valid json can still be a poisoned row: an unparsable/naive ts,     or no"
     },
     {
@@ -6283,8 +6283,8 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_112",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "events from the last n hours (none = everything)."
     },
     {
@@ -6294,8 +6294,8 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_120",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "cost and token totals grouped by agent/model/service \u2014 the os headline table."
     },
     {
@@ -6327,8 +6327,8 @@
       "source_location": "L205",
       "_origin": "ast",
       "id": "src_peterpan_usage_rationale_205",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 0,
+      "community_name": "Budget Tracking",
       "norm_label": "cheap heuristics that catch the common cost regressions early."
     },
     {
@@ -7185,8 +7185,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "tests_test_edge_cases_test_predict_survives_unicode_hebrew_emoji",
-      "community": 3,
-      "community_name": "Predictor Training",
+      "community": 1,
+      "community_name": "LLM Story Evaluation",
       "norm_label": "test_predict_survives_unicode_hebrew_emoji()"
     },
     {
@@ -7806,10 +7806,43 @@
       "norm_label": "test_load_missing_file_returns_empty()"
     },
     {
-      "label": "test_load_skips_poisoned_rows()",
+      "label": "test_enriched_fields_roundtrip()",
       "file_type": "code",
       "source_file": "tests/test_feedback_store.py",
       "source_location": "L44",
+      "_origin": "ast",
+      "id": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "community": 84,
+      "community_name": "append_feedback",
+      "norm_label": "test_enriched_fields_roundtrip()"
+    },
+    {
+      "label": "test_legacy_rows_without_new_fields_still_load()",
+      "file_type": "code",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "tests_test_feedback_store_test_legacy_rows_without_new_fields_still_load",
+      "community": 84,
+      "community_name": "append_feedback",
+      "norm_label": "test_legacy_rows_without_new_fields_still_load()"
+    },
+    {
+      "label": "test_analyst_confidence_rejects_out_of_range()",
+      "file_type": "code",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L88",
+      "_origin": "ast",
+      "id": "tests_test_feedback_store_test_analyst_confidence_rejects_out_of_range",
+      "community": 84,
+      "community_name": "append_feedback",
+      "norm_label": "test_analyst_confidence_rejects_out_of_range()"
+    },
+    {
+      "label": "test_load_skips_poisoned_rows()",
+      "file_type": "code",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "tests_test_feedback_store_test_load_skips_poisoned_rows",
       "community": 84,
@@ -7820,7 +7853,7 @@
       "label": "test_count_feedback()",
       "file_type": "code",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L57",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "tests_test_feedback_store_test_count_feedback",
       "community": 84,
@@ -7839,14 +7872,36 @@
       "norm_label": "feedback store: append/load jsonl roundtrip and resilience to bad rows."
     },
     {
+      "label": "The structured outcome fields (learning loop) survive the JSONL trip.",
+      "file_type": "rationale",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "tests_test_feedback_store_rationale_45",
+      "community": 84,
+      "community_name": "append_feedback",
+      "norm_label": "the structured outcome fields (learning loop) survive the jsonl trip."
+    },
+    {
+      "label": "Additive contract: pre-enrichment JSONL rows (the five original     fields only)",
+      "file_type": "rationale",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "tests_test_feedback_store_rationale_72",
+      "community": 84,
+      "community_name": "append_feedback",
+      "norm_label": "additive contract: pre-enrichment jsonl rows (the five original     fields only)"
+    },
+    {
       "label": "test_grafana_preview.py",
       "file_type": "code",
       "source_file": "tests/test_grafana_preview.py",
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_grafana_preview",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_grafana_preview.py"
     },
     {
@@ -7856,8 +7911,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_make_alert",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "make_alert()"
     },
     {
@@ -7867,8 +7922,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_py_alert",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "alert"
     },
     {
@@ -7878,8 +7933,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_make_spec",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "make_spec()"
     },
     {
@@ -7889,8 +7944,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_py_dashboardspec",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "dashboardspec"
     },
     {
@@ -7900,8 +7955,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_test_export_is_validated_and_class_specific",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_export_is_validated_and_class_specific()"
     },
     {
@@ -7911,8 +7966,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_test_service_variable_comes_from_alert_labels",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_service_variable_comes_from_alert_labels()"
     },
     {
@@ -7922,8 +7977,8 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_test_deploy_evidence_becomes_cited_annotation",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_deploy_evidence_becomes_cited_annotation()"
     },
     {
@@ -7933,8 +7988,8 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_test_problem_text_is_data_never_query",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_problem_text_is_data_never_query()"
     },
     {
@@ -7966,8 +8021,8 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_test_grafana_endpoint_previews_and_never_publishes",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "test_grafana_endpoint_previews_and_never_publishes()"
     },
     {
@@ -7977,8 +8032,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_grafana_preview_rationale_1",
-      "community": 43,
-      "community_name": "build_story",
+      "community": 104,
+      "community_name": "os.ts",
       "norm_label": "grafana exporter \u2014 catalog-bound panels, citation-carrying annotations, preview-"
     },
     {
@@ -8175,8 +8230,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "test_langgraph_and_evals.py"
     },
     {
@@ -8186,8 +8241,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_make_alert",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "make_alert()"
     },
     {
@@ -8197,8 +8252,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_py_alert",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "alert"
     },
     {
@@ -8208,8 +8263,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_test_langgraph_story_matches_deterministic_pipeline",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "test_langgraph_story_matches_deterministic_pipeline()"
     },
     {
@@ -8219,8 +8274,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_test_langgraph_story_keeps_invariants",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "test_langgraph_story_keeps_invariants()"
     },
     {
@@ -8230,8 +8285,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_test_eval_harness_passes_all_cases",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "test_eval_harness_passes_all_cases()"
     },
     {
@@ -8241,8 +8296,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_langgraph_and_evals_rationale_1",
-      "community": 10,
-      "community_name": "Story Graph Orchestration",
+      "community": 107,
+      "community_name": "test_langgraph_and_evals.py",
       "norm_label": "langgraph story graph equivalence + eval harness health."
     },
     {
@@ -8373,8 +8428,8 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "tests_test_llm_bedrock_test_resolve_model_switches_on_provider",
-      "community": 95,
-      "community_name": ".actions_allowed",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_resolve_model_switches_on_provider()"
     },
     {
@@ -8571,8 +8626,8 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "tests_test_llm_synthesis_test_synthesize_caches_response_and_skips_second_llm_call",
-      "community": 50,
-      "community_name": "run_llm_judge.py",
+      "community": 4,
+      "community_name": "LLM Story Synthesis",
       "norm_label": "test_synthesize_caches_response_and_skips_second_llm_call()"
     },
     {
@@ -8615,8 +8670,8 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "tests_test_llm_synthesis_rationale_81",
-      "community": 50,
-      "community_name": "run_llm_judge.py",
+      "community": 4,
+      "community_name": "LLM Story Synthesis",
       "norm_label": "adr-0001 response cache wired into the one real log_usage call: a     cache hit"
     },
     {
@@ -9396,8 +9451,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_nemo_rails",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "test_nemo_rails.py"
     },
     {
@@ -9451,8 +9506,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_detect_fabricated_citation_flags_invented_source",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "test_detect_fabricated_citation_flags_invented_source()"
     },
     {
@@ -9462,8 +9517,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_detect_fabricated_citation_false_on_real_source_shapes",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "test_detect_fabricated_citation_false_on_real_source_shapes()"
     },
     {
@@ -9539,8 +9594,8 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_input_blocks_prompt_injection",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_input_blocks_prompt_injection()"
     },
     {
@@ -9550,8 +9605,8 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_input_passes_benign_alert",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_input_passes_benign_alert()"
     },
     {
@@ -9561,8 +9616,8 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_output_blocks_fabricated_citation",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_output_blocks_fabricated_citation()"
     },
     {
@@ -9572,8 +9627,8 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_scan_output_passes_honest_report",
-      "community": 48,
-      "community_name": "tips",
+      "community": 88,
+      "community_name": "format.ts",
       "norm_label": "test_scan_output_passes_honest_report()"
     },
     {
@@ -9660,8 +9715,8 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_test_detect_fabricated_citation_skips_empty_claim",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "test_detect_fabricated_citation_skips_empty_claim()"
     },
     {
@@ -9671,8 +9726,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_nemo_rails_rationale_1",
-      "community": 48,
-      "community_name": "tips",
+      "community": 82,
+      "community_name": "test_nemo_rails.py",
       "norm_label": "nemo guardrails layer \u2014 additive screening behind the regex floor.  the pure `de"
     },
     {
@@ -9891,8 +9946,8 @@
       "source_location": "L327",
       "_origin": "ast",
       "id": "tests_test_observability_test_scrub_catches_json_quoted_and_compound_keys",
-      "community": 83,
-      "community_name": "observability.py",
+      "community": 80,
+      "community_name": "test_observability.py",
       "norm_label": "test_scrub_catches_json_quoted_and_compound_keys()"
     },
     {
@@ -10496,8 +10551,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "tests_test_ppos_budget_test_aggregate_rejects_unknown_grouping",
-      "community": 105,
-      "community_name": "usage.py",
+      "community": 44,
+      "community_name": "test_ppos_budget.py",
       "norm_label": "test_aggregate_rejects_unknown_grouping()"
     },
     {
@@ -11211,8 +11266,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "tests_test_rag_test_score_never_reaches_one_for_subset_query",
-      "community": 7,
-      "community_name": "RAG Retrieval Service",
+      "community": 108,
+      "community_name": "search",
       "norm_label": "test_score_never_reaches_one_for_subset_query()"
     },
     {
@@ -12256,8 +12311,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents",
-      "community": 99,
-      "community_name": "ServiceDetailPanel.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "incidents.ts"
     },
     {
@@ -12267,8 +12322,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "web_agent_os_src_fixtures_incidents_incidentstatus",
-      "community": 99,
-      "community_name": "ServiceDetailPanel.tsx",
+      "community": 72,
+      "community_name": "App.tsx",
       "norm_label": "incidentstatus"
     },
     {
@@ -13708,8 +13763,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_app",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "app.tsx"
     },
     {
@@ -13719,8 +13774,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "web_demo_src_app_modebadge",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "modebadge()"
     },
     {
@@ -13730,8 +13785,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "web_demo_src_app_app",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "app()"
     },
     {
@@ -13763,8 +13818,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "web_demo_src_components_evidencepanel_evidencepanel",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "evidencepanel()"
     },
     {
@@ -13862,8 +13917,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "reasoningpanel.tsx"
     },
     {
@@ -13873,8 +13928,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel_steprow",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "steprow()"
     },
     {
@@ -13884,8 +13939,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "web_demo_src_components_reasoningpanel_reasoningpanel",
-      "community": 87,
-      "community_name": "stream.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "reasoningpanel()"
     },
     {
@@ -13895,8 +13950,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_components_servicedetailpanel",
-      "community": 85,
-      "community_name": "IncidentGraph.tsx",
+      "community": 99,
+      "community_name": "ServiceDetailPanel.tsx",
       "norm_label": "servicedetailpanel.tsx"
     },
     {
@@ -13906,8 +13961,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "web_demo_src_components_servicedetailpanel_servicedetailpanel",
-      "community": 85,
-      "community_name": "IncidentGraph.tsx",
+      "community": 99,
+      "community_name": "ServiceDetailPanel.tsx",
       "norm_label": "servicedetailpanel()"
     },
     {
@@ -13928,8 +13983,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "web_demo_src_components_storypanel_storypanel",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "storypanel()"
     },
     {
@@ -14148,8 +14203,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "web_demo_src_fixtures_topology_service_details",
-      "community": 85,
-      "community_name": "IncidentGraph.tsx",
+      "community": 99,
+      "community_name": "ServiceDetailPanel.tsx",
       "norm_label": "service_details"
     },
     {
@@ -14269,8 +14324,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "web_demo_src_lib_stream_useagentstream",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "useagentstream()"
     },
     {
@@ -14280,8 +14335,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "web_demo_src_main",
-      "community": 88,
-      "community_name": "format.ts",
+      "community": 96,
+      "community_name": "ui.tsx",
       "norm_label": "main.tsx"
     },
     {
@@ -22935,10 +22990,22 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L60",
+      "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_count_feedback",
+      "target": "src_peterpan_feedback_store_append_feedback"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_enriched_fields_roundtrip",
       "target": "src_peterpan_feedback_store_append_feedback"
     },
     {
@@ -22959,7 +23026,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L46",
+      "source_location": "L98",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_load_skips_poisoned_rows",
@@ -23030,6 +23097,30 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_feedback_store.py",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "target": "src_peterpan_feedback_store_load_feedback"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_legacy_rows_without_new_fields_still_load",
+      "target": "src_peterpan_feedback_store_load_feedback"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_feedback_store.py",
       "source_location": "L41",
       "weight": 1.0,
       "_origin": "ast",
@@ -23054,7 +23145,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L53",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_load_skips_poisoned_rows",
@@ -23066,7 +23157,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L59",
+      "source_location": "L111",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_count_feedback",
@@ -27868,7 +27959,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L133",
+      "source_location": "L151",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -27890,7 +27981,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L159",
+      "source_location": "L177",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -27945,7 +28036,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L172",
+      "source_location": "L190",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -27956,7 +28047,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L114",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -27978,7 +28069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L148",
+      "source_location": "L166",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -27989,7 +28080,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L141",
+      "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -28000,7 +28091,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L120",
+      "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -28011,7 +28102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L127",
+      "source_location": "L145",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas",
@@ -28374,7 +28465,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L141",
+      "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_panelkind",
@@ -28511,7 +28602,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L133",
+      "source_location": "L151",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_agentrun",
@@ -28522,7 +28613,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L159",
+      "source_location": "L177",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_dashboardspec",
@@ -28566,7 +28657,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L172",
+      "source_location": "L190",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_grafanadashboardpreview",
@@ -28577,7 +28668,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L114",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_guardrailverdict",
@@ -28599,7 +28690,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L148",
+      "source_location": "L166",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_panel",
@@ -28610,7 +28701,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L120",
+      "source_location": "L138",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_prediction",
@@ -28621,7 +28712,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L127",
+      "source_location": "L145",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_peterpan_schemas_ragresult",
@@ -29018,10 +29109,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L149",
+      "source_location": "L167",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_schemas_rationale_149",
+      "source": "src_peterpan_schemas_rationale_167",
       "target": "src_peterpan_schemas_panel",
       "confidence_score": 1.0
     },
@@ -29029,10 +29120,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L160",
+      "source_location": "L178",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_schemas_rationale_160",
+      "source": "src_peterpan_schemas_rationale_178",
       "target": "src_peterpan_schemas_dashboardspec",
       "confidence_score": 1.0
     },
@@ -29073,10 +29164,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/peterpan/schemas.py",
-      "source_location": "L173",
+      "source_location": "L191",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_peterpan_schemas_rationale_173",
+      "source": "src_peterpan_schemas_rationale_191",
       "target": "src_peterpan_schemas_grafanadashboardpreview",
       "confidence_score": 1.0
     },
@@ -35322,6 +35413,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store",
+      "target": "tests_test_feedback_store_test_analyst_confidence_rejects_out_of_range",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
       "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
@@ -35333,11 +35435,33 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L57",
+      "source_location": "L109",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store",
       "target": "tests_test_feedback_store_test_count_feedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store",
+      "target": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store",
+      "target": "tests_test_feedback_store_test_legacy_rows_without_new_fields_still_load",
       "confidence_score": 1.0
     },
     {
@@ -35366,7 +35490,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L44",
+      "source_location": "L96",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store",
@@ -35413,6 +35537,18 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_analyst_confidence_rejects_out_of_range",
+      "target": "tests_test_feedback_store_fb",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
       "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
@@ -35425,7 +35561,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L60",
+      "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_count_feedback",
@@ -35449,11 +35585,23 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L46",
+      "source_location": "L98",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_load_skips_poisoned_rows",
       "target": "tests_test_feedback_store_fb",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "target": "tests_test_feedback_store_py_feedback",
       "confidence_score": 1.0
     },
     {
@@ -35473,10 +35621,34 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L57",
+      "source_location": "L109",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_count_feedback",
+      "target": "tests_test_feedback_store_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "target": "tests_test_feedback_store_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_test_legacy_rows_without_new_fields_still_load",
       "target": "tests_test_feedback_store_py_path",
       "confidence_score": 1.0
     },
@@ -35509,11 +35681,33 @@
       "context": "parameter_type",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_feedback_store.py",
-      "source_location": "L44",
+      "source_location": "L96",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_test_feedback_store_test_load_skips_poisoned_rows",
       "target": "tests_test_feedback_store_py_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_rationale_45",
+      "target": "tests_test_feedback_store_test_enriched_fields_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_feedback_store.py",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_test_feedback_store_rationale_72",
+      "target": "tests_test_feedback_store_test_legacy_rows_without_new_fields_still_load",
       "confidence_score": 1.0
     },
     {
@@ -48441,5 +48635,5 @@
       "source_file": "prompts/incident-agent/LOG.md"
     }
   ],
-  "built_at_commit": "34941a913c6037214106447806d0abf521ffb5c6"
+  "built_at_commit": "ed5477daed828b74c4d129e4a4d4017e6f4291fc"
 }
