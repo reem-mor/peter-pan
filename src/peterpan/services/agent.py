@@ -26,6 +26,7 @@ from peterpan.schemas import (
     Alert,
     DashboardSpec,
     Evidence,
+    GrafanaDashboardPreview,
     IncidentStory,
     Severity,
 )
@@ -187,6 +188,18 @@ def dashboard_route(body: DrawRequest) -> DashboardSpec:
 
     story = build_story(body.alert)
     return build_dashboard(body.problem, story, settings)
+
+
+@app.post("/dashboard/grafana")
+def grafana_preview_route(body: DrawRequest) -> GrafanaDashboardPreview:
+    """Grafana JSON model export of 'draw me the problem' — preview/dry-run
+    only. Nothing here publishes; importing the JSON is a human action."""
+    from peterpan.dashboard import build_dashboard
+    from peterpan.grafana import export_grafana_preview
+
+    story = build_story(body.alert)
+    spec = build_dashboard(body.problem, story, settings)
+    return export_grafana_preview(spec, story)
 
 
 class StepEvent(BaseModel):

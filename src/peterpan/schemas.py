@@ -159,11 +159,30 @@ class Panel(BaseModel):
 class DashboardSpec(BaseModel):
     """A renderable dashboard: the answer to 'draw me the problem'.
 
-    Rendered by the Streamlit UI today; the same spec maps 1:1 onto Grafana
-    panel JSON when the Grafana exporter lands.
+    Rendered by the Streamlit UI today; peterpan.grafana exports the same
+    spec as a validated Grafana JSON model preview.
     """
 
     title: str
     problem: str
     generated_by: str  # "llm" | "deterministic-fallback"
     panels: list[Panel]
+
+
+class GrafanaDashboardPreview(BaseModel):
+    """A validated Grafana dashboard JSON model — preview/dry-run ONLY.
+
+    Publishing to a live Grafana is a separate, explicit production action
+    that does not exist in this codebase; nothing here talks to a network.
+    `validated=False` means the preview failed a safety check and must not
+    be imported — `warnings` says why. Every panel description states why
+    the panel was selected and cites story evidence where it exists.
+    """
+
+    title: str
+    objective: str  # the operator's problem statement, verbatim (data, not code)
+    generated_by: str  # "grafana-exporter/<spec.generated_by>"
+    panel_titles: list[str]
+    warnings: list[str] = Field(default_factory=list)
+    validated: bool
+    dashboard_json: dict[str, object]  # importable Grafana model (schemaVersion 39)
