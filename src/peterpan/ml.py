@@ -11,7 +11,9 @@ The model is an upgrade *behind* the floor, never a replacement for it:
 
 Training is offline and deterministic (fixed seed) over the labeled
 synthetic set data/synthetic/predictor_train.jsonl; weights + vocab land in
-data/models/. See scripts/train_predictor.py.
+models/. See scripts/train_predictor.py. models/ lives outside data/ on
+purpose: data/ is mutable runtime state (chowned to the container user),
+models/ is immutable baked artifacts (root-owned in the image).
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ if TYPE_CHECKING:  # torch types only for checking; runtime import stays lazy
     import torch
 
 _ROOT = Path(__file__).parent.parent.parent
-DEFAULT_MODEL_DIR = _ROOT / "data" / "models"
+DEFAULT_MODEL_DIR = _ROOT / "models"
 _TRAIN_DATA = _ROOT / "data" / "synthetic" / "predictor_train.jsonl"
 
 # Below this the model has no opinion worth acting on: its output is

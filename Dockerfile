@@ -10,7 +10,7 @@ COPY src/ src/
 # peterpan.llm, peterpan.ml): the corpus, versioned prompts, and model artifacts.
 COPY knowledge/ knowledge/
 COPY prompts/ prompts/
-COPY data/models/ data/models/
+COPY models/ models/
 # Editable install keeps peterpan importing from /app/src, so the repo-root
 # asset paths above resolve; a site-packages install pointed them into the
 # interpreter tree and shipped an empty corpus (rag corpus_size=0).
@@ -24,8 +24,11 @@ RUN pip install --no-cache-dir -e ".[llm,rag,aws]"
 # writes incident docs), usage-shared/ stays writable so log_usage()
 # (called on every metered LLM call) can append usage.jsonl, and data/
 # stays writable because feedback.jsonl / leads.jsonl / prompt_log.jsonl
-# default there (COPY data/models/ above created it root-owned, which made
-# POST /feedback and POST /leads 500 with PermissionError in-container).
+# default there (it was root-owned in the image, which made POST /feedback
+# and POST /leads 500 with PermissionError in-container). models/ is
+# deliberately NOT chowned: the baked ML artifacts stay root-owned so a
+# compromised runtime process cannot replace or unlink them — mutable
+# state and immutable artifacts are path-separated on purpose.
 RUN useradd --create-home peterpan \
     && mkdir -p /app/usage-shared /app/data \
     && chown -R peterpan /app/knowledge /app/usage-shared /app/data
