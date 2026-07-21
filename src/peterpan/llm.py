@@ -7,8 +7,11 @@ The LLM refines the narrative; it never gets to break the invariants:
   of evidence actually collected (fabricated citations => rejection)
 - confidence is capped below 1.0; class/severity come from the predictor
 - every call logs tokens + cost to PETER PAN OS via peterpan.usage
-- ANY failure (API, parse, validation) raises LlmSynthesisError so the
+- ANY failure (provider dispatch, prompt load, API, response parse,
+  schema/floor validation, usage metering) raises LlmSynthesisError so the
   caller falls back to the deterministic path — fail-safe by construction.
+  A completed call whose usage cannot be metered is discarded rather than
+  shipped unmetered (invariant 6: metering is load-bearing).
 """
 
 from __future__ import annotations
@@ -46,7 +49,10 @@ class _LlmStoryDraft(BaseModel):
 
 
 def load_system_prompt() -> str:
-    return _PROMPT_PATH.read_text(encoding="utf-8")
+    try:
+        return _PROMPT_PATH.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise LlmSynthesisError(f"prompt file unreadable: {_PROMPT_PATH.name}") from exc
 
 
 def _validate_draft(
@@ -84,8 +90,11 @@ def _anthropic_complete(
         )
     except Exception as exc:
         raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
-    text = "".join(block.text for block in response.content if block.type == "text").strip()
-    return text, response.usage.input_tokens, response.usage.output_tokens
+    try:
+        text = "".join(block.text for block in response.content if block.type == "text").strip()
+        return text, response.usage.input_tokens, response.usage.output_tokens
+    except Exception as exc:
+        raise LlmSynthesisError(f"anthropic response parse failure: {type(exc).__name__}") from exc
 
 
 def _bedrock_complete(
@@ -107,10 +116,16 @@ def _bedrock_complete(
         )
     except Exception as exc:
         raise LlmSynthesisError(f"bedrock API failure: {type(exc).__name__}") from exc
-    blocks = response["output"]["message"]["content"]
-    text = "".join(b["text"] for b in blocks if "text" in b).strip()
-    usage = response["usage"]
-    return text, int(usage["inputTokens"]), int(usage["outputTokens"])
+    # Parse in its own guarded block: a malformed Converse response (missing
+    # keys, non-list content, non-numeric token counts) must become
+    # LlmSynthesisError, never a raw KeyError that 500s past the fallback.
+    try:
+        blocks = response["output"]["message"]["content"]
+        text = "".join(b["text"] for b in blocks if "text" in b).strip()
+        usage = response["usage"]
+        return text, int(usage["inputTokens"]), int(usage["outputTokens"])
+    except Exception as exc:
+        raise LlmSynthesisError(f"bedrock response parse failure: {type(exc).__name__}") from exc
 
 
 def resolve_model(settings: Settings) -> str:
@@ -127,6 +142,17 @@ def synthesize(
     settings: Settings,
 ) -> IncidentStory:
     """Real-LLM synthesis. Raises LlmSynthesisError on any failure."""
+    # Explicit provider dispatch, first thing: PP_LLM=off (or any future
+    # provider without a completer wired here) must never fall through to a
+    # priced API call — even a cached completion is not served when synthesis
+    # is not enabled.
+    if settings.llm is LlmProvider.BEDROCK:
+        complete = _bedrock_complete
+    elif settings.llm is LlmProvider.ANTHROPIC:
+        complete = _anthropic_complete
+    else:
+        raise LlmSynthesisError(f"PP_LLM={settings.llm.value!r} does not enable LLM synthesis")
+
     model_name = resolve_model(settings)
     trace = trace_run(service="agent", model=model_name, settings=settings)
 
@@ -177,23 +203,10 @@ def synthesize(
     raw = cache_get(key)
 
     if raw is None:
-        complete = _bedrock_complete if settings.llm is LlmProvider.BEDROCK else _anthropic_complete
         raw, input_tokens, output_tokens = complete(system_prompt, user_content, settings)
 
         rate_in, rate_out = model_rates(model_name)
         cost_usd = round(input_tokens * rate_in + output_tokens * rate_out, 6)
-
-        log_usage(
-            make_event(
-                service="agent",
-                agent="incident-agent",
-                model=model_name,
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                cost_usd=cost_usd,
-            ),
-            settings.usage_log_path,
-        )
 
         fresh = True
     else:
@@ -203,9 +216,11 @@ def synthesize(
         cost_usd = 0.0
 
     # Structured prompt/completion log (§6.6): every call — cached or fresh,
-    # whether or not the completion below passes schema/floor validation —
-    # gets one row keyed by trace.trace_id. Hashes + a scrubbed preview only,
-    # never raw prompt/completion text.
+    # whether or not the completion below passes schema/floor validation or
+    # metering — gets one row keyed by trace.trace_id. Recorded BEFORE the
+    # metering guard (record() never raises) so a completed call keeps its
+    # prompt-log trail even when the usage row cannot be written. Hashes + a
+    # scrubbed preview only, never raw prompt/completion text.
     trace.record(
         surface=_SURFACE,
         system_prompt=system_prompt,
@@ -216,6 +231,25 @@ def synthesize(
         cost_usd=cost_usd,
         cached=not fresh,
     )
+
+    if fresh:
+        try:
+            log_usage(
+                make_event(
+                    service="agent",
+                    agent="incident-agent",
+                    model=model_name,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cost_usd=cost_usd,
+                ),
+                settings.usage_log_path,
+            )
+        except Exception as exc:
+            # Invariant 6: metering is load-bearing. A completion whose usage
+            # cannot be recorded is discarded (caller falls back) rather than
+            # shipped unmetered.
+            raise LlmSynthesisError(f"usage metering failed: {type(exc).__name__}") from exc
 
     try:
         draft = _LlmStoryDraft.model_validate_json(raw)
