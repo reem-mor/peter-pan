@@ -41,6 +41,58 @@ def test_load_missing_file_returns_empty(tmp_path: Path) -> None:
     assert load_feedback(tmp_path / "nope.jsonl") == []
 
 
+def test_enriched_fields_roundtrip(tmp_path: Path) -> None:
+    """The structured outcome fields (learning loop) survive the JSONL trip."""
+    log = tmp_path / "feedback.jsonl"
+    enriched = Feedback(
+        trace_id="trace-rich",
+        verdict=FeedbackVerdict.PARTIAL,
+        comment="cause right, fix wrong",
+        submitted_by="sre-alex",
+        submitted_at=datetime.now(UTC),
+        alert_id="demo-oom",
+        root_cause_correct=True,
+        recommendation_correct=False,
+        dashboard_useful=True,
+        final_root_cause="connection pool exhausted by retry storm",
+        resolution_action="lowered client retry budget",
+        analyst_confidence=1.0,  # a HUMAN may be certain — invariant binds the system only
+    )
+    append_feedback(enriched, log)
+    (row,) = load_feedback(log)
+    assert row.alert_id == "demo-oom"
+    assert row.root_cause_correct is True
+    assert row.recommendation_correct is False
+    assert row.dashboard_useful is True
+    assert row.final_root_cause.startswith("connection pool")
+    assert row.analyst_confidence == 1.0
+
+
+def test_legacy_rows_without_new_fields_still_load(tmp_path: Path) -> None:
+    """Additive contract: pre-enrichment JSONL rows (the five original
+    fields only) must keep loading with defaults — never skipped as drift."""
+    log = tmp_path / "feedback.jsonl"
+    legacy = (
+        '{"trace_id": "old-1", "verdict": "helpful", "comment": "",'
+        ' "submitted_by": "sre-dana", "submitted_at": "2026-07-01T00:00:00+00:00"}'
+    )
+    log.write_text(legacy + "\n", encoding="utf-8")
+    (row,) = load_feedback(log)
+    assert row.trace_id == "old-1"
+    assert row.alert_id is None
+    assert row.root_cause_correct is None
+    assert row.analyst_confidence is None
+    assert row.final_root_cause == ""
+
+
+def test_analyst_confidence_rejects_out_of_range() -> None:
+    import pytest
+
+    payload = {**_fb().model_dump(mode="json"), "analyst_confidence": 1.5}
+    with pytest.raises(ValueError):
+        Feedback.model_validate(payload)
+
+
 def test_load_skips_poisoned_rows(tmp_path: Path) -> None:
     log = tmp_path / "feedback.jsonl"
     append_feedback(_fb("good-1"), log)

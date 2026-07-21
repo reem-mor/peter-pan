@@ -191,4 +191,15 @@ export interface Feedback {
   submitted_by: string;
   /** ISO-8601 datetime. */
   submitted_at: string;
+  // Structured outcome fields (additive, PR #53) — all optional; null/absent
+  // means "not answered". Mirrors the enriched schemas.py Feedback.
+  alert_id?: string | null;
+  root_cause_correct?: boolean | null;
+  recommendation_correct?: boolean | null;
+  dashboard_useful?: boolean | null;
+  final_root_cause?: string;
+  resolution_action?: string;
+  /** Human's stated certainty, 0..1 — MAY be 1.0 (the confidence < 1.0
+   *  invariant binds system outputs, not analyst input). */
+  analyst_confidence?: number | null;
 }

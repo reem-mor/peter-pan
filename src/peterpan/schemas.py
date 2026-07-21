@@ -102,13 +102,31 @@ class FeedbackVerdict(StrEnum):
 
 class Feedback(BaseModel):
     """Operator feedback on an agent output, keyed to its trace for the
-    learning loop. `trace_id` links back to usage/observability records."""
+    learning loop. `trace_id` links back to usage/observability records.
+
+    Every field beyond the original five is OPTIONAL and defaulted — old
+    JSONL rows and old clients stay valid (additive contract change). The
+    structured booleans exist so the learning loop can measure specific
+    failure modes instead of parsing free-text comments.
+    """
 
     trace_id: str
     verdict: FeedbackVerdict
     comment: str = ""
     submitted_by: str
     submitted_at: datetime
+
+    # Structured outcome fields (learning-loop §feedback). None = not answered.
+    alert_id: str | None = None
+    root_cause_correct: bool | None = None
+    recommendation_correct: bool | None = None
+    dashboard_useful: bool | None = None
+    final_root_cause: str = ""  # what it actually was, in the analyst's words
+    resolution_action: str = ""  # what actually fixed it
+    # le=1.0 deliberately: this is a HUMAN's stated certainty, not a system
+    # output — the confidence < 1.0 invariant binds what the system claims,
+    # never what an analyst reports.
+    analyst_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class GuardrailVerdict(BaseModel):
