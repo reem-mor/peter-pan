@@ -19,7 +19,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ValidationError
 
 from peterpan.cache import DEFAULT_TTL_S, cache_get, cache_key, cache_set
-from peterpan.config import Settings
+from peterpan.config import LlmProvider, Settings
 from peterpan.observability import trace_run
 from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
 from peterpan.usage import log_usage, make_event, model_rates
@@ -64,6 +64,62 @@ def _validate_draft(
         )
 
 
+def _anthropic_complete(
+    system_prompt: str, user_content: str, settings: Settings
+) -> tuple[str, int, int]:
+    """One direct-API completion. Returns (text, input_tokens, output_tokens)."""
+    if not settings.anthropic_api_key:
+        raise LlmSynthesisError("no ANTHROPIC_API_KEY configured")
+    try:
+        import anthropic  # lazy: optional `llm` extra
+    except ImportError as exc:
+        raise LlmSynthesisError("anthropic SDK not installed (pip install -e '.[llm]')") from exc
+    try:
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
+        response = client.messages.create(
+            model=settings.anthropic_model,
+            max_tokens=1500,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_content}],
+        )
+    except Exception as exc:
+        raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
+    text = "".join(block.text for block in response.content if block.type == "text").strip()
+    return text, response.usage.input_tokens, response.usage.output_tokens
+
+
+def _bedrock_complete(
+    system_prompt: str, user_content: str, settings: Settings
+) -> tuple[str, int, int]:
+    """One Bedrock Converse completion. Credentials come from the boto3
+    chain (env vars locally, instance profile on EC2) — never Settings."""
+    try:
+        import boto3  # lazy: optional `aws` extra
+    except ImportError as exc:
+        raise LlmSynthesisError("boto3 not installed (pip install -e '.[aws]')") from exc
+    try:
+        client = boto3.client("bedrock-runtime", region_name=settings.aws_region)
+        response = client.converse(
+            modelId=settings.bedrock_model_id,
+            system=[{"text": system_prompt}],
+            messages=[{"role": "user", "content": [{"text": user_content}]}],
+            inferenceConfig={"maxTokens": 1500},
+        )
+    except Exception as exc:
+        raise LlmSynthesisError(f"bedrock API failure: {type(exc).__name__}") from exc
+    blocks = response["output"]["message"]["content"]
+    text = "".join(b["text"] for b in blocks if "text" in b).strip()
+    usage = response["usage"]
+    return text, int(usage["inputTokens"]), int(usage["outputTokens"])
+
+
+def resolve_model(settings: Settings) -> str:
+    """The model id that meters, caches, and traces this call."""
+    if settings.llm is LlmProvider.BEDROCK:
+        return settings.bedrock_model_id
+    return settings.anthropic_model
+
+
 def synthesize(
     alert: Alert,
     prediction: Prediction,
@@ -71,15 +127,8 @@ def synthesize(
     settings: Settings,
 ) -> IncidentStory:
     """Real-LLM synthesis. Raises LlmSynthesisError on any failure."""
-    if not settings.anthropic_api_key:
-        raise LlmSynthesisError("no ANTHROPIC_API_KEY configured")
-
-    try:
-        import anthropic  # lazy: optional `llm` extra
-    except ImportError as exc:
-        raise LlmSynthesisError("anthropic SDK not installed (pip install -e '.[llm]')") from exc
-
-    trace = trace_run(service="agent", model=settings.anthropic_model, settings=settings)
+    model_name = resolve_model(settings)
+    trace = trace_run(service="agent", model=model_name, settings=settings)
 
     # The alert itself is first-class, citable evidence (source alert:<origin>)
     # — v2 prompt-log finding: the model rightly kept citing it, so it belongs
@@ -124,31 +173,21 @@ def synthesize(
     # model+prompt+evidence. A hit skips the priced API call entirely — no
     # log_usage entry — but is still counted via cache.cache_stats().
     system_prompt = load_system_prompt()
-    key = cache_key(settings.anthropic_model, system_prompt + user_content)
+    key = cache_key(model_name, system_prompt + user_content)
     raw = cache_get(key)
 
     if raw is None:
-        try:
-            client = anthropic.Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
-            response = client.messages.create(
-                model=settings.anthropic_model,
-                max_tokens=1500,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_content}],
-            )
-        except Exception as exc:
-            raise LlmSynthesisError(f"anthropic API failure: {type(exc).__name__}") from exc
+        complete = _bedrock_complete if settings.llm is LlmProvider.BEDROCK else _anthropic_complete
+        raw, input_tokens, output_tokens = complete(system_prompt, user_content, settings)
 
-        input_tokens = response.usage.input_tokens
-        output_tokens = response.usage.output_tokens
-        rate_in, rate_out = model_rates(settings.anthropic_model)
+        rate_in, rate_out = model_rates(model_name)
         cost_usd = round(input_tokens * rate_in + output_tokens * rate_out, 6)
 
         log_usage(
             make_event(
                 service="agent",
                 agent="incident-agent",
-                model=settings.anthropic_model,
+                model=model_name,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
                 cost_usd=cost_usd,
@@ -156,7 +195,6 @@ def synthesize(
             settings.usage_log_path,
         )
 
-        raw = "".join(block.text for block in response.content if block.type == "text").strip()
         fresh = True
     else:
         fresh = False

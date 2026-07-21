@@ -25,7 +25,8 @@ class Env(StrEnum):
 
 class LlmProvider(StrEnum):
     OFF = "off"  # fixture-first default: demo path never depends on a live LLM
-    ANTHROPIC = "anthropic"
+    ANTHROPIC = "anthropic"  # direct Anthropic API (ANTHROPIC_API_KEY)
+    BEDROCK = "bedrock"  # AWS Bedrock (boto3 credential chain — no key in Settings)
 
 
 class RagBackend(StrEnum):
@@ -70,6 +71,15 @@ class Settings(BaseSettings):
     # the deterministic path so the demo never hard-depends on a live model.
     llm: LlmProvider = Field(default=LlmProvider.OFF)
     anthropic_model: str = Field(default="claude-sonnet-5")
+    # Bedrock (PP_LLM=bedrock): model id must exist in the account/region —
+    # this default is the current known-good Sonnet id on Bedrock; override
+    # with PP_BEDROCK_MODEL_ID as newer Sonnets land. Credentials come from
+    # the boto3 chain (env / instance profile), never from Settings.
+    bedrock_model_id: str = Field(default="anthropic.claude-sonnet-4-5-20250929-v1:0")
+    aws_region: str | None = Field(
+        default=None,  # None -> boto3's own region resolution chain
+        validation_alias=AliasChoices("AWS_REGION", "PP_AWS_REGION"),
+    )
     # Credentials are SecretStr: repr/str/model_dump mask the value, so a
     # settings object landing in a log line, traceback, or pytest assertion
     # diff never echoes a live key. Call .get_secret_value() only at the

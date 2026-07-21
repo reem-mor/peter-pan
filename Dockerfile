@@ -14,9 +14,10 @@ COPY data/models/ data/models/
 # Editable install keeps peterpan importing from /app/src, so the repo-root
 # asset paths above resolve; a site-packages install pointed them into the
 # interpreter tree and shipped an empty corpus (rag corpus_size=0).
-# llm+rag extras: without them PP_LLM/PP_RAG_BACKEND silently fall back to
-# the deterministic paths in cloud deploys (torch/ml stays out — image size).
-RUN pip install --no-cache-dir -e ".[llm,rag]"
+# llm+rag+aws extras: without them PP_LLM/PP_RAG_BACKEND silently fall back
+# to the deterministic paths in cloud deploys (torch/ml stays out — image
+# size). aws ships boto3 so PP_LLM=bedrock works under the instance profile.
+RUN pip install --no-cache-dir -e ".[llm,rag,aws]"
 
 # Non-root, matching the security baseline. WORKDIR /app itself stays
 # root-owned; knowledge/ stays writable for the memory feed (POST /memory
