@@ -103,6 +103,7 @@ def _provider_report(
     assert isinstance(rag, RagResult)
     return ProviderReport(
         llm=llm,
+        configured_llm=settings.llm.value,
         llm_fallback=llm_fallback,
         rag_backend=rag.backend,
         rag_fallback=rag.fallback,

@@ -1,0 +1,186 @@
+﻿
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_agent_and_actions.py:75: assert 401 == 200
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_agent_stream.py:42: assert 401 == 200
+E   assert 401 == 404
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_agent_stream.py:87: assert 401 == 404
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_dashboard.py:95: assert 401 == 200
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:68: AssertionError: assert 401 == 422
+E   KeyError: 'passed'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:99: KeyError: 'passed'
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:108: AssertionError: assert 401 == 422
+E   KeyError: 'matches'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:119: KeyError: 'matches'
+E   AssertionError: assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:126: AssertionError: assert 401 == 200
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:139: assert 401 == 200
+E   KeyError: 'confidence'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:149: KeyError: 'confidence'
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:158: assert 401 == 200
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:169: assert 401 == 200
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_edge_cases.py:218: AssertionError: assert 401 == 422
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:39: assert 401 == 201
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:48: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:53: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:60: assert 401 == 422
+E   AssertionError: assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:76: AssertionError: assert 401 == 
+201
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:88: assert 401 == 422
+E   KeyError: 'total'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:112: KeyError: 'total'
+E   assert 401 == 413
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:127: assert 401 == 413
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:134: assert 401 == 201
+E   KeyError: 'counts'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:146: KeyError: 'counts'
+E   KeyError: 'total'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:157: KeyError: 'total'
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:163: AssertionError: assert 401 
+== 422
+E   KeyError: 'total'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:173: KeyError: 'total'
+E   AssertionError: assert {'error': 'un...d X-PP-Token'} == {'counts': {'...'entries': []}
+      {'detail': 'missing or invalid X-PP-Token', 'error': 'unauthorized'}
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_feedback_endpoint.py:179: AssertionError: assert 
+{'error': 'un...d X-PP-Token'} == {'counts': {'...'entries': []}
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_grafana_preview.py:273: assert 401 == 200
+E   KeyError: 'passed'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_guardrails.py:65: KeyError: 'passed'
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_memory_feed.py:142: assert 401 == 200
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_memory_feed.py:165: AssertionError: assert 401 == 422
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_memory_feed.py:192: assert 401 == 200
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_n8n_contracts.py:191: assert 401 == 200
+E   KeyError: 'sonnet'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_budget.py:117: KeyError: 'sonnet'
+E   KeyError: 'status'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_budget.py:130: KeyError: 'status'
+E   KeyError: 'buckets'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_dashboard.py:79: KeyError: 'buckets'
+E   KeyError: 'services'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_dashboard.py:102: KeyError: 'services'
+E   AssertionError: assert 401 == 404
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_dashboard.py:112: AssertionError: assert 401 == 
+404
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:33: assert 401 == 201
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:50: assert 401 == 201
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:61: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:61: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:61: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:61: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:61: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:77: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:77: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:77: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:77: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:77: assert 401 == 422
+E   assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:83: assert 401 == 422
+E   AssertionError: assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:92: AssertionError: assert 401 == 201
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:104: assert 401 == 201
+E   assert 401 == 201
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_leads.py:121: assert 401 == 201
+E   KeyError: 'agents'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_ppos_usage.py:43: KeyError: 'agents'
+E   assert 401 == 200
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_predictor.py:55: assert 401 == 200
+E   assert 'deterministic-fallback' in '{"error":"unauthorized","detail":"missing or invalid X-PP-Token"}'
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_provider_truth.py:99: assert 'deterministic-fallback' 
+in '{"error":"unauthorized","detail":"missing or invalid X-PP-Token"}'
+E   AssertionError: assert 401 == 422
+C:\dev\peter-pan-worktrees\peter-pan-canonical-audit\tests\test_rag.py:45: AssertionError: assert 401 == 422
+FAILED tests/test_agent_and_actions.py::test_story_endpoint - assert 401 == 200
+FAILED tests/test_agent_stream.py::test_stream_event_order_and_payloads - ass...
+FAILED tests/test_agent_stream.py::test_stream_unknown_alert_id_returns_404_envelope
+FAILED tests/test_dashboard.py::test_dashboard_endpoint - assert 401 == 200
+FAILED tests/test_edge_cases.py::test_predict_endpoint_rejects_bad_severity_and_missing_fields
+FAILED tests/test_edge_cases.py::test_whitespace_only_input_rejected - KeyErr...
+FAILED tests/test_edge_cases.py::test_query_rejects_empty_and_nonpositive_top_k
+FAILED tests/test_edge_cases.py::test_query_with_absurd_top_k_returns_at_most_corpus
+FAILED tests/test_edge_cases.py::test_query_unicode_and_regex_metachars - Ass...
+FAILED tests/test_edge_cases.py::test_story_treats_injection_as_data - assert...
+FAILED tests/test_edge_cases.py::test_story_confidence_always_below_certainty
+FAILED tests/test_edge_cases.py::test_story_survives_blank_title_and_description
+FAILED tests/test_edge_cases.py::test_dashboard_survives_blank_title_and_description
+FAILED tests/test_edge_cases.py::test_ppos_endpoints_reject_garbage_params - ...
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_stores_and_counts
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_rejects_invalid_verdict
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_rejects_blank_submitted_by
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_rejects_missing_required_field
+FAILED tests/test_feedback_endpoint.py::test_post_enriched_feedback_roundtrips_through_the_route
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_rejects_out_of_range_analyst_confidence
+FAILED tests/test_feedback_endpoint.py::test_summary_serves_a_mixed_legacy_and_enriched_log
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_rejects_oversize_body
+FAILED tests/test_feedback_endpoint.py::test_post_feedback_accepts_body_at_the_boundary
+FAILED tests/test_feedback_endpoint.py::test_summary_counts_and_accuracy - Ke...
+FAILED tests/test_feedback_endpoint.py::test_summary_last_n_is_bounded - KeyE...
+FAILED tests/test_feedback_endpoint.py::test_summary_limit_rejects_out_of_range
+FAILED tests/test_feedback_endpoint.py::test_summary_filters_by_trace_id - Ke...
+FAILED tests/test_feedback_endpoint.py::test_summary_on_empty_log - Assertion...
+FAILED tests/test_grafana_preview.py::test_grafana_endpoint_previews_and_never_publishes
+FAILED tests/test_guardrails.py::test_endpoints - KeyError: 'passed'
+FAILED tests/test_memory_feed.py::test_memory_endpoint_feeds_and_reloads_corpus
+FAILED tests/test_memory_feed.py::test_memory_endpoint_rejects_unapproved - A...
+FAILED tests/test_memory_feed.py::test_pinecone_failure_never_loses_the_local_write
+FAILED tests/test_n8n_contracts.py::test_triage_output_is_incident_story_shaped
+FAILED tests/test_ppos_budget.py::test_usage_endpoint_supports_window_and_grouping
+FAILED tests/test_ppos_budget.py::test_budget_endpoint - KeyError: 'status'
+FAILED tests/test_ppos_dashboard.py::test_series_endpoint - KeyError: 'buckets'
+FAILED tests/test_ppos_dashboard.py::test_services_endpoint_reports_down_without_raising
+FAILED tests/test_ppos_dashboard.py::test_dashboard_route_is_retired - Assert...
+FAILED tests/test_ppos_leads.py::test_create_lead_appends_jsonl - assert 401 ...
+FAILED tests/test_ppos_leads.py::test_create_lead_message_optional - assert 4...
+FAILED tests/test_ppos_leads.py::test_invalid_email_rejected[] - assert 401 =...
+FAILED tests/test_ppos_leads.py::test_invalid_email_rejected[not-an-email] - ...
+FAILED tests/test_ppos_leads.py::test_invalid_email_rejected[missing-tld@host]
+FAILED tests/test_ppos_leads.py::test_invalid_email_rejected[spaces in@example.com]
+FAILED tests/test_ppos_leads.py::test_invalid_email_rejected[@example.com] - ...
+FAILED tests/test_ppos_leads.py::test_bounds_enforced[overrides0] - assert 40...
+FAILED tests/test_ppos_leads.py::test_bounds_enforced[overrides1] - assert 40...
+FAILED tests/test_ppos_leads.py::test_bounds_enforced[overrides2] - assert 40...
+FAILED tests/test_ppos_leads.py::test_bounds_enforced[overrides3] - assert 40...
+FAILED tests/test_ppos_leads.py::test_bounds_enforced[overrides4] - assert 40...
+FAILED tests/test_ppos_leads.py::test_missing_fields_rejected - assert 401 ==...
+FAILED tests/test_ppos_leads.py::test_webhook_not_fired_when_unset - Assertio...
+FAILED tests/test_ppos_leads.py::test_webhook_fired_when_set - assert 401 == 201
+FAILED tests/test_ppos_leads.py::test_webhook_failure_never_loses_the_lead - ...
+FAILED tests/test_ppos_usage.py::test_os_endpoints - KeyError: 'agents'
+FAILED tests/test_predictor.py::test_healthz_and_predict_endpoint - assert 40...
+FAILED tests/test_provider_truth.py::test_sse_synthesize_step_does_not_claim_claude_on_fallback
+FAILED tests/test_rag.py::test_endpoint_rejects_empty_query_with_422 - Assert...
+
+

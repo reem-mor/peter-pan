@@ -47,6 +47,7 @@ def synthesize_node(state: StoryState) -> StoryState:
     """Fixture synthesiser. A real LLM (prompts/incident-agent/v1.md) replaces
     this body; the citation and confidence invariants stay enforced either way."""
     alert, prediction, rag = state["alert"], state["prediction"], state["rag"]
+    configured = Settings()
     evidence: list[Evidence] = [
         Evidence(
             kind="metric",
@@ -65,6 +66,7 @@ def synthesize_node(state: StoryState) -> StoryState:
         repair_options=_repair_options(prediction.incident_class),
         providers=ProviderReport(
             llm="off",
+            configured_llm=configured.llm.value,
             llm_fallback=False,
             rag_backend=rag.backend,
             rag_fallback=rag.fallback,

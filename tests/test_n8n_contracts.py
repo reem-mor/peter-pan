@@ -152,6 +152,29 @@ def test_http_urls_match_live_route_tables(path: Path) -> None:
         )
 
 
+def test_triage_export_is_v3_with_error_terminal() -> None:
+    """Git SoT pin: triage export stays on v3 (11 nodes + Respond Error).
+
+    Docs used to claim a live v2/10-node shape while the repo shipped v3 —
+    this test makes that drift fail CI instead of silently rotting READMEs.
+    """
+    wf = _load(TRIAGE)
+    assert wf["name"] == "PETER PAN — Triage (v3)"
+    nodes = _nodes(wf)
+    assert len(nodes) == 11
+    names = {n["name"] for n in nodes}
+    terminals = {"Respond Story", "Respond Flagged", "Respond Rejected", "Respond Error"}
+    assert terminals <= names
+    for http_name in ("Guardrails Input", "Build Story", "Guardrails Output"):
+        err_branch = wf["connections"][http_name]["main"][1]
+        assert any(t["node"] == "Respond Error" for t in err_branch), (
+            f"{http_name!r} error output must terminate at Respond Error"
+        )
+    error_body = _node(wf, "Respond Error")["parameters"]["responseBody"]
+    assert '"error": true' in error_body or '"error":true' in error_body.replace(" ", "")
+    assert _node(wf, "Respond Error")["parameters"]["options"]["responseCode"] == 502
+
+
 def test_triage_webhook_input_matches_alert_schema() -> None:
     """(c) Input contract: Normalize Alert emits Alert-schema fields only,
     including every required one — a rail-passing alert can't 422 at /story."""

@@ -22,21 +22,24 @@ schema shape, env-templated URLs, the `peterpan.schemas` input/output
 contracts, and the no-embedded-credentials rule on every push. Importing a
 flow into the live instance is always a **manual step** (below).
 
-## Live instance
+## Live instance (deployment target — may lag git)
 
-Imported 2026-07-17 via the n8n MCP (SDK code path), **inactive** until the
-services are reachable from n8n cloud:
+**Git is the source of truth.** The export in this directory is
+`PETER PAN — Triage (v3)` — **11 nodes**, including **Respond Error** (502)
+when any of the three HTTP calls fails. Re-import
+`workflows/peter-pan-triage.json` into the cloud instance whenever the export
+changes; an unexported live edit (or a stale import) is drift.
 
-- Workflow: `PETER PAN — Triage v2 (MVP services)` · id `Ibo84O4MC4w0ODYt`
+Last documented cloud deployment (2026-07-17, n8n MCP SDK path) was still on
+an older **v2** shape and must be treated as **stale until re-imported**:
+
+- Prior live name: `PETER PAN — Triage v2 (MVP services)` · id `Ibo84O4MC4w0ODYt`
 - URL: https://reemmor.app.n8n.cloud/workflow/Ibo84O4MC4w0ODYt
-- 10 nodes — adds a **Normalize Alert** step (webhook payload hygiene) and a
-  third response path: output-rail failure → `flagged_for_human_review`.
-- The three HTTP nodes carry placeholder URLs on purpose — fill them with the
-  EC2 public host (or a tunnel to localhost) before activating. No
-  credentials are stored in the flow.
-- Before activating: run once with pinned test data in the n8n editor. Once
-  a flow is live, prefer editing a duplicate and swapping, over experimenting
-  on the flow that owns the production webhook URL.
+- Prior shape: 10 nodes (no Respond Error). Do not cite this as current SoT.
+- After re-import: bind Header Auth on the webhook, set `PP_GUARDRAILS_BASE`,
+  `PP_AGENT_BASE`, and `PP_API_TOKEN` in the n8n env, run once with pinned
+  test data, then activate. Prefer editing a duplicate and swapping over
+  experimenting on the flow that owns the production webhook URL.
 
 ## Conventions (PETER PAN's own rules, from the product invariants)
 
@@ -56,8 +59,8 @@ services are reachable from n8n cloud:
   Re-wiring around either is an invariant violation (see CLAUDE.md), not a
   flow optimization.
 - **Fail visible, not silent.** Every branch terminates in an explicit
-  response (story / flagged-for-review / rejected) — no path drops an alert
-  without telling the caller what happened.
+  response (story / flagged-for-review / rejected / error) — no path drops
+  an alert without telling the caller what happened.
 
 ## Manual import (both flows — never automated)
 1. `docker compose up -d` (services on 8001–8005).

@@ -130,6 +130,7 @@ def search(query: str, top_k: int = 3) -> RagResult:
         insight=f"Top context ({label}) drawn from: {cited}. "
         "Verify against live signals before acting.",
         backend=backend,
+        configured_backend=settings.rag_backend.value,
         fallback=fallback,
         fallback_reason=fallback_reason,
     )
@@ -149,7 +150,9 @@ def healthz() -> dict[str, object]:
         "service": "rag",
         "status": "ok",
         "corpus_size": len(_CORPUS),
+        # `backend` kept as configured for probe compat; prefer configured_backend.
         "backend": configured,
+        "configured_backend": configured,
         "pinecone_credentials_present": pinecone_ready,
         "auth_required": settings.api_token is not None,
     }

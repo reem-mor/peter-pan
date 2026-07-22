@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field, ValidationError
 from peterpan import feedback_store, scoring
 from peterpan.auth import install_api_auth
 from peterpan.config import Settings
-from peterpan.schemas import Feedback
+from peterpan.schemas import Feedback, UsageAggregate, UsageRow
 from peterpan.usage import aggregate, budget_status, load_usage, timeseries, tips, window
 
 logger = logging.getLogger(__name__)
@@ -55,8 +55,9 @@ _MAX_WINDOW_HOURS = 8760
 def usage_route(
     hours: float | None = Query(default=None, gt=0, le=_MAX_WINDOW_HOURS),
     by: Literal["agent", "model", "service"] = "agent",
-) -> dict[str, dict[str, float]]:
-    return aggregate(window(load_usage(settings.usage_log_path), hours), by=by)
+) -> UsageAggregate:
+    raw = aggregate(window(load_usage(settings.usage_log_path), hours), by=by)
+    return {key: UsageRow.model_validate(row) for key, row in raw.items()}
 
 
 @app.get("/os/usage/series")

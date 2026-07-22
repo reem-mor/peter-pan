@@ -67,6 +67,7 @@ def _parse_story(raw: bytes | str, alert: Alert) -> IncidentStory:
         update={
             "providers": ProviderReport(
                 llm=story.providers.llm if story.providers.llm != "off" else "bedrock",
+                configured_llm=story.providers.configured_llm,
                 llm_fallback=False,
                 rag_backend=story.providers.rag_backend,
                 rag_fallback=story.providers.rag_fallback,

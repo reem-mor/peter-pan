@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 REGION = "us-east-1"
 REPO = "peter-pan"
-INSTANCE_ID = "i-072591e3ce8b322f3"
+STACK_NAME = "peter-pan-demo"
 SECRET_ID = "peter-pan/deploy"
 ACCOUNT = "329597159579"
 ECR = f"{ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com"
@@ -33,6 +33,55 @@ def _run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[s
         encoding="utf-8",
         errors="replace",
     )
+
+
+def _stack_instance_id() -> str:
+    """Resolve the demo instance from stack output, then Name=peter-pan-demo tag.
+
+    Older stacks omit the InstanceId output; tag fallback keeps day-2 rolls
+    working without a CFN template sync.
+    """
+    out = _run(
+        [
+            "aws",
+            "cloudformation",
+            "describe-stacks",
+            "--stack-name",
+            STACK_NAME,
+            "--region",
+            REGION,
+            "--query",
+            "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue",
+            "--output",
+            "text",
+        ],
+        check=False,
+    ).stdout.strip()
+    if out and out != "None":
+        return out.split()[0]
+    tagged = _run(
+        [
+            "aws",
+            "ec2",
+            "describe-instances",
+            "--region",
+            REGION,
+            "--filters",
+            "Name=tag:Name,Values=peter-pan-demo",
+            "Name=instance-state-name,Values=running,pending,stopping,stopped",
+            "--query",
+            "Reservations[].Instances[].InstanceId",
+            "--output",
+            "text",
+        ],
+        check=False,
+    ).stdout.strip()
+    if tagged and tagged != "None":
+        iid = tagged.split()[0]
+        print(f"InstanceId from tag Name=peter-pan-demo (stack output missing): {iid}")
+        return iid
+    print(f"could not resolve InstanceId from stack {STACK_NAME} or EC2 tags")
+    sys.exit(1)
 
 
 def _git_sha() -> str:
@@ -117,8 +166,26 @@ def _docker_push(tag: str) -> str:
     return image
 
 
-def _ssm_roll(image: str) -> None:
+def _awslogs_opts(service: str) -> str:
+    return (
+        "--log-driver awslogs "
+        f"--log-opt awslogs-region={REGION} "
+        "--log-opt awslogs-group=/peter-pan/demo "
+        f"--log-opt awslogs-stream={service} "
+    )
+
+
+def _sync_stack_image_uri(image: str) -> None:
+    """Keep CFN ImageUri aligned with the rolled tag (no instance replace)."""
+    # UsePreviousValue for every other parameter so only ImageUri drifts closed.
+    # Changing ImageUri alone still rewrites UserData → replacement; skip CFN
+    # mutate here. Record intent in stdout for operators / audit.
+    print(f"stack ImageUri should be: {image} (day-2 roll does not rewrite UserData)")
+
+
+def _ssm_roll(image: str, instance_id: str) -> None:
     # Keep host-port mapping identical to infra/aws/stack.yaml UserData.
+    logs = _awslogs_opts
     commands = [
         "set -euo pipefail",
         f"REGION={REGION}",
@@ -145,12 +212,14 @@ def _ssm_roll(image: str) -> None:
         "sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'",
         # predictor
         "docker run -d --restart unless-stopped --name predictor "
+        f"{logs('predictor')}"
         "-e SERVICE=predictor -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
         '-v /opt/peterpan/usage:/app/usage-shared -p 8001:8000 "$IMAGE"',
         # rag
         "docker run -d --restart unless-stopped --name rag "
+        f"{logs('rag')}"
         "-e SERVICE=rag -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         "-e PP_RAG_BACKEND=pinecone "
@@ -161,6 +230,7 @@ def _ssm_roll(image: str) -> None:
         '-v /opt/peterpan/knowledge:/app/knowledge -p 8002:8000 "$IMAGE"',
         # guardrails
         "docker run -d --restart unless-stopped --name guardrails "
+        f"{logs('guardrails')}"
         "-e SERVICE=guardrails -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
@@ -168,6 +238,7 @@ def _ssm_roll(image: str) -> None:
         # agent — in-process search() needs PP_RAG_BACKEND + keys too;
         # Bedrock via instance profile; AgentCore ARN unset => local
         "docker run -d --restart unless-stopped --name agent "
+        f"{logs('agent')}"
         "-e SERVICE=agent -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         "-e PP_LLM=bedrock "
@@ -183,6 +254,7 @@ def _ssm_roll(image: str) -> None:
         '-v /opt/peterpan/agent-data:/app/data -p 8004:8000 "$IMAGE"',
         # ppos
         "docker run -d --restart unless-stopped --name ppos "
+        f"{logs('ppos')}"
         "-e SERVICE=ppos -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
@@ -208,7 +280,7 @@ def _ssm_roll(image: str) -> None:
                 "ssm",
                 "send-command",
                 "--instance-ids",
-                INSTANCE_ID,
+                instance_id,
                 "--document-name",
                 "AWS-RunShellScript",
                 "--comment",
@@ -232,7 +304,7 @@ def _ssm_roll(image: str) -> None:
                     "--command-id",
                     cid,
                     "--instance-id",
-                    INSTANCE_ID,
+                    instance_id,
                     "--output",
                     "json",
                 ]
@@ -256,7 +328,9 @@ def _ssm_roll(image: str) -> None:
 
 def main() -> int:
     tag = _git_sha()
+    instance_id = _stack_instance_id()
     print(f"deploy tag: {tag}")
+    print(f"target instance: {instance_id} (from {STACK_NAME})")
     values = _load_env_keys()
     missing = [k for k in ("PINECONE_API_KEY", "VOYAGE_API_KEY") if k not in values]
     if missing:
@@ -264,7 +338,8 @@ def main() -> int:
         sys.exit(2)
     _put_secret(values)
     image = _docker_push(tag)
-    _ssm_roll(image)
+    _ssm_roll(image, instance_id)
+    _sync_stack_image_uri(image)
     print("rolling deploy complete")
     return 0
 

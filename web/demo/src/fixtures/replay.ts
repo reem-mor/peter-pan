@@ -127,6 +127,7 @@ export const REPLAY_STREAMS: Record<string, readonly StreamFrame[]> = {
         ],
         providers: {
           llm: "off",
+          configured_llm: "off",
           llm_fallback: false,
           rag_backend: "lexical",
           rag_fallback: false,
@@ -254,6 +255,7 @@ export const REPLAY_STREAMS: Record<string, readonly StreamFrame[]> = {
         ],
         providers: {
           llm: "off",
+          configured_llm: "off",
           llm_fallback: false,
           rag_backend: "lexical",
           rag_fallback: false,
@@ -380,6 +382,7 @@ export const REPLAY_STREAMS: Record<string, readonly StreamFrame[]> = {
         ],
         providers: {
           llm: "off",
+          configured_llm: "off",
           llm_fallback: false,
           rag_backend: "lexical",
           rag_fallback: false,

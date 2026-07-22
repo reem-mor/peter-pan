@@ -56,8 +56,10 @@ export interface Evidence {
  * omit this and consumers treat defaults as fixture/off.
  */
 export interface ProviderReport {
-  /** off | anthropic | bedrock | deterministic-fallback */
+  /** off | anthropic | bedrock | deterministic-fallback — what actually ran */
   llm: string;
+  /** off | anthropic | bedrock — PP_LLM intent (may differ when llm_fallback) */
+  configured_llm: string;
   llm_fallback: boolean;
   /** lexical | pinecone | fallback */
   rag_backend: string;
@@ -142,6 +144,8 @@ export interface RagResult {
   insight: string;
   /** lexical | pinecone | fallback — actual backend that served results. */
   backend: string;
+  /** lexical | pinecone — PP_RAG_BACKEND intent (may differ when fallback). */
+  configured_backend: string;
   fallback: boolean;
   fallback_reason: string;
 }
@@ -213,6 +217,21 @@ export interface GrafanaDashboardPreview {
   /** Importable Grafana model (schemaVersion 39). */
   dashboard_json: Record<string, unknown>;
 }
+
+// ---------------------------------------------------------------------------
+// UsageRow / UsageAggregate — GET /os/usage (PETER PAN OS metering table)
+// ---------------------------------------------------------------------------
+
+/** One group row from GET /os/usage (aggregate by agent|model|service). */
+export interface UsageRow {
+  calls: number;
+  input_tokens: number;
+  output_tokens: number;
+  cost_usd: number;
+}
+
+/** Wire shape of GET /os/usage — map keyed by the chosen grouping dimension. */
+export type UsageAggregate = Record<string, UsageRow>;
 
 // ---------------------------------------------------------------------------
 // Deployment — mirrors schemas.py (merged in PR #33)

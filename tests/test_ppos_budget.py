@@ -112,9 +112,12 @@ def test_usage_endpoint_supports_window_and_grouping(
     log_usage(make_event("agent", "incident-agent", "sonnet", 1000, 200, 0.01), log)
     monkeypatch.setattr(ppos.settings, "usage_log_path", str(log))
 
+    from peterpan.schemas import UsageRow
+
     client = TestClient(ppos.app)
     body = client.get("/os/usage", params={"hours": 24, "by": "model"}).json()
     assert body["sonnet"]["calls"] == 1
+    UsageRow.model_validate(body["sonnet"])
     assert client.get("/os/usage", params={"by": "nonsense"}).status_code == 422
 
 
