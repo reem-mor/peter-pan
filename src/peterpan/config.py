@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import AliasChoices, Field, SecretStr
+from pydantic import AliasChoices, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -152,6 +152,24 @@ class Settings(BaseSettings):
     # Structured prompt/completion log (§6.6) — hashes + scrubbed previews
     # only, never raw text. Queryable by trace_id via observability.py.
     prompt_log_path: str = Field(default="data/prompt_log.jsonl")
+
+    # Mesh API token (X-PP-Token). Unset/empty = open (fixture-first). Set in
+    # staging/production / EC2 so n8n and the Next.js BFF authenticate;
+    # never expose to browser JavaScript. Env: PP_API_TOKEN (via env_prefix).
+    api_token: SecretStr | None = Field(default=None)
+
+    @field_validator("api_token", mode="before")
+    @classmethod
+    def _empty_api_token_is_none(cls, value: object) -> object:
+        # Compose interpolates PP_API_TOKEN:- as "" — treat blank as unset so
+        # the fixture-first path stays open without a real token.
+        if value is None:
+            return None
+        if isinstance(value, str) and not value.strip():
+            return None
+        if isinstance(value, SecretStr) and not value.get_secret_value().strip():
+            return None
+        return value
 
     @property
     def actions_allowed(self) -> bool:

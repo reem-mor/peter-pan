@@ -3,9 +3,9 @@
 Usage:  python scripts/put_deploy_secret.py
 
 Creates/updates the JSON secret `peter-pan/deploy` (ANTHROPIC_API_KEY,
-PINECONE_API_KEY, VOYAGE_API_KEY) that infra/aws/stack.yaml reads at boot.
-Prints the secret ARN (needed as the SecretArn stack parameter) and which
-key NAMES were included — never a value.
+PINECONE_API_KEY, VOYAGE_API_KEY, optional PP_API_TOKEN) that
+infra/aws/stack.yaml reads at boot. Prints the secret ARN (needed as the
+SecretArn stack parameter) and which key NAMES were included — never a value.
 """
 
 from __future__ import annotations
@@ -16,7 +16,9 @@ import sys
 from pathlib import Path
 
 SECRET_NAME = "peter-pan/deploy"
-KEY_NAMES = ("ANTHROPIC_API_KEY", "PINECONE_API_KEY", "VOYAGE_API_KEY")
+REQUIRED_KEYS = ("ANTHROPIC_API_KEY", "PINECONE_API_KEY", "VOYAGE_API_KEY")
+OPTIONAL_KEYS = ("PP_API_TOKEN",)
+KEY_NAMES = REQUIRED_KEYS + OPTIONAL_KEYS
 ENV_PATH = Path(__file__).parent.parent / ".env"
 
 
@@ -36,10 +38,12 @@ def main() -> int:
         print(f".env not found at {ENV_PATH}")
         return 2
     values = read_env_values()
-    missing = [k for k in KEY_NAMES if k not in values]
+    missing = [k for k in REQUIRED_KEYS if k not in values]
     if missing:
         print(f"missing in .env: {', '.join(missing)} — run set_api_keys.py first")
         return 2
+    if "PP_API_TOKEN" not in values:
+        print("warning: PP_API_TOKEN unset — mesh will stay open (CIDR-only)")
 
     # file:// keeps the values out of the process command line (visible in
     # any process listing); the temp file is chmod-narrow and always deleted.

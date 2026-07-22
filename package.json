@@ -4,6 +4,7 @@
   "description": "npm workspaces root for the PETER PAN web surfaces (web/*) and shared packages (packages/*). Python services are managed separately via pyproject.toml.",
   "workspaces": [
     "packages/types",
+    "web/product",
     "web/landing",
     "web/demo",
     "web/agent-os"

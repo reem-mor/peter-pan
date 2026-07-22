@@ -44,6 +44,24 @@ class Evidence(BaseModel):
     confidence: float = Field(ge=0.0, lt=1.0)
 
 
+class ProviderReport(BaseModel):
+    """Honest runtime provenance for an incident run.
+
+    Additive contract: older clients ignore unknown fields; older producers
+    omit this object and consumers see the safe defaults (fixture / off).
+    Never claim a live cloud provider when a deterministic fallback ran.
+    """
+
+    llm: str = "off"  # off | anthropic | bedrock | deterministic-fallback
+    llm_fallback: bool = False
+    rag_backend: str = "lexical"  # lexical | pinecone | fallback
+    rag_fallback: bool = False
+    rag_fallback_reason: str = ""
+    predictor: str = "floor"  # floor | torch | floor-fallback
+    predictor_model_version: str = ""
+    agent_provider: str = "local"  # local | agentcore | local-fallback
+
+
 class IncidentStory(BaseModel):
     """The explained incident: what changed, likely cause, evidence, options.
 
@@ -58,6 +76,7 @@ class IncidentStory(BaseModel):
     confidence: float = Field(ge=0.0, lt=1.0)
     evidence: list[Evidence]
     repair_options: list[str]
+    providers: ProviderReport = Field(default_factory=ProviderReport)
 
 
 class ActionRisk(StrEnum):
@@ -140,12 +159,19 @@ class Prediction(BaseModel):
     severity: Severity
     # lt=1.0: floor emits 0.75/0.3; the torch path caps at _CONFIDENCE_CAP.
     confidence: float = Field(ge=0.0, lt=1.0)
+    # Additive diagnostics — defaults preserve legacy JSONL / clients.
+    mode: str = "floor"  # floor | torch | floor-fallback
+    model_version: str = ""  # empty when floor-only / unavailable
 
 
 class RagResult(BaseModel):
     query: str
     matches: list[Evidence]
     insight: str
+    # Additive: which backend actually served results (never mislabel fallback).
+    backend: str = "lexical"  # lexical | pinecone | fallback
+    fallback: bool = False
+    fallback_reason: str = ""
 
 
 class AgentRun(BaseModel):

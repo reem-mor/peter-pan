@@ -31,6 +31,9 @@ if TYPE_CHECKING:  # torch types only for checking; runtime import stays lazy
 _ROOT = Path(__file__).parent.parent.parent
 DEFAULT_MODEL_DIR = _ROOT / "models"
 _TRAIN_DATA = _ROOT / "data" / "synthetic" / "predictor_train.jsonl"
+# Stable artifact label for provider diagnostics / PETER PAN OS. Bump when
+# the training recipe or feature schema changes (not on every retrain).
+MODEL_VERSION = "predictor-bow-v1"
 
 # Below this the model has no opinion worth acting on: its output is
 # discarded wholesale (it may not even raise severity on a hunch).

@@ -27,6 +27,8 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $env.PP_GUARDRAILS_BASE }}/check/input",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-PP-Token", "value": "={{ $env.PP_API_TOKEN }}" }] },
         "sendBody": true,
         "bodyParameters": { "parameters": [{ "name": "text", "value": "={{ $json.title }} {{ $json.description }}" }] }
       },
@@ -59,6 +61,8 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $env.PP_AGENT_BASE }}/story",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-PP-Token", "value": "={{ $env.PP_API_TOKEN }}" }] },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ $('Normalize Alert').item.json }}"
@@ -73,6 +77,8 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $env.PP_GUARDRAILS_BASE }}/check/output",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-PP-Token", "value": "={{ $env.PP_API_TOKEN }}" }] },
         "sendBody": true,
         "bodyParameters": { "parameters": [{ "name": "text", "value": "={{ JSON.stringify($json) }}" }] }
       },

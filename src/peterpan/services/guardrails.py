@@ -23,10 +23,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from peterpan import nemo_rails
+from peterpan.auth import install_api_auth
 from peterpan.config import GuardrailsBackend, Settings
 from peterpan.schemas import GuardrailVerdict
 
 app = FastAPI(title="peter-pan-guardrails")
+_settings = Settings()
+install_api_auth(app, _settings)
 
 # Input floor: obvious non-ops / injection markers.
 _INPUT_BLOCK: list[tuple[str, str]] = [
@@ -108,8 +111,13 @@ class TextIn(BaseModel):
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
-    return {"service": "guardrails", "status": "ok"}
+def healthz() -> dict[str, object]:
+    return {
+        "service": "guardrails",
+        "status": "ok",
+        "backend": _settings.guardrails.value,
+        "auth_required": _settings.api_token is not None,
+    }
 
 
 @app.post("/check/input")

@@ -23,6 +23,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ValidationError
 
 from peterpan import feedback_store, scoring
+from peterpan.auth import install_api_auth
 from peterpan.config import Settings
 from peterpan.schemas import Feedback
 from peterpan.usage import aggregate, budget_status, load_usage, timeseries, tips, window
@@ -31,13 +32,19 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="peter-pan-os")
 settings = Settings()
+install_api_auth(app, settings)
 
 _HEALTH_TIMEOUT_S = 1.5
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
-    return {"service": "peter-pan-os", "status": "ok", "env": settings.env.value}
+def healthz() -> dict[str, object]:
+    return {
+        "service": "peter-pan-os",
+        "status": "ok",
+        "env": settings.env.value,
+        "auth_required": settings.api_token is not None,
+    }
 
 
 # One year. Unbounded floats (1e300, inf) overflow timedelta into a 500.
@@ -84,13 +91,25 @@ def info_route() -> dict[str, object]:
 
     Config only, never secrets: values here render in a browser.
     """
+    model = (
+        settings.bedrock_model_id
+        if settings.llm.value == "bedrock"
+        else settings.anthropic_model
+        if settings.llm.value == "anthropic"
+        else "none"
+    )
     return {
         "service": settings.service_name,
         "env": settings.env.value,
         "llm": settings.llm.value,
-        "model": settings.anthropic_model,
+        "model": model,
         "rag_backend": settings.rag_backend.value,
+        "rag_provider_label": (
+            "standalone-pinecone" if settings.rag_backend.value == "pinecone" else "local-lexical"
+        ),
         "predictor": settings.predictor.value,
+        "agent_provider": "local",
+        "auth_required": settings.api_token is not None,
         "daily_budget_usd": settings.daily_budget_usd,
         "repo": "https://github.com/reem-mor/peter-pan",
     }

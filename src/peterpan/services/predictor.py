@@ -8,15 +8,19 @@ floor classification, and any model failure falls back to floor-only.
 
 from __future__ import annotations
 
+import os
 import re
 
 from fastapi import FastAPI
 
 from peterpan import ml
+from peterpan.auth import install_api_auth
 from peterpan.config import PredictorBackend, Settings
 from peterpan.schemas import Alert, Prediction, Severity
 
 app = FastAPI(title="peter-pan-predictor")
+_settings = Settings()
+install_api_auth(app, _settings)
 
 # Deterministic floor: keyword → (class, minimum severity). The ML model may
 # refine the class or raise severity above the floor, never lower it.
@@ -45,8 +49,20 @@ def predict(alert: Alert) -> Prediction:
         if re.search(rf"\b{re.escape(needle)}", text):
             # Never lower severity below what the alert already carries.
             severity = min(alert.severity, floor_severity, key=lambda s: s.value)
-            return Prediction(incident_class=incident_class, severity=severity, confidence=0.75)
-    return Prediction(incident_class="unclassified", severity=alert.severity, confidence=0.3)
+            return Prediction(
+                incident_class=incident_class,
+                severity=severity,
+                confidence=0.75,
+                mode="floor",
+                model_version="",
+            )
+    return Prediction(
+        incident_class="unclassified",
+        severity=alert.severity,
+        confidence=0.3,
+        mode="floor",
+        model_version="",
+    )
 
 
 def predict_full(alert: Alert, settings: Settings) -> Prediction:
@@ -55,14 +71,36 @@ def predict_full(alert: Alert, settings: Settings) -> Prediction:
     if settings.predictor is not PredictorBackend.TORCH:
         return floor
     try:
-        return ml.apply_floor_guardrails(floor, ml.model_predict(alert))
+        refined = ml.apply_floor_guardrails(floor, ml.model_predict(alert))
+        return refined.model_copy(update={"mode": "torch", "model_version": ml.MODEL_VERSION})
     except ml.MlPredictError:
-        return floor  # fail-safe: the deterministic path always answers
+        # Fail-safe: answer with the floor, but never claim a torch prediction.
+        return floor.model_copy(update={"mode": "floor-fallback", "model_version": ""})
+
+
+def _artifact_status() -> dict[str, object]:
+    model_dir = ml.DEFAULT_MODEL_DIR
+    weights = model_dir / "predictor.pt"
+    vocab = model_dir / "vocab.json"
+    present = weights.exists() and vocab.exists()
+    return {
+        "model_dir": str(model_dir),
+        "artifacts_present": present,
+        "model_version": ml.MODEL_VERSION if present else "",
+        "writable_models_dir": model_dir.exists() and os.access(model_dir, os.W_OK),
+    }
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
-    return {"service": "predictor", "status": "ok"}
+def healthz() -> dict[str, object]:
+    artifacts = _artifact_status()
+    return {
+        "service": "predictor",
+        "status": "ok",
+        "backend": _settings.predictor.value,
+        "auth_required": _settings.api_token is not None,
+        **artifacts,
+    }
 
 
 @app.post("/predict")

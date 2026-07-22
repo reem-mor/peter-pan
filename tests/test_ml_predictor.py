@@ -92,7 +92,14 @@ def test_torch_backend_falls_back_to_floor_on_any_model_failure(
     monkeypatch.setattr("peterpan.ml.model_predict", boom)
     settings = Settings(predictor=PredictorBackend.TORCH)
     alert = make_alert("mysterious blip")
-    assert predict_full(alert, settings) == predict(alert)
+    floor = predict(alert)
+    full = predict_full(alert, settings)
+    # Classification matches the floor; mode honestly reports the torch miss.
+    assert full.incident_class == floor.incident_class
+    assert full.severity == floor.severity
+    assert full.confidence == floor.confidence
+    assert full.mode == "floor-fallback"
+    assert full.model_version == ""
 
 
 def test_torch_backend_applies_guardrails_to_model_output(

@@ -19,6 +19,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from peterpan import memory
+from peterpan.auth import install_api_auth
 from peterpan.config import RagBackend, Settings
 from peterpan.knowledge import KNOWLEDGE_ROOT, load_corpus
 from peterpan.memory import MemoryRecord
@@ -26,6 +27,7 @@ from peterpan.schemas import Evidence, RagResult
 
 app = FastAPI(title="peter-pan-rag")
 settings = Settings()
+install_api_auth(app, settings)
 
 # Deterministic confidence ceiling: retrieval never claims certainty
 # (product invariant: confidence < 1.0 ALWAYS).
@@ -106,20 +108,30 @@ def search(query: str, top_k: int = 3) -> RagResult:
     if not query.strip():
         raise ValueError("query must be non-empty")
     backend = "lexical"
+    fallback = False
+    fallback_reason = ""
     if settings.rag_backend is RagBackend.PINECONE:
         try:
             matches = _search_pinecone(query, top_k)
             backend = "pinecone"
-        except Exception:
-            matches = _search_lexical(query, top_k)  # fail-safe: never lose retrieval
+        except Exception as exc:
+            # Fail-safe retrieval, but never label lexical results as Pinecone.
+            matches = _search_lexical(query, top_k)
+            backend = "fallback"
+            fallback = True
+            fallback_reason = f"pinecone_unavailable:{type(exc).__name__}"
     else:
         matches = _search_lexical(query, top_k)
+    label = "lexical-fallback" if fallback else backend
     cited = ", ".join(m.source for m in matches if m.confidence > 0) or "no relevant source"
     return RagResult(
         query=query,
         matches=matches,
-        insight=f"Top context ({backend}) drawn from: {cited}. "
+        insight=f"Top context ({label}) drawn from: {cited}. "
         "Verify against live signals before acting.",
+        backend=backend,
+        fallback=fallback,
+        fallback_reason=fallback_reason,
     )
 
 
@@ -130,12 +142,16 @@ class QueryIn(BaseModel):
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
+def healthz() -> dict[str, object]:
+    configured = settings.rag_backend.value
+    pinecone_ready = bool(settings.pinecone_api_key and settings.voyage_api_key)
     return {
         "service": "rag",
         "status": "ok",
-        "corpus_size": str(len(_CORPUS)),
-        "backend": settings.rag_backend.value,
+        "corpus_size": len(_CORPUS),
+        "backend": configured,
+        "pinecone_credentials_present": pinecone_ready,
+        "auth_required": settings.api_token is not None,
     }
 
 

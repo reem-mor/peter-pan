@@ -51,6 +51,25 @@ export interface Evidence {
 // IncidentStory — the explained incident the Dynamic Incident Dashboard renders
 // ---------------------------------------------------------------------------
 
+/**
+ * Honest runtime provenance for an incident run. Additive — older producers
+ * omit this and consumers treat defaults as fixture/off.
+ */
+export interface ProviderReport {
+  /** off | anthropic | bedrock | deterministic-fallback */
+  llm: string;
+  llm_fallback: boolean;
+  /** lexical | pinecone | fallback */
+  rag_backend: string;
+  rag_fallback: boolean;
+  rag_fallback_reason: string;
+  /** floor | torch | floor-fallback */
+  predictor: string;
+  predictor_model_version: string;
+  /** local | agentcore | local-fallback */
+  agent_provider: string;
+}
+
 export interface IncidentStory {
   alert: Alert;
   what_changed: string;
@@ -59,6 +78,7 @@ export interface IncidentStory {
   confidence: number;
   evidence: Evidence[];
   repair_options: string[];
+  providers: ProviderReport;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,6 +126,10 @@ export interface Prediction {
   severity: Severity;
   /** 0.0 <= confidence < 1.0 — the floor never claims certainty. */
   confidence: number;
+  /** floor | torch | floor-fallback */
+  mode: string;
+  /** Empty when floor-only / unavailable. */
+  model_version: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +140,10 @@ export interface RagResult {
   query: string;
   matches: Evidence[];
   insight: string;
+  /** lexical | pinecone | fallback — actual backend that served results. */
+  backend: string;
+  fallback: boolean;
+  fallback_reason: string;
 }
 
 // ---------------------------------------------------------------------------

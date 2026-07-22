@@ -12,9 +12,17 @@ from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from peterpan.schemas import Alert, Evidence, IncidentStory, Prediction, RagResult
+from peterpan.config import Settings
+from peterpan.schemas import (
+    Alert,
+    Evidence,
+    IncidentStory,
+    Prediction,
+    ProviderReport,
+    RagResult,
+)
 from peterpan.services.agent import _repair_options, search_query
-from peterpan.services.predictor import predict
+from peterpan.services.predictor import predict_full
 from peterpan.services.rag import search
 
 
@@ -26,8 +34,8 @@ class StoryState(TypedDict, total=False):
 
 
 def classify_node(state: StoryState) -> StoryState:
-    """Deterministic floor — always first; its severity may only be argued up."""
-    return {"prediction": predict(state["alert"])}
+    """Floor (+ optional torch) — always first; severity may only be argued up."""
+    return {"prediction": predict_full(state["alert"], Settings())}
 
 
 def retrieve_node(state: StoryState) -> StoryState:
@@ -55,6 +63,16 @@ def synthesize_node(state: StoryState) -> StoryState:
         confidence=min(prediction.confidence, 0.9),
         evidence=evidence,
         repair_options=_repair_options(prediction.incident_class),
+        providers=ProviderReport(
+            llm="off",
+            llm_fallback=False,
+            rag_backend=rag.backend,
+            rag_fallback=rag.fallback,
+            rag_fallback_reason=rag.fallback_reason,
+            predictor=prediction.mode,
+            predictor_model_version=prediction.model_version,
+            agent_provider="local",
+        ),
     )
     return {"story": story}
 

@@ -18,9 +18,10 @@ Parameters:
     Type: String
     Description: >-
       Secrets Manager secret (JSON with ANTHROPIC_API_KEY, PINECONE_API_KEY,
-      VOYAGE_API_KEY). Created by scripts/put_deploy_secret.py.
+      VOYAGE_API_KEY, PP_API_TOKEN). Created by scripts/put_deploy_secret.py.
       ANTHROPIC_API_KEY may be empty when LlmProvider=bedrock (Bedrock
       authorizes via the instance profile, never an API key).
+      PP_API_TOKEN authenticates n8n / Next.js BFF to the mesh (X-PP-Token).
   LlmProvider:
     Type: String
     Default: anthropic
@@ -151,6 +152,13 @@ Resources:
         HttpEndpoint: enabled
         HttpTokens: required
         HttpPutResponseHopLimit: 2
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 30
+            VolumeType: gp3
+            Encrypted: true
+            DeleteOnTermination: true
       Tags:
         - { Key: Name, Value: peter-pan-demo }
         - { Key: project, Value: peter-pan }
@@ -169,6 +177,7 @@ Resources:
           ANTHROPIC_API_KEY=$(echo "$SECRET_JSON" | jq -r '.ANTHROPIC_API_KEY // empty')
           PINECONE_API_KEY=$(echo "$SECRET_JSON" | jq -r '.PINECONE_API_KEY // empty')
           VOYAGE_API_KEY=$(echo "$SECRET_JSON" | jq -r '.VOYAGE_API_KEY // empty')
+          PP_API_TOKEN=$(echo "$SECRET_JSON" | jq -r '.PP_API_TOKEN // empty')
           unset SECRET_JSON
 
           # Shared usage log: every service meters LLM calls into the same
@@ -181,14 +190,19 @@ Resources:
           # python:3.12-slim in the Dockerfile); 770 instead of 777 so only
           # the container user (and root) can touch the state dirs.
           install -d -m 770 -o 1000 -g 1000 \
-            /opt/peterpan/usage /opt/peterpan/agent-data /opt/peterpan/ppos-data
+            /opt/peterpan/usage /opt/peterpan/agent-data /opt/peterpan/ppos-data \
+            /opt/peterpan/knowledge
 
           # Least privilege per service: only agent sees the Anthropic key
           # (empty under bedrock — the instance profile authorizes instead),
-          # only rag sees the retrieval keys. Everything else runs key-less.
+          # only rag sees the retrieval keys. All services share PP_API_TOKEN
+          # when present (application auth; CIDR allowlist is not enough).
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
             svc="${!entry%%:*}"; port="${!entry##*:}"
             extra=()
+            if [ -n "$PP_API_TOKEN" ]; then
+              extra+=(-e "PP_API_TOKEN=$PP_API_TOKEN")
+            fi
             if [ "$svc" = "agent" ]; then
               extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" \
                       -e "PP_BEDROCK_MODEL_ID=${BedrockModelId}" \
@@ -197,16 +211,20 @@ Resources:
             elif [ "$svc" = "rag" ]; then
               extra+=(-e "PP_RAG_BACKEND=${RagBackend}" \
                       -e "PINECONE_API_KEY=$PINECONE_API_KEY" \
-                      -e "VOYAGE_API_KEY=$VOYAGE_API_KEY")
+                      -e "VOYAGE_API_KEY=$VOYAGE_API_KEY" \
+                      -v /opt/peterpan/knowledge:/app/knowledge)
             elif [ "$svc" = "ppos" ]; then
               extra+=(-v /opt/peterpan/ppos-data:/app/data)
             fi
             docker run -d --restart unless-stopped --name "$svc" \
+              --health-cmd "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/healthz',timeout=3)\"" \
+              --health-interval 30s --health-timeout 5s --health-retries 3 \
               -e SERVICE="$svc" -e PP_ENV=mirage \
               -e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl \
               -v /opt/peterpan/usage:/app/usage-shared "${!extra[@]}" \
               -p "$port":8000 ${ImageUri}
           done
+          unset ANTHROPIC_API_KEY PINECONE_API_KEY VOYAGE_API_KEY PP_API_TOKEN
 
 Outputs:
   PublicIp:

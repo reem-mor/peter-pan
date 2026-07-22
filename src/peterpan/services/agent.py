@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
+from peterpan.auth import install_api_auth
 from peterpan.config import LlmProvider, Settings
 from peterpan.schemas import (
     ActionPreview,
@@ -28,13 +29,15 @@ from peterpan.schemas import (
     Evidence,
     GrafanaDashboardPreview,
     IncidentStory,
+    ProviderReport,
     Severity,
 )
-from peterpan.services.predictor import predict
+from peterpan.services.predictor import predict_full
 from peterpan.services.rag import search
 
 app = FastAPI(title="peter-pan-agent")
 settings = Settings()
+install_api_auth(app, settings)
 
 MAX_STEPS = 6  # bounded loop — the agent can never run away
 
@@ -84,19 +87,47 @@ def search_query(alert: Alert) -> str:
     return query if query else f"{alert.id} {alert.source}"
 
 
+def _provider_report(
+    *,
+    prediction_mode: str,
+    prediction_model_version: str,
+    rag: object,
+    llm: str,
+    llm_fallback: bool,
+    agent_provider: str = "local",
+) -> ProviderReport:
+    from peterpan.schemas import RagResult
+
+    assert isinstance(rag, RagResult)
+    return ProviderReport(
+        llm=llm,
+        llm_fallback=llm_fallback,
+        rag_backend=rag.backend,
+        rag_fallback=rag.fallback,
+        rag_fallback_reason=rag.fallback_reason,
+        predictor=prediction_mode,
+        predictor_model_version=prediction_model_version,
+        agent_provider=agent_provider,
+    )
+
+
 def build_story(alert: Alert) -> IncidentStory:
     """Planner → tools → synthesis. Deterministic by default; PP_LLM=anthropic
-    upgrades the synthesis step to Claude, guarded by peterpan.llm's invariant
-    checks and falling back here on ANY failure (fixture-first rule)."""
+    or bedrock upgrades synthesis, guarded by peterpan.llm's invariant checks
+    and falling back here on ANY failure (fixture-first rule). Provider fields
+    always reflect what actually ran — never the configured intent alone."""
     steps = 0
 
-    # Step 1: classify (deterministic floor — its verdict is final).
-    prediction = predict(alert)
+    # Step 1: classify (floor + optional torch behind floor guardrails).
+    prediction = predict_full(alert, settings)
     steps += 1
 
     # Step 2: retrieve context (runbooks, past incidents).
     rag = search(search_query(alert), top_k=3)
     steps += 1
+
+    llm_label = "off"
+    llm_fallback = False
 
     # Step 3: synthesize — LLM if opted in (anthropic OR bedrock),
     # deterministic otherwise/on failure.
@@ -108,9 +139,20 @@ def build_story(alert: Alert) -> IncidentStory:
             story = synthesize(alert, prediction, rag, settings)
             if steps > MAX_STEPS:
                 raise RuntimeError("loop budget invariant violated")
-            return story
+            return story.model_copy(
+                update={
+                    "providers": _provider_report(
+                        prediction_mode=prediction.mode,
+                        prediction_model_version=prediction.model_version,
+                        rag=rag,
+                        llm=settings.llm.value,
+                        llm_fallback=False,
+                    )
+                }
+            )
         except LlmSynthesisError:
-            pass  # fall through to the deterministic synthesis below
+            llm_label = "deterministic-fallback"
+            llm_fallback = True
 
     evidence: list[Evidence] = [
         Evidence(
@@ -132,6 +174,13 @@ def build_story(alert: Alert) -> IncidentStory:
         confidence=min(prediction.confidence, 0.9),  # never claim certainty
         evidence=evidence,
         repair_options=_repair_options(prediction.incident_class),
+        providers=_provider_report(
+            prediction_mode=prediction.mode,
+            prediction_model_version=prediction.model_version,
+            rag=rag,
+            llm=llm_label,
+            llm_fallback=llm_fallback,
+        ),
     )
 
 
@@ -168,8 +217,15 @@ def approve(preview: ActionPreview, approver: str) -> ActionPreview:
 
 
 @app.get("/healthz")
-def healthz() -> dict[str, str]:
-    return {"service": "agent", "status": "ok", "env": settings.env.value}
+def healthz() -> dict[str, object]:
+    return {
+        "service": "agent",
+        "status": "ok",
+        "env": settings.env.value,
+        "llm": settings.llm.value,
+        "agent_provider": "local",  # AgentCore adapter lands separately; honest default
+        "auth_required": settings.api_token is not None,
+    }
 
 
 @app.post("/story")
@@ -225,31 +281,45 @@ class SseEvent(BaseModel):
         return f"event: {self.event}\ndata: {self.data}\n\n"
 
 
+def _synthesize_step_detail(story: IncidentStory) -> str:
+    """SSE synthesize detail must match what actually ran, not PP_LLM intent."""
+    p = story.providers
+    if p.llm_fallback or p.llm == "deterministic-fallback":
+        return (
+            f"Synthesizing the incident story (deterministic-fallback; "
+            f"configured={settings.llm.value})."
+        )
+    if p.llm in {"anthropic", "bedrock"}:
+        return f"Synthesizing the incident story via {p.llm}."
+    return "Synthesizing the incident story (deterministic)."
+
+
 async def _stream_story(alert: Alert) -> AsyncIterator[str]:
     """Narrate build_story()'s existing pipeline as CONTRACTS.md §5 SSE
     frames: step+ -> evidence+ -> story -> done. Calls build_story() exactly
-    once — this never re-implements the classify/retrieve/synthesize logic,
-    it only describes it, so PP_LLM=anthropic streams the same shape around
-    the real LLM call (metered by peterpan.llm/usage as it already is)."""
-    plan = [
-        ("classify", "Classifying the alert against the deterministic floor."),
+    once — classify/retrieve steps are announced first; synthesize detail is
+    emitted AFTER the run so it cannot claim Claude/Bedrock when fallback won.
+    """
+    for name, detail in (
+        ("classify", "Classifying the alert (predictor floor / optional torch)."),
         ("retrieve", "Retrieving runbooks and past incidents."),
-        (
-            "synthesize",
-            "Synthesizing the incident story via Claude."
-            if settings.llm is not LlmProvider.OFF
-            else "Synthesizing the incident story (deterministic).",
-        ),
-    ]
-    for name, detail in plan:
+    ):
         step = StepEvent(name=name, detail=detail, ts=datetime.now(UTC).isoformat())
         yield SseEvent(event="step", data=step.model_dump_json()).encode()
         await asyncio.sleep(_STREAM_STEP_DELAY_S)
 
     # Off the event loop: build_story does blocking I/O (RAG search; a
-    # synchronous LLM call when PP_LLM=anthropic) and must not stall other
+    # synchronous LLM call when PP_LLM is enabled) and must not stall other
     # requests mid-stream.
     story = await asyncio.to_thread(build_story, alert)
+
+    synth = StepEvent(
+        name="synthesize",
+        detail=_synthesize_step_detail(story),
+        ts=datetime.now(UTC).isoformat(),
+    )
+    yield SseEvent(event="step", data=synth.model_dump_json()).encode()
+    await asyncio.sleep(_STREAM_STEP_DELAY_S)
 
     for evidence in story.evidence:
         yield SseEvent(event="evidence", data=evidence.model_dump_json()).encode()
@@ -257,7 +327,15 @@ async def _stream_story(alert: Alert) -> AsyncIterator[str]:
 
     yield SseEvent(event="story", data=story.model_dump_json()).encode()
     await asyncio.sleep(_STREAM_STEP_DELAY_S)
-    yield SseEvent(event="done", data=json.dumps({"status": "done"})).encode()
+    yield SseEvent(
+        event="done",
+        data=json.dumps(
+            {
+                "status": "done",
+                "providers": story.providers.model_dump(),
+            }
+        ),
+    ).encode()
 
 
 @app.get("/agent/stream", response_model=None)
