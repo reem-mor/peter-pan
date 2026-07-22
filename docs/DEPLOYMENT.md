@@ -180,6 +180,66 @@ State on the instance: `/opt/peterpan/usage` (shared metering log),
 `/opt/peterpan/agent-data` (prompt log), `/opt/peterpan/ppos-data`
 (feedback + leads) — per-service mounts, surviving container recreation.
 
+Observability (demo ops):
+- Log group `/peter-pan/demo` — container stdout/stderr via the `awslogs` driver
+- Alarms `peter-pan-demo-status-check-failed`, `peter-pan-demo-cpu-high`
+- Stack outputs include `InstanceId`, `SecurityGroupId`, `LogGroupName`
+
+### Day-2 parameter hygiene
+
+| Drift | Fix |
+|---|---|
+| Your egress IP ∉ `DevIp` | Re-resolve `https://checkip.amazonaws.com`, then `aws cloudformation update-stack … ParameterKey=DevIp,ParameterValue=<ip>/32` (keep other params). Mesh ports 8001–8005 are `/32`-exact. If the SG was patched out-of-band, also sync the CFN parameter so the next template update does not revert the CIDR. |
+| `LlmProvider=anthropic` on a Bedrock-ready host | Set `LlmProvider=bedrock` (template default). **UserData change replaces the instance.** |
+| Stale `ImageUri` tag | Prefer `python scripts/deploy_ec2_rolling.py` (SSM recreate; resolves `InstanceId` from stack output, with tag fallback). Avoid CFN `ImageUri` updates unless you intend replacement. |
+| Root volume unencrypted / undersized | Shipped template forces encrypted gp3 30 GB. Applying that template to an older stack **replaces** the instance (in-place encrypt is not supported). Use `scripts/sync_demo_stack.py` to preview via change-set before execute. |
+| Local compose returns 401 with a deploy `.env` | Compose reads `PP_COMPOSE_API_TOKEN`, not `PP_API_TOKEN`. Leave unset for the open fixture mesh. |
+
+### AgentCore / Bedrock KB (not required for Pinecone path)
+
+- Demo agent runs `PP_AGENT_PROVIDER=local`. Empty AgentCore runtime list is expected.
+- Correct control-plane list op: `aws bedrock-agentcore-control list-agent-runtimes --region us-east-1` (not `bedrock-agentcore list-runtimes`).
+- Retrieval is Pinecone (`RagBackend=pinecone`). Unrelated Bedrock Knowledge Bases in the account are out of scope — do not treat them as PETER PAN resources.
+
+### Post-update verification (P4 checklist)
+
+```powershell
+$egress = (Invoke-RestMethod https://checkip.amazonaws.com).Trim()
+aws cloudformation describe-stacks --stack-name peter-pan-demo --region us-east-1 `
+  --query "Stacks[0].{Status:StackStatus,Params:Parameters}" --output table
+# DevIp must equal "$egress/32"; LlmProvider should be bedrock; ImageUri tag ≈ git HEAD
+# Param-only DevIp sync (needs IAM capability even with --use-previous-template):
+# aws cloudformation update-stack --stack-name peter-pan-demo --region us-east-1 `
+#   --use-previous-template --capabilities CAPABILITY_NAMED_IAM `
+#   --parameters ParameterKey=DevIp,ParameterValue=$egress/32 `
+#   ParameterKey=N8nIp,UsePreviousValue=true ParameterKey=ImageUri,UsePreviousValue=true `
+#   ParameterKey=SecretArn,UsePreviousValue=true ParameterKey=LlmProvider,UsePreviousValue=true `
+#   ParameterKey=RagBackend,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true `
+#   ParameterKey=AmiId,UsePreviousValue=true
+# Full template sync (encrypted root / bedrock / outputs) — preview then execute:
+#   python scripts/sync_demo_stack.py
+#   python scripts/sync_demo_stack.py --execute
+$iid = aws cloudformation describe-stacks --stack-name peter-pan-demo --region us-east-1 `
+  --query "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue" --output text
+if (-not $iid) {
+  $iid = aws ec2 describe-instances --region us-east-1 `
+    --filters Name=tag:Name,Values=peter-pan-demo Name=instance-state-name,Values=running `
+    --query "Reservations[0].Instances[0].InstanceId" --output text
+}
+aws ec2 describe-instances --instance-ids $iid --region us-east-1 `
+  --query "Reservations[0].Instances[0].{State:State.Name,HttpTokens:MetadataOptions.HttpTokens,Vol:BlockDeviceMappings[0].Ebs.VolumeId}"
+$vol = aws ec2 describe-instances --instance-ids $iid --region us-east-1 `
+  --query "Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId" --output text
+aws ec2 describe-volumes --volume-ids $vol --region us-east-1 --query "Volumes[0].Encrypted"
+# Encrypted must be true on the attached root volume
+aws logs describe-log-groups --log-group-name-prefix /peter-pan --region us-east-1
+aws cloudwatch describe-alarms --alarm-name-prefix peter-pan --region us-east-1 `
+  --query "MetricAlarms[].AlarmName"
+$pip = aws cloudformation describe-stacks --stack-name peter-pan-demo --region us-east-1 `
+  --query "Stacks[0].Outputs[?OutputKey=='PublicIp'].OutputValue" --output text
+1..5 | ForEach-Object { Invoke-RestMethod "http://${pip}:800$_/healthz" }
+```
+
 ## Enterprise AWS Deployment Target
 
 The hardened target architecture below is the direction of travel — the

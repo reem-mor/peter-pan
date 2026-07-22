@@ -8,9 +8,13 @@ Parameters:
   DevIp:
     Type: String
     Description: Developer public IP in CIDR form (x.x.x.x/32)
+    AllowedPattern: '^(\d{1,3}\.){3}\d{1,3}/32$'
+    ConstraintDescription: Must be a single host CIDR (x.x.x.x/32)
   N8nIp:
     Type: String
     Description: n8n egress IP in CIDR form (x.x.x.x/32)
+    AllowedPattern: '^(\d{1,3}\.){3}\d{1,3}/32$'
+    ConstraintDescription: Must be a single host CIDR (x.x.x.x/32)
   ImageUri:
     Type: String
     Description: ECR image URI (repo:tag)
@@ -68,6 +72,9 @@ Resources:
       SecurityGroupIngress:
         - { IpProtocol: tcp, FromPort: 8001, ToPort: 8005, CidrIp: !Ref DevIp }
         - { IpProtocol: tcp, FromPort: 8001, ToPort: 8005, CidrIp: !Ref N8nIp }
+      Tags:
+        - { Key: Name, Value: peter-pan-demo-sg }
+        - { Key: project, Value: peter-pan }
 
   InstanceRole:
     Type: AWS::IAM::Role
@@ -111,6 +118,18 @@ Resources:
                   !Sub
                     - "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${RepoName}"
                     - RepoName: !Select [0, !Split [":", !Select [1, !Split ["/", !Ref ImageUri]]]]
+        - PolicyName: cloudwatch-logs-scoped
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource:
+                  - !GetAtt ServiceLogGroup.Arn
+                  - !Sub "${ServiceLogGroup.Arn}:*"
         # Bedrock invocation, only when LlmProvider=bedrock. Converse is
         # authorized by bedrock:InvokeModel. Claude 4.5 uses a cross-region
         # inference profile id in BedrockModelId; the underlying foundation
@@ -138,6 +157,15 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles: [!Ref InstanceRole]
+
+  ServiceLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /peter-pan/demo
+      RetentionInDays: 14
+      Tags:
+        - { Key: Name, Value: peter-pan-demo-logs }
+        - { Key: project, Value: peter-pan }
 
   Instance:
     # Single EC2 instance running all five services — a documented demo-only
@@ -210,6 +238,7 @@ Resources:
           # it needs PP_RAG_BACKEND + retrieval keys too, not only the rag service.
           # Bedrock authorizes via the instance profile (ANTHROPIC_API_KEY may be empty).
           # All services share PP_API_TOKEN when present (CIDR allowlist is not enough).
+          # Container stdout/stderr → /peter-pan/demo (awslogs); host state stays on EBS.
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
             svc="${!entry%%:*}"; port="${!entry##*:}"
             extra=()
@@ -220,6 +249,7 @@ Resources:
               extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" \
                       -e "PP_BEDROCK_MODEL_ID=${BedrockModelId}" \
                       -e "AWS_REGION=${AWS::Region}" \
+                      -e "PP_AGENT_PROVIDER=local" \
                       -e "PP_RAG_BACKEND=${RagBackend}" \
                       -e "PINECONE_API_KEY=$PINECONE_API_KEY" \
                       -e "VOYAGE_API_KEY=$VOYAGE_API_KEY" \
@@ -233,6 +263,10 @@ Resources:
               extra+=(-v /opt/peterpan/ppos-data:/app/data)
             fi
             docker run -d --restart unless-stopped --name "$svc" \
+              --log-driver awslogs \
+              --log-opt awslogs-region=${AWS::Region} \
+              --log-opt awslogs-group=/peter-pan/demo \
+              --log-opt awslogs-stream="$svc" \
               --health-cmd "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/healthz',timeout=3)\"" \
               --health-interval 30s --health-timeout 5s --health-retries 3 \
               -e SERVICE="$svc" -e PP_ENV=mirage \
@@ -242,8 +276,54 @@ Resources:
           done
           unset ANTHROPIC_API_KEY PINECONE_API_KEY VOYAGE_API_KEY PP_API_TOKEN
 
+  StatusCheckFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: peter-pan-demo-status-check-failed
+      AlarmDescription: EC2 instance status check failed (demo mesh host)
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref Instance
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      Tags:
+        - { Key: Name, Value: peter-pan-demo-status-check }
+        - { Key: project, Value: peter-pan }
+
+  HighCpuAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: peter-pan-demo-cpu-high
+      AlarmDescription: Demo host CPU > 85% for 10 minutes
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref Instance
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 85
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      Tags:
+        - { Key: Name, Value: peter-pan-demo-cpu }
+        - { Key: project, Value: peter-pan }
+
 Outputs:
   PublicIp:
     Value: !GetAtt Instance.PublicIp
   PublicDns:
     Value: !GetAtt Instance.PublicDnsName
+  InstanceId:
+    Value: !Ref Instance
+  SecurityGroupId:
+    Value: !GetAtt ServiceSecurityGroup.GroupId
+  LogGroupName:
+    Value: !Ref ServiceLogGroup

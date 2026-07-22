@@ -38,8 +38,14 @@ def test_tips_on_empty_log_prompt_wiring() -> None:
 
 
 def test_os_endpoints(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from peterpan.schemas import UsageRow
+
     client = TestClient(app)
     assert client.get("/healthz").json()["status"] == "ok"
     agents = client.get("/os/agents").json()["agents"]
     assert "incident-agent" in agents
     assert client.get("/os/tips").status_code == 200
+    usage = client.get("/os/usage").json()
+    assert isinstance(usage, dict)
+    for row in usage.values():
+        UsageRow.model_validate(row)

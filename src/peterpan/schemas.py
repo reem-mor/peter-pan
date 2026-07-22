@@ -53,6 +53,8 @@ class ProviderReport(BaseModel):
     """
 
     llm: str = "off"  # off | anthropic | bedrock | deterministic-fallback
+    # Intent from PP_LLM — distinct from `llm` when a deterministic fallback ran.
+    configured_llm: str = "off"  # off | anthropic | bedrock
     llm_fallback: bool = False
     rag_backend: str = "lexical"  # lexical | pinecone | fallback
     rag_fallback: bool = False
@@ -170,6 +172,8 @@ class RagResult(BaseModel):
     insight: str
     # Additive: which backend actually served results (never mislabel fallback).
     backend: str = "lexical"  # lexical | pinecone | fallback
+    # Intent from PP_RAG_BACKEND — distinct from `backend` when fallback ran.
+    configured_backend: str = "lexical"  # lexical | pinecone
     fallback: bool = False
     fallback_reason: str = ""
 
@@ -230,3 +234,20 @@ class GrafanaDashboardPreview(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     validated: bool
     dashboard_json: dict[str, object]  # importable Grafana model (schemaVersion 39)
+
+
+class UsageRow(BaseModel):
+    """One group row from GET /os/usage (aggregate by agent|model|service).
+
+    Empty aggregates are valid — `{}` when the usage log has no rows
+    (e.g. fixture path with PP_LLM=off and no metered calls).
+    """
+
+    calls: float
+    input_tokens: float
+    output_tokens: float
+    cost_usd: float
+
+
+# Wire shape of GET /os/usage — map keyed by the chosen grouping dimension.
+UsageAggregate = dict[str, UsageRow]

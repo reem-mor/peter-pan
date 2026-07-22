@@ -7,7 +7,33 @@ incident data.
 
 ## Raw
 
-*(empty — capture the next lesson here)*
+### 2026-07-22 · compose-must-not-inherit-deploy-api-token
+- **Context:** P6 local mesh: `docker compose` auto-loads `.env`, so a deploy `PP_API_TOKEN` hardened ports 8001–8005 and broke fixture-first `/predict`/`/feedback` with 401 while healthz stayed open.
+- **Lesson:** Local compose auth must be opt-in via a separate var (`PP_COMPOSE_API_TOKEN`); never interpolate host `PP_API_TOKEN` into compose service env.
+- **Candidate rule:** Compose mesh stays open unless `PP_COMPOSE_API_TOKEN` is set; deploy/EC2 paths alone consume `PP_API_TOKEN`.
+- **Target:** quality-gate / DEPLOYMENT.md
+- **Status:** raw
+
+### 2026-07-22 · os-usage-needs-named-schema
+- **Context:** Canonical audit P3 golden path — hops 1–6 matched schemas.py; hop 7 `GET /os/usage` returned `dict[str, dict[str, float]]` with no named model (empty `{}` with PP_LLM=off is still a valid aggregate).
+- **Lesson:** OS metering wire shapes that the console and golden-path audit assert against belong in `schemas.py` (+ `@peterpan/types`), not only as informal dict annotations on the route.
+- **Candidate rule:** Every golden-path hop response must have a named `schemas.py` model (or documented alias) before the audit marks schema coverage complete.
+- **Target:** peter-pan-design / CLAUDE.md
+- **Status:** raw
+
+### 2026-07-22 · provider-truth-intent-vs-served
+- **Context:** Canonical audit P2 — RAG/LLM fallbacks labeled honestly, but healthz/`providers` lacked intent fields so clients could not distinguish configured vs served.
+- **Lesson:** Keep `backend`/`llm` as what actually ran; add additive `configured_backend` / `configured_llm` for PP_* intent (story/SSE/`RagResult`/rag healthz).
+- **Candidate rule:** Provider-truth changes must assert both served and configured fields on fallback paths in `tests/test_provider_truth.py`.
+- **Target:** peter-pan-design / quality-gate
+- **Status:** raw
+
+### 2026-07-22 · pytest-401-from-local-env-api-token
+- **Context:** Canonical audit P1: `pytest -q` reported 59× `401 missing X-PP-Token` while CI/fixture-first expects open mesh; root cause was developer `.env` `PP_API_TOKEN` loaded by module-level `Settings()` in services.
+- **Lesson:** Empty `PP_API_TOKEN` must be set in-process before service imports (`tests/conftest.py`); PowerShell `$env:PP_API_TOKEN=''` does not reliably override `.env` for child Python on Windows.
+- **Candidate rule:** Keep a root `tests/conftest.py` that sets `os.environ["PP_API_TOKEN"]="" ` at import time so the API suite stays fixture-open regardless of local `.env` hardening.
+- **Target:** quality-gate / CLAUDE.md
+- **Status:** raw
 
 ## Absorbed
 

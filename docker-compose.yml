@@ -11,8 +11,11 @@ services:
       SERVICE: predictor
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
-      # Unset = open mesh (fixture-first). Set PP_API_TOKEN to require X-PP-Token.
-      PP_API_TOKEN: "${PP_API_TOKEN:-}"
+      # Local compose stays open by default (fixture-first). Do NOT bind host
+      # PP_API_TOKEN here — docker compose auto-loads .env and would harden the
+      # demo mesh whenever a deploy token is present. Opt-in:
+      #   $env:PP_COMPOSE_API_TOKEN = "<token>"; docker compose up -d
+      PP_API_TOKEN: "${PP_COMPOSE_API_TOKEN:-}"
     ports: ["8001:8000"]
     volumes: ["usage-data:/app/usage-shared"]
     restart: unless-stopped
@@ -22,7 +25,7 @@ services:
       SERVICE: rag
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
-      PP_API_TOKEN: "${PP_API_TOKEN:-}"
+      PP_API_TOKEN: "${PP_COMPOSE_API_TOKEN:-}"
       PP_RAG_BACKEND: "${PP_RAG_BACKEND:-lexical}"
       PINECONE_API_KEY: "${PINECONE_API_KEY:-}"
       VOYAGE_API_KEY: "${VOYAGE_API_KEY:-}"
@@ -39,7 +42,7 @@ services:
       SERVICE: guardrails
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
-      PP_API_TOKEN: "${PP_API_TOKEN:-}"
+      PP_API_TOKEN: "${PP_COMPOSE_API_TOKEN:-}"
     ports: ["8003:8000"]
     volumes: ["usage-data:/app/usage-shared"]
     restart: unless-stopped
@@ -49,7 +52,7 @@ services:
       SERVICE: agent
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
-      PP_API_TOKEN: "${PP_API_TOKEN:-}"
+      PP_API_TOKEN: "${PP_COMPOSE_API_TOKEN:-}"
       # LLM opt-in passthrough — default off keeps the demo path fixture-first.
       # anthropic: export ANTHROPIC_API_KEY before `docker compose up`.
       # bedrock:   export AWS_REGION + credentials (or use an SSO profile via
@@ -81,7 +84,7 @@ services:
       SERVICE: ppos
       PP_ENV: "${PP_ENV:-mirage}"
       PP_USAGE_LOG_PATH: /app/usage-shared/usage.jsonl
-      PP_API_TOKEN: "${PP_API_TOKEN:-}"
+      PP_API_TOKEN: "${PP_COMPOSE_API_TOKEN:-}"
       # Mesh healthz targets for /os/services — compose DNS names, in-container port.
       PP_MESH: '{"predictor": "http://predictor:8000", "rag": "http://rag:8000", "guardrails": "http://guardrails:8000", "agent": "http://agent:8000"}'
     ports: ["8005:8000"]

@@ -1,22 +1,15 @@
 /**
  * Response shapes of the PETER PAN OS endpoints (src/peterpan/services/ppos.py).
  *
- * These are OS-console wire shapes, not product schemas — product schemas
- * live in @peterpan/types mirroring schemas.py. The OS endpoints return
- * plain aggregates from peterpan/usage.py; this file mirrors those.
+ * UsageAggregate/UsageRow live in @peterpan/types (schemas.py). Other OS
+ * console shapes (series, budget, tips) remain local until promoted.
  */
+
+import type { UsageAggregate, UsageRow } from "@peterpan/types";
 
 import { getJSON } from "./api";
 
-/** One row of `aggregate()` output — /os/usage?by=agent|model|service. */
-export interface UsageRow {
-  calls: number;
-  input_tokens: number;
-  output_tokens: number;
-  cost_usd: number;
-}
-
-export type UsageAggregate = Record<string, UsageRow>;
+export type { UsageAggregate, UsageRow };
 
 /** One bucket of `timeseries()` — /os/usage/series. `t` is the bucket start. */
 export interface SeriesPoint {

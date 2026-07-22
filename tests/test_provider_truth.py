@@ -30,6 +30,7 @@ def _alert(title: str = "checkout OOMKilled") -> Alert:
 def test_lexical_rag_reports_backend_not_fallback() -> None:
     result = search("checkout out of memory")
     assert result.backend == "lexical"
+    assert result.configured_backend == "lexical"
     assert result.fallback is False
     assert result.fallback_reason == ""
 
@@ -47,11 +48,20 @@ def test_pinecone_failure_labels_fallback_not_pinecone(
     monkeypatch.setattr(rag_mod, "_search_pinecone", boom)
     result = search("checkout out of memory")
     assert result.backend == "fallback"
+    assert result.configured_backend == "pinecone"
     assert result.fallback is True
     assert "pinecone_unavailable" in result.fallback_reason
     assert "lexical-fallback" in result.insight
     # Must not claim a successful pinecone retrieval in the insight label.
     assert "(pinecone)" not in result.insight
+
+
+def test_rag_healthz_exposes_configured_backend() -> None:
+    from peterpan.services.rag import app
+
+    body = TestClient(app).get("/healthz").json()
+    assert body["configured_backend"] in {"lexical", "pinecone"}
+    assert body["backend"] == body["configured_backend"]
 
 
 def test_build_story_llm_failure_sets_deterministic_fallback(
@@ -72,6 +82,7 @@ def test_build_story_llm_failure_sets_deterministic_fallback(
     )
     story = build_story(_alert())
     assert story.providers.llm == "deterministic-fallback"
+    assert story.providers.configured_llm == "anthropic"
     assert story.providers.llm_fallback is True
     assert story.providers.agent_provider == "local"
 
@@ -101,6 +112,8 @@ def test_sse_synthesize_step_does_not_claim_claude_on_fallback(
     assert done
     payload = json.loads(done[-1].removeprefix("data: ").strip())
     assert payload["providers"]["llm_fallback"] is True
+    assert payload["providers"]["llm"] == "deterministic-fallback"
+    assert payload["providers"]["configured_llm"] == "anthropic"
 
 
 def test_predictor_floor_mode_and_healthz() -> None:
