@@ -23,7 +23,16 @@ ECR = f"{ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com"
 
 
 def _run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, check=check, capture_output=True, text=True)
+    # encoding=utf-8 + replace: Docker/build logs on Windows often contain
+    # bytes outside the active code page (cp1252), which crashes text=True.
+    return subprocess.run(
+        cmd,
+        check=check,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
 
 
 def _git_sha() -> str:
