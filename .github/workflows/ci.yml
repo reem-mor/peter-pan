@@ -46,6 +46,10 @@ jobs:
         run: pip install -e ".[dev,agents]"
       - name: Deterministic story eval (fixture path, no keys)
         run: python evals/run_story_eval.py
+      - name: Retrieval eval (lexical, no keys) — hit-rate@k gate
+        run: python evals/run_retrieval_eval.py
+      - name: Feedback eval (fixture seed, no keys) — learning-loop accuracy gate
+        run: python evals/run_feedback_eval.py
 
   security:
     runs-on: ubuntu-latest
