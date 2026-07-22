@@ -108,7 +108,8 @@ def info_route() -> dict[str, object]:
             "standalone-pinecone" if settings.rag_backend.value == "pinecone" else "local-lexical"
         ),
         "predictor": settings.predictor.value,
-        "agent_provider": "local",
+        "agent_provider": settings.agent_provider.value,
+        "agentcore_configured": bool(settings.agentcore_runtime_arn),
         "auth_required": settings.api_token is not None,
         "daily_budget_usd": settings.daily_budget_usd,
         "repo": "https://github.com/reem-mor/peter-pan",

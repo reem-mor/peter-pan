@@ -35,6 +35,16 @@ class LlmSynthesisError(Exception):
     """Any LLM-path failure. Callers must catch this and fall back."""
 
 
+class _LlmEvidenceDraft(BaseModel):
+    """Raw evidence item from the model — confidence may claim 1.0."""
+
+    kind: str
+    summary: str
+    source: str
+    # le=1.0: same rationale as story draft confidence — clamp on emit.
+    confidence: float = Field(ge=0.0, le=1.0)
+
+
 class _LlmStoryDraft(BaseModel):
     """The exact JSON contract the prompt demands from the model."""
 
@@ -44,7 +54,7 @@ class _LlmStoryDraft(BaseModel):
     # draft claiming 1.0 is accepted and clamped by min(confidence, 0.9) below
     # — rejecting it here would trade a cheap cap for a full fallback.
     confidence: float = Field(ge=0.0, le=1.0)
-    evidence: list[Evidence]
+    evidence: list[_LlmEvidenceDraft]
     repair_options: list[str]
 
 
@@ -53,6 +63,31 @@ def load_system_prompt() -> str:
         return _PROMPT_PATH.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as exc:
         raise LlmSynthesisError(f"prompt file unreadable: {_PROMPT_PATH.name}") from exc
+
+
+def _extract_json_payload(raw: str) -> str:
+    """Strip markdown fences / leading prose so model_validate_json can parse.
+
+    Bedrock (and some Anthropic) completions often wrap the contract JSON in
+    ```json ... ``` even when the prompt asks for raw JSON.
+    """
+    text = raw.strip()
+    if text.startswith("```"):
+        # Drop opening fence line (``` or ```json) and optional closing fence.
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    if text.startswith("{"):
+        return text
+    # Last resort: widest {...} slice.
+    start = text.find("{")
+    end = text.rfind("}")
+    if start >= 0 and end > start:
+        return text[start : end + 1]
+    return text
 
 
 def _validate_draft(
@@ -252,10 +287,19 @@ def synthesize(
             raise LlmSynthesisError(f"usage metering failed: {type(exc).__name__}") from exc
 
     try:
-        draft = _LlmStoryDraft.model_validate_json(raw)
+        draft = _LlmStoryDraft.model_validate_json(_extract_json_payload(raw))
     except ValidationError as exc:
+        # Surface the first error loc/msg so ops can see prompt/schema drift
+        # without dumping the full model completion.
+        errors = exc.errors()
+        if errors:
+            loc = ".".join(str(p) for p in errors[0]["loc"])
+            msg = str(errors[0]["msg"])[:160]
+            detail = f" ({loc}: {msg})"
+        else:
+            detail = ""
         raise LlmSynthesisError(
-            f"LLM output failed schema validation: {exc.error_count()} errors"
+            f"LLM output failed schema validation: {exc.error_count()} errors{detail}"
         ) from exc
 
     _validate_draft(draft, prediction, allowed)
@@ -267,11 +311,21 @@ def synthesize(
     if fresh:
         cache_set(key, raw, ttl_s=DEFAULT_TTL_S)
 
+    # Clamp draft evidence into the system Evidence contract (confidence < 1.0).
+    evidence = [
+        Evidence(
+            kind=item.kind,
+            summary=item.summary,
+            source=item.source,
+            confidence=min(item.confidence, 0.99),
+        )
+        for item in draft.evidence
+    ]
     return IncidentStory(
         alert=alert,
         what_changed=draft.what_changed,
         probable_cause=prediction.incident_class,  # floor's verdict, always
         confidence=min(draft.confidence, 0.9),  # never certainty
-        evidence=draft.evidence,
+        evidence=evidence,
         repair_options=draft.repair_options,
     )

@@ -268,6 +268,56 @@ def test_invalid_completion_is_not_cached(
     cache_mod.reset_backend()
 
 
+def test_extract_json_payload_strips_markdown_fence() -> None:
+    from peterpan.llm import _extract_json_payload
+
+    inner = '{"what_changed":"x","probable_cause":"resource_exhaustion"}'
+    assert _extract_json_payload(f"```json\n{inner}\n```") == inner
+    assert _extract_json_payload(f"Here you go:\n{inner}\nThanks") == inner
+
+
+def test_evidence_confidence_one_is_clamped_not_rejected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: object
+) -> None:
+    """Models often emit evidence.confidence=1.0; clamp instead of full fallback."""
+    import peterpan.cache as cache_mod
+
+    monkeypatch.delenv("PP_REDIS_URL", raising=False)
+    cache_mod.reset_backend()
+    draft = json.dumps(
+        {
+            "what_changed": "OOM kills on checkout pods",
+            "probable_cause": "resource_exhaustion",
+            "confidence": 0.8,
+            "evidence": [
+                {
+                    "kind": "metric",
+                    "summary": "classified as resource_exhaustion at P1",
+                    "source": "predictor:/predict",
+                    "confidence": 1.0,
+                },
+                {
+                    "kind": "alert",
+                    "summary": "checkout OOMKilled",
+                    "source": "alert:grafana",
+                    "confidence": 0.6,
+                },
+            ],
+            "repair_options": ["raise memory limit"],
+        }
+    )
+    install_fake_boto3(monkeypatch, bedrock_response(draft))
+    settings = Settings(
+        llm="bedrock",
+        usage_log_path=str(tmp_path) + "/u.jsonl",  # type: ignore[operator]
+        prompt_log_path=str(tmp_path) + "/p.jsonl",  # type: ignore[operator]
+    )
+    story = synthesize(make_alert(), make_prediction(), make_rag(), settings)
+    assert all(e.confidence < 1.0 for e in story.evidence)
+    assert max(e.confidence for e in story.evidence) == 0.99
+    cache_mod.reset_backend()
+
+
 def test_build_story_bedrock_failure_falls_back_deterministic(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

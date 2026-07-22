@@ -61,7 +61,7 @@ services:
       PP_LLM: "${PP_LLM:-off}"
       # Keep in sync with the config.py default — compose must re-state it
       # because an empty passthrough would otherwise override the default.
-      PP_BEDROCK_MODEL_ID: "${PP_BEDROCK_MODEL_ID:-anthropic.claude-sonnet-4-5-20250929-v1:0}"
+      PP_BEDROCK_MODEL_ID: "${PP_BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}"
       AWS_REGION: "${AWS_REGION:-}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"

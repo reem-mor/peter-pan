@@ -11,6 +11,9 @@ COPY src/ src/
 COPY knowledge/ knowledge/
 COPY prompts/ prompts/
 COPY models/ models/
+# Day-2 Pinecone ingest (scripts/ingest_kb.py) — kept out of site-packages
+# but available in-image for rolling deploys / SSM.
+COPY scripts/ingest_kb.py scripts/ingest_kb.py
 # Editable install keeps peterpan importing from /app/src, so the repo-root
 # asset paths above resolve; a site-packages install pointed them into the
 # interpreter tree and shipped an empty corpus (rag corpus_size=0).

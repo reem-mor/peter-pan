@@ -44,6 +44,11 @@ class GuardrailsBackend(StrEnum):
     NEMO = "nemo"  # + NeMo Guardrails pattern rails layered on top, floor always wins
 
 
+class AgentProvider(StrEnum):
+    LOCAL = "local"  # EC2/local LangGraph+build_story path (default)
+    AGENTCORE = "agentcore"  # Amazon Bedrock AgentCore Runtime adapter
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PP_", env_file=".env", extra="ignore")
 
@@ -75,7 +80,9 @@ class Settings(BaseSettings):
     # this default is the current known-good Sonnet id on Bedrock; override
     # with PP_BEDROCK_MODEL_ID as newer Sonnets land. Credentials come from
     # the boto3 chain (env / instance profile), never from Settings.
-    bedrock_model_id: str = Field(default="anthropic.claude-sonnet-4-5-20250929-v1:0")
+    # Claude 4.5 on Bedrock requires a cross-region inference profile id
+    # (on-demand foundation-model ids raise ValidationException).
+    bedrock_model_id: str = Field(default="us.anthropic.claude-sonnet-4-5-20250929-v1:0")
     aws_region: str | None = Field(
         default=None,  # None -> boto3's own region resolution chain
         validation_alias=AliasChoices("AWS_REGION", "PP_AWS_REGION"),
@@ -157,6 +164,14 @@ class Settings(BaseSettings):
     # staging/production / EC2 so n8n and the Next.js BFF authenticate;
     # never expose to browser JavaScript. Env: PP_API_TOKEN (via env_prefix).
     api_token: SecretStr | None = Field(default=None)
+
+    # Agent execution provider — local by default; agentcore invokes a managed
+    # Bedrock AgentCore Runtime ARN when configured. Any AgentCore failure
+    # falls back to local build_story with agent_provider=local-fallback.
+    agent_provider: AgentProvider = Field(default=AgentProvider.LOCAL)
+    agentcore_runtime_arn: str | None = Field(default=None)
+    agentcore_qualifier: str = Field(default="DEFAULT")
+    agentcore_timeout_s: float = Field(default=45.0, gt=0, le=300)
 
     @field_validator("api_token", mode="before")
     @classmethod

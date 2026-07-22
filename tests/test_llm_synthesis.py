@@ -8,7 +8,7 @@ import pytest
 
 from peterpan.config import Settings
 from peterpan.llm import LlmSynthesisError, _LlmStoryDraft, _validate_draft, load_system_prompt
-from peterpan.schemas import Alert, Evidence, Prediction, RagResult, Severity
+from peterpan.schemas import Alert, Prediction, RagResult, Severity
 from peterpan.services.agent import build_story
 from peterpan.services.predictor import predict
 
@@ -23,12 +23,12 @@ def make_draft(**overrides: object) -> _LlmStoryDraft:
         "probable_cause": "resource_exhaustion",
         "confidence": 0.8,
         "evidence": [
-            Evidence(
-                kind="runbook",
-                summary="raise limits",
-                source="knowledge/runbooks/checkout-oom.md",
-                confidence=0.4,
-            )
+            {
+                "kind": "runbook",
+                "summary": "raise limits",
+                "source": "knowledge/runbooks/checkout-oom.md",
+                "confidence": 0.4,
+            }
         ],
         "repair_options": ["raise memory limit"],
     }
@@ -52,7 +52,12 @@ def test_valid_draft_passes() -> None:
 def test_fabricated_citation_rejected() -> None:
     draft = make_draft(
         evidence=[
-            Evidence(kind="runbook", summary="x", source="knowledge/made-up.md", confidence=0.5)
+            {
+                "kind": "runbook",
+                "summary": "x",
+                "source": "knowledge/made-up.md",
+                "confidence": 0.5,
+            }
         ]
     )
     with pytest.raises(LlmSynthesisError, match="fabricated"):
