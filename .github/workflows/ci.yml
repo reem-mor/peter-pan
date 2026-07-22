@@ -81,16 +81,42 @@ jobs:
       - name: Boot ppos (and its mesh deps) and wait for healthy
         run: |
           docker compose up -d
+          healthy=""
           for i in $(seq 1 30); do
-            if curl -fsS http://localhost:8005/healthz; then
-              echo "ppos is healthy"
-              exit 0
+            if curl -fsS http://localhost:8005/healthz && curl -fsS http://localhost:8004/healthz; then
+              echo "ppos + agent are healthy"
+              healthy=1
+              break
             fi
             sleep 2
           done
-          echo "ppos never became healthy" >&2
-          docker compose logs
-          exit 1
+          if [ -z "$healthy" ]; then
+            echo "mesh never became healthy" >&2
+            docker compose logs
+            exit 1
+          fi
+      - name: In-container E2E — story + feedback loop
+        # Regression guard: /app/data was root-owned in the image, so
+        # POST /feedback (and /leads) 500'd with PermissionError inside the
+        # container while every host-side unit test stayed green.
+        run: |
+          set -o pipefail
+          curl -fsS -X POST http://localhost:8004/story \
+            -H 'Content-Type: application/json' \
+            -d '{"id":"smoke-1","source":"ci","title":"checkout OOMKilled","description":"pod restarted twice, memory at limit","severity":"P1","received_at":"2026-01-01T00:00:00Z"}' \
+            -o story.json
+          grep -q '"probable_cause"' story.json
+          curl -fsS -X POST http://localhost:8005/feedback \
+            -H 'Content-Type: application/json' \
+            -d '{"trace_id":"smoke-trace","verdict":"helpful","comment":"ci smoke","submitted_by":"ci-smoke","submitted_at":"2026-01-01T00:00:00Z"}' \
+            -o feedback.json
+          grep -q '"stored":true' feedback.json
+          curl -fsS 'http://localhost:8005/feedback/summary?limit=5' -o summary.json
+          grep -q '"total":' summary.json
+          echo "story + feedback E2E passed"
+      - name: Dump compose logs on failure
+        if: failure()
+        run: docker compose logs --tail 100
       - name: Compose down
         if: always()
         run: docker compose down -v

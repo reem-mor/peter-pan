@@ -21,12 +21,14 @@ RUN pip install --no-cache-dir -e ".[llm,rag,aws]"
 
 # Non-root, matching the security baseline. WORKDIR /app itself stays
 # root-owned; knowledge/ stays writable for the memory feed (POST /memory
-# writes incident docs), and usage-shared/ stays writable so log_usage()
-# (called on every metered LLM call) can append usage.jsonl without hitting
-# a PermissionError against the root-owned CWD.
+# writes incident docs), usage-shared/ stays writable so log_usage()
+# (called on every metered LLM call) can append usage.jsonl, and data/
+# stays writable because feedback.jsonl / leads.jsonl / prompt_log.jsonl
+# default there (COPY data/models/ above created it root-owned, which made
+# POST /feedback and POST /leads 500 with PermissionError in-container).
 RUN useradd --create-home peterpan \
-    && mkdir -p /app/usage-shared \
-    && chown -R peterpan /app/knowledge /app/usage-shared
+    && mkdir -p /app/usage-shared /app/data \
+    && chown -R peterpan /app/knowledge /app/usage-shared /app/data
 USER peterpan
 
 ENV SERVICE=agent PORT=8000
