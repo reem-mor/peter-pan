@@ -33,16 +33,17 @@ Parameters:
       the instance profile + BedrockModelId, no API key)
   BedrockModelId:
     Type: String
-    Default: anthropic.claude-sonnet-4-5-20250929-v1:0
+    # Claude 4.5 requires a cross-region inference profile (us.anthropic....);
+    # on-demand foundation-model ids fail Converse with ValidationException.
+    Default: us.anthropic.claude-sonnet-4-5-20250929-v1:0
     # Spliced into IAM Resource ARNs and the boot script: the pattern forbids
     # wildcards, quotes, $(), spaces and slashes so a parameter value can
     # neither broaden the grant nor inject into the root boot shell.
     AllowedPattern: '^[A-Za-z0-9][A-Za-z0-9.\-]*(:[0-9]+)?$'
     Description: >-
       PP_BEDROCK_MODEL_ID for the agent service when LlmProvider=bedrock.
-      Must be invocable in this account/region (check on-demand access; a
-      cross-region inference profile id like us.anthropic.... also works —
-      see docs/DEPLOYMENT.md for the extra IAM grant that case needs).
+      Prefer a cross-region inference profile id (us.anthropic....). See
+      docs/DEPLOYMENT.md for the multi-region foundation-model IAM grant.
   RagBackend:
     Type: String
     Default: pinecone
@@ -110,11 +111,10 @@ Resources:
                     - "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${RepoName}"
                     - RepoName: !Select [0, !Split [":", !Select [1, !Split ["/", !Ref ImageUri]]]]
         # Bedrock invocation, only when LlmProvider=bedrock. Converse is
-        # authorized by bedrock:InvokeModel; scoped to the exact configured
-        # model id in both ARN shapes (foundation models have no account-id
-        # segment; inference profiles do). A cross-region inference profile
-        # additionally needs foundation-model grants in its destination
-        # regions — add those deliberately if you adopt one (DEPLOYMENT.md).
+        # authorized by bedrock:InvokeModel. Claude 4.5 uses a cross-region
+        # inference profile id in BedrockModelId; the underlying foundation
+        # model must also be granted in the profile's destination regions
+        # (us-east-1/2 + us-west-2 for the us.* geo profile).
         - !If
           - UseBedrock
           - PolicyName: bedrock-invoke-scoped
@@ -122,10 +122,15 @@ Resources:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
-                  Action: bedrock:InvokeModel
+                  Action:
+                    - bedrock:InvokeModel
+                    - bedrock:InvokeModelWithResponseStream
                   Resource:
-                    - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}"
                     - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${BedrockModelId}"
+                    - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}"
+                    - arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0
+                    - arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0
+                    - arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0
           - !Ref AWS::NoValue
 
   InstanceProfile:

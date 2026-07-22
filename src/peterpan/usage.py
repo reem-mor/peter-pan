@@ -22,6 +22,7 @@ MODEL_RATES: dict[str, tuple[float, float]] = {
     "claude-haiku-4-5-20251001": (1e-06, 5e-06),
     # Bedrock list price for Sonnet matches the direct API ($3/$15 per MTok).
     "anthropic.claude-sonnet-4-5-20250929-v1:0": (3e-06, 1.5e-05),
+    "us.anthropic.claude-sonnet-4-5-20250929-v1:0": (3e-06, 1.5e-05),
     "_default": (3e-06, 1.5e-05),
 }
 

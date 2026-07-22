@@ -152,7 +152,7 @@ def _ssm_roll(image: str) -> None:
         '-v /opt/peterpan/usage:/app/usage-shared -p 8003:8000 "$IMAGE"',
         # Seed baked corpus into the host knowledge mount (empty mount would
         # hide /app/knowledge from the image and yield corpus_size=0).
-        "docker run --rm -v /opt/peterpan/knowledge:/out \"$IMAGE\" "
+        'docker run --rm -v /opt/peterpan/knowledge:/out "$IMAGE" '
         "sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'",
         # agent — in-process search() needs PP_RAG_BACKEND + keys too;
         # Bedrock via instance profile; AgentCore ARN unset => local
@@ -160,7 +160,7 @@ def _ssm_roll(image: str) -> None:
         "-e SERVICE=agent -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         "-e PP_LLM=bedrock "
-        f"-e PP_BEDROCK_MODEL_ID=anthropic.claude-sonnet-4-5-20250929-v1:0 "
+        f"-e PP_BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-5-20250929-v1:0 "
         f"-e AWS_REGION={REGION} "
         "-e PP_AGENT_PROVIDER=local "
         "-e PP_RAG_BACKEND=pinecone "

@@ -80,7 +80,9 @@ class Settings(BaseSettings):
     # this default is the current known-good Sonnet id on Bedrock; override
     # with PP_BEDROCK_MODEL_ID as newer Sonnets land. Credentials come from
     # the boto3 chain (env / instance profile), never from Settings.
-    bedrock_model_id: str = Field(default="anthropic.claude-sonnet-4-5-20250929-v1:0")
+    # Claude 4.5 on Bedrock requires a cross-region inference profile id
+    # (on-demand foundation-model ids raise ValidationException).
+    bedrock_model_id: str = Field(default="us.anthropic.claude-sonnet-4-5-20250929-v1:0")
     aws_region: str | None = Field(
         default=None,  # None -> boto3's own region resolution chain
         validation_alias=AliasChoices("AWS_REGION", "PP_AWS_REGION"),

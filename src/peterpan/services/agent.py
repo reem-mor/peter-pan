@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Literal
@@ -38,6 +39,7 @@ from peterpan.services.rag import search
 app = FastAPI(title="peter-pan-agent")
 settings = Settings()
 install_api_auth(app, settings)
+logger = logging.getLogger(__name__)
 
 MAX_STEPS = 6  # bounded loop — the agent can never run away
 
@@ -179,7 +181,9 @@ def build_story(alert: Alert) -> IncidentStory:
                     )
                 }
             )
-        except LlmSynthesisError:
+        except LlmSynthesisError as exc:
+            # Honest fallback: keep the reason in logs (never the completion).
+            logger.warning("llm synthesis failed; using deterministic fallback: %s", exc)
             llm_label = "deterministic-fallback"
             llm_fallback = True
 
