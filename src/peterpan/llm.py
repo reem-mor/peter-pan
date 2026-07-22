@@ -291,12 +291,15 @@ def synthesize(
     except ValidationError as exc:
         # Surface the first error loc/msg so ops can see prompt/schema drift
         # without dumping the full model completion.
-        first = exc.errors()[0] if exc.errors() else {}
-        loc = ".".join(str(p) for p in first.get("loc", ()))
-        msg = str(first.get("msg", ""))[:160]
+        errors = exc.errors()
+        if errors:
+            loc = ".".join(str(p) for p in errors[0]["loc"])
+            msg = str(errors[0]["msg"])[:160]
+            detail = f" ({loc}: {msg})"
+        else:
+            detail = ""
         raise LlmSynthesisError(
-            f"LLM output failed schema validation: {exc.error_count()} errors"
-            + (f" ({loc}: {msg})" if loc or msg else "")
+            f"LLM output failed schema validation: {exc.error_count()} errors{detail}"
         ) from exc
 
     _validate_draft(draft, prediction, allowed)
