@@ -24,7 +24,8 @@ Parameters:
       PP_API_TOKEN authenticates n8n / Next.js BFF to the mesh (X-PP-Token).
   LlmProvider:
     Type: String
-    Default: anthropic
+    # Demo default is bedrock (instance profile); anthropic needs a key in the secret.
+    Default: bedrock
     # Every value quoted: unquoted `off` is a YAML-1.1 boolean and must never
     # be able to drift into `false` under a different parser.
     AllowedValues: ["off", "anthropic", "bedrock"]
@@ -198,10 +199,17 @@ Resources:
             /opt/peterpan/usage /opt/peterpan/agent-data /opt/peterpan/ppos-data \
             /opt/peterpan/knowledge
 
-          # Least privilege per service: only agent sees the Anthropic key
-          # (empty under bedrock — the instance profile authorizes instead),
-          # only rag sees the retrieval keys. All services share PP_API_TOKEN
-          # when present (application auth; CIDR allowlist is not enough).
+          # Seed baked corpus into the host knowledge mount BEFORE rag starts.
+          # An empty host dir mounted over /app/knowledge hides the image corpus
+          # (corpus_size=0). Idempotent overwrite of baked docs only.
+          docker pull ${ImageUri}
+          docker run --rm -v /opt/peterpan/knowledge:/out ${ImageUri} \
+            sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'
+
+          # Agent builds stories in-process (predict + search + synthesize) —
+          # it needs PP_RAG_BACKEND + retrieval keys too, not only the rag service.
+          # Bedrock authorizes via the instance profile (ANTHROPIC_API_KEY may be empty).
+          # All services share PP_API_TOKEN when present (CIDR allowlist is not enough).
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
             svc="${!entry%%:*}"; port="${!entry##*:}"
             extra=()
@@ -212,6 +220,9 @@ Resources:
               extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" \
                       -e "PP_BEDROCK_MODEL_ID=${BedrockModelId}" \
                       -e "AWS_REGION=${AWS::Region}" \
+                      -e "PP_RAG_BACKEND=${RagBackend}" \
+                      -e "PINECONE_API_KEY=$PINECONE_API_KEY" \
+                      -e "VOYAGE_API_KEY=$VOYAGE_API_KEY" \
                       -v /opt/peterpan/agent-data:/app/data)
             elif [ "$svc" = "rag" ]; then
               extra+=(-e "PP_RAG_BACKEND=${RagBackend}" \

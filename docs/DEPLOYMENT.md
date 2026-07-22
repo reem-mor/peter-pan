@@ -154,22 +154,27 @@ Delete the stack to tear everything down.
 ### Bedrock mode (`LlmProvider=bedrock`)
 
 - **No API key.** The agent container authorizes through the EC2 instance
-  profile; the stack grants `bedrock:InvokeModel` scoped to the exact
-  `BedrockModelId` (both foundation-model and inference-profile ARN shapes).
+  profile; the stack grants `bedrock:InvokeModel` (+ `InvokeModelWithResponseStream`)
+  on the inference-profile ARN for `BedrockModelId` and on the Claude 4.5
+  foundation-model ARNs in `us-east-1` / `us-east-2` / `us-west-2` (required
+  by the default `us.anthropic....` cross-region profile).
 - **Region + model id** are injected into the agent container (`AWS_REGION`,
   `PP_BEDROCK_MODEL_ID`); credentials resolve via IMDSv2 — the instance sets
   `HttpTokens: required` and `HttpPutResponseHopLimit: 2` (bridge-networked
   containers cannot reach IMDS at the default hop limit of 1).
-- **Model access is a prerequisite:** the model must be enabled for
-  on-demand invocation in the target account/region. If your account
-  requires a cross-region inference profile (id like
-  `us.anthropic....`), pass that id as `BedrockModelId` and add
-  foundation-model grants for the profile's destination regions to the
-  `bedrock-invoke-scoped` policy — the template deliberately does not
-  wildcard them.
-- Any Bedrock failure (permissions, region, model access) degrades to the
-  deterministic story path — check `usage.jsonl` for bedrock-model rows to
-  confirm the live path is actually being taken.
+- **Default model id** is the cross-region inference profile
+  `us.anthropic.claude-sonnet-4-5-20250929-v1:0`. On-demand foundation-model
+  ids for Claude 4.5 raise `ValidationException` — do not use them.
+- **Day-2 image updates:** prefer `python scripts/deploy_ec2_rolling.py`
+  (SSM recreate). Changing `ImageUri` / `LlmProvider` via CloudFormation
+  rewrites `UserData` and **replaces the instance**.
+- The agent service runs retrieval **in-process** — rolling/UserData must
+  pass `PP_RAG_BACKEND` + Pinecone/Voyage keys to **agent** as well as rag.
+- Rolling deploy seeds `/opt/peterpan/knowledge` from the image and runs
+  `scripts/ingest_kb.py` (idempotent upsert) so Pinecone is never empty.
+- Any Bedrock failure (permissions, region, model access, schema) degrades
+  to the deterministic story path — check `providers.llm` /
+  `providers.llm_fallback` on `/story` and `usage.jsonl` for live metering.
 
 State on the instance: `/opt/peterpan/usage` (shared metering log),
 `/opt/peterpan/agent-data` (prompt log), `/opt/peterpan/ppos-data`

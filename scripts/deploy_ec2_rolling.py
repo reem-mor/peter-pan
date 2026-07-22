@@ -128,6 +128,10 @@ def _ssm_roll(image: str) -> None:
         "/opt/peterpan/ppos-data /opt/peterpan/knowledge",
         'docker pull "$IMAGE"',
         "docker rm -f predictor rag guardrails agent ppos >/dev/null 2>&1 || true",
+        # Seed baked corpus into the host knowledge mount BEFORE rag starts
+        # (empty mount would hide /app/knowledge → corpus_size=0).
+        'docker run --rm -v /opt/peterpan/knowledge:/out "$IMAGE" '
+        "sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'",
         # predictor
         "docker run -d --restart unless-stopped --name predictor "
         "-e SERVICE=predictor -e PP_ENV=mirage "
@@ -150,10 +154,6 @@ def _ssm_roll(image: str) -> None:
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
         '-v /opt/peterpan/usage:/app/usage-shared -p 8003:8000 "$IMAGE"',
-        # Seed baked corpus into the host knowledge mount (empty mount would
-        # hide /app/knowledge from the image and yield corpus_size=0).
-        'docker run --rm -v /opt/peterpan/knowledge:/out "$IMAGE" '
-        "sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'",
         # agent — in-process search() needs PP_RAG_BACKEND + keys too;
         # Bedrock via instance profile; AgentCore ARN unset => local
         "docker run -d --restart unless-stopped --name agent "
@@ -177,6 +177,12 @@ def _ssm_roll(image: str) -> None:
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
         "-v /opt/peterpan/usage:/app/usage-shared "
         '-v /opt/peterpan/ppos-data:/app/data -p 8005:8000 "$IMAGE"',
+        # Idempotent Pinecone upsert of the baked corpus (empty index →
+        # pinecone backend with 0 matches and thin stories).
+        "docker run --rm -e PP_RAG_BACKEND=pinecone "
+        '-e "PINECONE_API_KEY=$PINECONE_API_KEY" '
+        '-e "VOYAGE_API_KEY=$VOYAGE_API_KEY" '
+        '"$IMAGE" python scripts/ingest_kb.py',
         "unset ANTHROPIC_API_KEY PINECONE_API_KEY VOYAGE_API_KEY PP_API_TOKEN",
         "sleep 5",
         "for p in 8001 8002 8003 8004 8005; do "
