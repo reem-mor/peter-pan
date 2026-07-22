@@ -18,5 +18,18 @@ data/feedback.jsonl
 .deploy-secret.tmp.json
 .coverage
 coverage.xml
-graphify-out/cache/
-graphify-out/20*/
+graphify-out/
+
+# Key material — never committed; live credentials live in env vars or vaults.
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Local scratch from audit/review sessions.
+_audit_*.txt
+PLAN.md
+
+# Agent worktrees — promoted from .git/info/exclude, which is machine-local
+# and syncs nowhere.
+.claude/worktrees/

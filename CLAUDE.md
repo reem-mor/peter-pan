@@ -92,6 +92,12 @@ This project has a knowledge graph at graphify-out/ with god nodes, community st
 committed `.claude/settings.json` hooks call `graphify` on PATH; without it,
 Bash/Read/Glob hooks fail on this repo.
 
+**First run in a fresh clone:** `graphify-out/` is generated, not tracked. Run
+`graphify update .` once before relying on `graphify query` or the wiki
+(AST-only, no API cost). The `.git/hooks/post-commit` and `post-checkout` hooks
+rebuild it from then on; set `GRAPHIFY_SKIP_HOOK=1` to suppress that during
+branch surgery, where a mid-operation rebuild can abort a switch or rebase.
+
 Rules:
 - For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
