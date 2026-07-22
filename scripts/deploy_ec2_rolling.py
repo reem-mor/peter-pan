@@ -150,7 +150,12 @@ def _ssm_roll(image: str) -> None:
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
         '-v /opt/peterpan/usage:/app/usage-shared -p 8003:8000 "$IMAGE"',
-        # agent — Bedrock via instance profile; AgentCore ARN unset => local
+        # Seed baked corpus into the host knowledge mount (empty mount would
+        # hide /app/knowledge from the image and yield corpus_size=0).
+        "docker run --rm -v /opt/peterpan/knowledge:/out \"$IMAGE\" "
+        "sh -c 'cp -a /app/knowledge/. /out/ && chown -R 1000:1000 /out'",
+        # agent — in-process search() needs PP_RAG_BACKEND + keys too;
+        # Bedrock via instance profile; AgentCore ARN unset => local
         "docker run -d --restart unless-stopped --name agent "
         "-e SERVICE=agent -e PP_ENV=mirage "
         "-e PP_USAGE_LOG_PATH=/app/usage-shared/usage.jsonl "
@@ -158,8 +163,11 @@ def _ssm_roll(image: str) -> None:
         f"-e PP_BEDROCK_MODEL_ID=anthropic.claude-sonnet-4-5-20250929-v1:0 "
         f"-e AWS_REGION={REGION} "
         "-e PP_AGENT_PROVIDER=local "
+        "-e PP_RAG_BACKEND=pinecone "
         '-e "PP_API_TOKEN=$PP_API_TOKEN" '
         '-e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" '
+        '-e "PINECONE_API_KEY=$PINECONE_API_KEY" '
+        '-e "VOYAGE_API_KEY=$VOYAGE_API_KEY" '
         "-v /opt/peterpan/usage:/app/usage-shared "
         '-v /opt/peterpan/agent-data:/app/data -p 8004:8000 "$IMAGE"',
         # ppos
