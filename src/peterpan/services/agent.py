@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 from peterpan.auth import install_api_auth
-from peterpan.config import LlmProvider, Settings
+from peterpan.config import AgentProvider, LlmProvider, Settings
 from peterpan.schemas import (
     ActionPreview,
     ActionRisk,
@@ -112,11 +112,13 @@ def _provider_report(
 
 
 def build_story(alert: Alert) -> IncidentStory:
-    """Planner → tools → synthesis. Deterministic by default; PP_LLM=anthropic
-    or bedrock upgrades synthesis, guarded by peterpan.llm's invariant checks
-    and falling back here on ANY failure (fixture-first rule). Provider fields
-    always reflect what actually ran — never the configured intent alone."""
+    """Planner → tools → synthesis (local or AgentCore).
+
+    Order: classify → retrieve → optional AgentCore Runtime → local LLM /
+    deterministic fallback. Provider fields always reflect what actually ran.
+    """
     steps = 0
+    agent_provider = "local"
 
     # Step 1: classify (floor + optional torch behind floor guardrails).
     prediction = predict_full(alert, settings)
@@ -125,6 +127,32 @@ def build_story(alert: Alert) -> IncidentStory:
     # Step 2: retrieve context (runbooks, past incidents).
     rag = search(search_query(alert), top_k=3)
     steps += 1
+
+    # Step 2b: AgentCore Runtime when configured — never silent on failure.
+    if settings.agent_provider is AgentProvider.AGENTCORE:
+        from peterpan.agentcore import AgentCoreError, invoke_story
+
+        steps += 1
+        try:
+            story = invoke_story(alert, settings)
+            if steps > MAX_STEPS:
+                raise RuntimeError("loop budget invariant violated")
+            # Preserve local predictor/rag provenance even when AgentCore wrote
+            # the narrative — the adapter collected them before the invoke.
+            return story.model_copy(
+                update={
+                    "providers": _provider_report(
+                        prediction_mode=prediction.mode,
+                        prediction_model_version=prediction.model_version,
+                        rag=rag,
+                        llm=story.providers.llm,
+                        llm_fallback=story.providers.llm_fallback,
+                        agent_provider="agentcore",
+                    )
+                }
+            )
+        except AgentCoreError:
+            agent_provider = "local-fallback"
 
     llm_label = "off"
     llm_fallback = False
@@ -147,6 +175,7 @@ def build_story(alert: Alert) -> IncidentStory:
                         rag=rag,
                         llm=settings.llm.value,
                         llm_fallback=False,
+                        agent_provider=agent_provider,
                     )
                 }
             )
@@ -180,6 +209,7 @@ def build_story(alert: Alert) -> IncidentStory:
             rag=rag,
             llm=llm_label,
             llm_fallback=llm_fallback,
+            agent_provider=agent_provider,
         ),
     )
 
@@ -223,7 +253,8 @@ def healthz() -> dict[str, object]:
         "status": "ok",
         "env": settings.env.value,
         "llm": settings.llm.value,
-        "agent_provider": "local",  # AgentCore adapter lands separately; honest default
+        "agent_provider": settings.agent_provider.value,
+        "agentcore_configured": bool(settings.agentcore_runtime_arn),
         "auth_required": settings.api_token is not None,
     }
 
