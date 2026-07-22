@@ -7,7 +7,12 @@ incident data.
 
 ## Raw
 
-*(empty — capture the next lesson here)*
+### 2026-07-21 · checkout-ran-in-wrong-worktree-cwd-persistence
+- **Context:** PR #51 first attempt — `git checkout -b feat/... origin/main` ran while Bash cwd was still C:\dev\peter-pan (persisted from earlier graphify queries), so MAIN worktree switched branches while edits+commit landed in the session worktree on a stale base (7c666de); push shipped an empty branch pointer and `gh pr create` said "No commits between".
+- **Lesson:** Bash cwd persists across turns; a branch command without an explicit `cd <worktree> &&` prefix can run in whichever worktree was last visited — and `git log -1` printing the expected SHA does not prove WHICH worktree/branch moved.
+- **Candidate rule:** Every branch-mutating git command starts with explicit `cd <intended-worktree> &&`, and is followed by `git branch --show-current` in the SAME command; treat a "[graphify] Branch switched" line from an unexpected path as a stop signal.
+- **Target:** CLAUDE.md hard-won conventions
+- **Status:** raw
 
 ## Absorbed
 
