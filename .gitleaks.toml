@@ -26,4 +26,9 @@ paths = [
     # the dashboard-JSON secret check's own adversarial input. Verified
     # 2026-07-18: constructed in-test, synthetic only.
     '''tests/test_grafana_preview.py''',
+    # Disposable-Grafana import walkthrough: `curl -u admin:admin` is the
+    # throwaway default credential for a loopback-bound, --rm'd local Grafana
+    # container the doc tells you to boot, import into, and delete. Verified
+    # 2026-07-22 (PR #60): not a live secret; documentation only.
+    '''infra/grafana/README.md''',
 ]

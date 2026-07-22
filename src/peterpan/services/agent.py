@@ -200,7 +200,7 @@ def grafana_preview_route(body: DrawRequest) -> GrafanaDashboardPreview:
 
     story = build_story(body.alert)
     spec = build_dashboard(body.problem, story, settings)
-    return export_grafana_preview(spec, story)
+    return export_grafana_preview(spec, story, settings)
 
 
 class StepEvent(BaseModel):
