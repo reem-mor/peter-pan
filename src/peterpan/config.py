@@ -118,6 +118,13 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("VOYAGE_API_KEY", "PP_VOYAGE_API_KEY"),
     )
 
+    # Grafana exporter datasource UIDs (peterpan.grafana). Generated panels
+    # may reference only these; they must match the UIDs provisioned in the
+    # target Grafana — infra/grafana/ ships a matching provisioning file for
+    # a disposable import instance.
+    grafana_prometheus_uid: str = Field(default="ds-prometheus")
+    grafana_loki_uid: str = Field(default="ds-loki")
+
     # n8n webhook notified on each landing-page lead (PP_N8N_LEAD_WEBHOOK).
     # Unset (default) disables the notification; the lead is stored regardless.
     n8n_lead_webhook: str | None = Field(default=None)

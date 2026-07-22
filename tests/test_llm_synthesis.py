@@ -75,6 +75,28 @@ def test_llm_off_by_default_keeps_deterministic_path() -> None:
     assert Settings().llm.value == "off"
 
 
+def test_unreadable_prompt_file_becomes_synthesis_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: object
+) -> None:
+    """A missing/unreadable versioned prompt is an LLM-path failure (caller
+    falls back), not a raw OSError that 500s past build_story's except."""
+    from pathlib import Path
+
+    import peterpan.llm as llm_mod
+
+    monkeypatch.setattr(llm_mod, "_PROMPT_PATH", Path(str(tmp_path)) / "missing.txt")
+    with pytest.raises(LlmSynthesisError, match="prompt file unreadable"):
+        llm_mod.load_system_prompt()
+
+    # Non-UTF-8 bytes raise UnicodeDecodeError (a ValueError, not OSError) —
+    # must be wrapped the same way, not leak past the fallback.
+    bad = Path(str(tmp_path)) / "bad.txt"
+    bad.write_bytes(b"\xff\xfe broken prompt")
+    monkeypatch.setattr(llm_mod, "_PROMPT_PATH", bad)
+    with pytest.raises(LlmSynthesisError, match="prompt file unreadable"):
+        llm_mod.load_system_prompt()
+
+
 def test_synthesize_caches_response_and_skips_second_llm_call(
     monkeypatch: pytest.MonkeyPatch, tmp_path: object
 ) -> None:

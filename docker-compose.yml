@@ -60,7 +60,12 @@ services:
       AWS_SESSION_TOKEN: "${AWS_SESSION_TOKEN:-}"
       ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
     ports: ["8004:8000"]
-    volumes: ["usage-data:/app/usage-shared"]
+    volumes:
+      # agent-data: prompt_log.jsonl (§6.6) must survive container recreation,
+      # same rationale as the shared usage volume. Per-service volume (not
+      # shared with ppos) so neither service can touch the other's data files.
+      - usage-data:/app/usage-shared
+      - agent-data:/app/data
     restart: unless-stopped
   ppos:
     build: .
@@ -71,7 +76,12 @@ services:
       # Mesh healthz targets for /os/services — compose DNS names, in-container port.
       PP_MESH: '{"predictor": "http://predictor:8000", "rag": "http://rag:8000", "guardrails": "http://guardrails:8000", "agent": "http://agent:8000"}'
     ports: ["8005:8000"]
-    volumes: ["usage-data:/app/usage-shared"]
+    volumes:
+      # ppos-data: feedback.jsonl + leads.jsonl are stateful product data —
+      # they must not vanish on docker compose down / image rebuild. Per-service
+      # volume (not shared with agent) so neither can touch the other's files.
+      - usage-data:/app/usage-shared
+      - ppos-data:/app/data
     restart: unless-stopped
     depends_on:
       predictor:
@@ -85,3 +95,5 @@ services:
 
 volumes:
   usage-data:
+  agent-data:
+  ppos-data:

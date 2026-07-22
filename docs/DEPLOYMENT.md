@@ -136,9 +136,52 @@ docker compose down -v
 
 Use the volume-removal command only when you intentionally want to delete local persisted data.
 
+## Shipped Demo Stack (`infra/aws/stack.yaml`)
+
+What actually deploys today: one EC2 instance running the five services from
+ECR, SSM-only access (no SSH), service ports allowlisted to two `/32` CIDRs.
+Delete the stack to tear everything down.
+
+| Parameter | Meaning |
+|---|---|
+| `DevIp`, `N8nIp` | The only two CIDRs allowed to reach ports 8001–8005 |
+| `ImageUri` | ECR image (`repo:tag`) all five services run |
+| `SecretArn` | Secrets Manager JSON with `ANTHROPIC_API_KEY`, `PINECONE_API_KEY`, `VOYAGE_API_KEY` — created by `scripts/put_deploy_secret.py`. `ANTHROPIC_API_KEY` may be empty when `LlmProvider=bedrock` |
+| `LlmProvider` | `off` \| `anthropic` \| `bedrock` — becomes `PP_LLM` on the agent container |
+| `BedrockModelId` | Always injected as `PP_BEDROCK_MODEL_ID` on the agent container; only consulted when `LlmProvider=bedrock` |
+| `RagBackend` | `lexical` \| `pinecone` — becomes `PP_RAG_BACKEND` on the rag container |
+
+### Bedrock mode (`LlmProvider=bedrock`)
+
+- **No API key.** The agent container authorizes through the EC2 instance
+  profile; the stack grants `bedrock:InvokeModel` scoped to the exact
+  `BedrockModelId` (both foundation-model and inference-profile ARN shapes).
+- **Region + model id** are injected into the agent container (`AWS_REGION`,
+  `PP_BEDROCK_MODEL_ID`); credentials resolve via IMDSv2 — the instance sets
+  `HttpTokens: required` and `HttpPutResponseHopLimit: 2` (bridge-networked
+  containers cannot reach IMDS at the default hop limit of 1).
+- **Model access is a prerequisite:** the model must be enabled for
+  on-demand invocation in the target account/region. If your account
+  requires a cross-region inference profile (id like
+  `us.anthropic....`), pass that id as `BedrockModelId` and add
+  foundation-model grants for the profile's destination regions to the
+  `bedrock-invoke-scoped` policy — the template deliberately does not
+  wildcard them.
+- Any Bedrock failure (permissions, region, model access) degrades to the
+  deterministic story path — check `usage.jsonl` for bedrock-model rows to
+  confirm the live path is actually being taken.
+
+State on the instance: `/opt/peterpan/usage` (shared metering log),
+`/opt/peterpan/agent-data` (prompt log), `/opt/peterpan/ppos-data`
+(feedback + leads) — per-service mounts, surviving container recreation.
+
 ## Enterprise AWS Deployment Target
 
-PETER PAN is designed to support a hardened AWS deployment through infrastructure definitions in `infra/aws/`, including AWS CloudFormation.
+The hardened target architecture below is the direction of travel — the
+shipped demo stack above intentionally trades a private subnet + tunnel for
+allowlisted public ports. PETER PAN is designed to support a hardened AWS
+deployment through infrastructure definitions in `infra/aws/`, including AWS
+CloudFormation.
 
 ```mermaid
 flowchart TB

@@ -19,11 +19,29 @@ Parameters:
     Description: >-
       Secrets Manager secret (JSON with ANTHROPIC_API_KEY, PINECONE_API_KEY,
       VOYAGE_API_KEY). Created by scripts/put_deploy_secret.py.
+      ANTHROPIC_API_KEY may be empty when LlmProvider=bedrock (Bedrock
+      authorizes via the instance profile, never an API key).
   LlmProvider:
     Type: String
     Default: anthropic
-    AllowedValues: [off, anthropic]
-    Description: PP_LLM for the agent service (off = deterministic only)
+    # Every value quoted: unquoted `off` is a YAML-1.1 boolean and must never
+    # be able to drift into `false` under a different parser.
+    AllowedValues: ["off", "anthropic", "bedrock"]
+    Description: >-
+      PP_LLM for the agent service (off = deterministic only; bedrock uses
+      the instance profile + BedrockModelId, no API key)
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-sonnet-4-5-20250929-v1:0
+    # Spliced into IAM Resource ARNs and the boot script: the pattern forbids
+    # wildcards, quotes, $(), spaces and slashes so a parameter value can
+    # neither broaden the grant nor inject into the root boot shell.
+    AllowedPattern: '^[A-Za-z0-9][A-Za-z0-9.\-]*(:[0-9]+)?$'
+    Description: >-
+      PP_BEDROCK_MODEL_ID for the agent service when LlmProvider=bedrock.
+      Must be invocable in this account/region (check on-demand access; a
+      cross-region inference profile id like us.anthropic.... also works —
+      see docs/DEPLOYMENT.md for the extra IAM grant that case needs).
   RagBackend:
     Type: String
     Default: pinecone
@@ -35,6 +53,9 @@ Parameters:
   AmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Conditions:
+  UseBedrock: !Equals [!Ref LlmProvider, bedrock]
 
 Resources:
   ServiceSecurityGroup:
@@ -87,6 +108,24 @@ Resources:
                   !Sub
                     - "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${RepoName}"
                     - RepoName: !Select [0, !Split [":", !Select [1, !Split ["/", !Ref ImageUri]]]]
+        # Bedrock invocation, only when LlmProvider=bedrock. Converse is
+        # authorized by bedrock:InvokeModel; scoped to the exact configured
+        # model id in both ARN shapes (foundation models have no account-id
+        # segment; inference profiles do). A cross-region inference profile
+        # additionally needs foundation-model grants in its destination
+        # regions — add those deliberately if you adopt one (DEPLOYMENT.md).
+        - !If
+          - UseBedrock
+          - PolicyName: bedrock-invoke-scoped
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action: bedrock:InvokeModel
+                  Resource:
+                    - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}"
+                    - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${BedrockModelId}"
+          - !Ref AWS::NoValue
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -102,6 +141,16 @@ Resources:
       ImageId: !Ref AmiId
       IamInstanceProfile: !Ref InstanceProfile
       SecurityGroupIds: [!GetAtt ServiceSecurityGroup.GroupId]
+      MetadataOptions:
+        # IMDSv2 only (token-optional v1 leaks the instance role to any
+        # container-level SSRF), and hop limit 2 so bridge-networked
+        # containers can reach IMDS at all — boto3 inside the agent container
+        # resolves instance-profile credentials AND the region through IMDS;
+        # at the default hop limit of 1 both fail and PP_LLM=bedrock dies
+        # silently into the deterministic fallback.
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 2
       Tags:
         - { Key: Name, Value: peter-pan-demo }
         - { Key: project, Value: peter-pan }
@@ -125,19 +174,32 @@ Resources:
           # Shared usage log: every service meters LLM calls into the same
           # host-mounted file so PETER PAN OS actually sees cross-service usage
           # (per-container files made /os/usage empty by construction).
-          mkdir -p /opt/peterpan/usage && chmod 777 /opt/peterpan/usage
+          # Per-service data dirs: feedback/leads (ppos) and the prompt log
+          # (agent) are stateful product data — they must survive container
+          # recreation, and neither service may touch the other's files.
+          # 1000 = the peterpan user's stable uid/gid (single useradd on
+          # python:3.12-slim in the Dockerfile); 770 instead of 777 so only
+          # the container user (and root) can touch the state dirs.
+          install -d -m 770 -o 1000 -g 1000 \
+            /opt/peterpan/usage /opt/peterpan/agent-data /opt/peterpan/ppos-data
 
-          # Least privilege per service: only agent sees the Anthropic key,
+          # Least privilege per service: only agent sees the Anthropic key
+          # (empty under bedrock — the instance profile authorizes instead),
           # only rag sees the retrieval keys. Everything else runs key-less.
           for entry in predictor:8001 rag:8002 guardrails:8003 agent:8004 ppos:8005; do
             svc="${!entry%%:*}"; port="${!entry##*:}"
             extra=()
             if [ "$svc" = "agent" ]; then
-              extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY")
+              extra+=(-e "PP_LLM=${LlmProvider}" -e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" \
+                      -e "PP_BEDROCK_MODEL_ID=${BedrockModelId}" \
+                      -e "AWS_REGION=${AWS::Region}" \
+                      -v /opt/peterpan/agent-data:/app/data)
             elif [ "$svc" = "rag" ]; then
               extra+=(-e "PP_RAG_BACKEND=${RagBackend}" \
                       -e "PINECONE_API_KEY=$PINECONE_API_KEY" \
                       -e "VOYAGE_API_KEY=$VOYAGE_API_KEY")
+            elif [ "$svc" = "ppos" ]; then
+              extra+=(-v /opt/peterpan/ppos-data:/app/data)
             fi
             docker run -d --restart unless-stopped --name "$svc" \
               -e SERVICE="$svc" -e PP_ENV=mirage \

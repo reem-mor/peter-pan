@@ -3,7 +3,7 @@
 Usage:  python scripts/train_predictor.py
 
 Deterministic (fixed seed) over data/synthetic/predictor_train.jsonl;
-writes weights + vocab to data/models/. Needs the `ml` extra (torch).
+writes weights + vocab to models/. Needs the `ml` extra (torch).
 """
 
 from __future__ import annotations
