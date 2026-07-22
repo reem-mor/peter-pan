@@ -19,7 +19,10 @@ PowerShell: replace `$(pwd)` with `${PWD}`.
 2. Import via API:
 
 ```bash
-curl -fsS -u admin:admin -X POST http://localhost:3000/api/dashboards/db \
+# Throwaway default cred for this disposable, loopback-bound, --rm'd local
+# container — not a live secret (same convention as the synthetic fixtures).
+auth="admin:admin"  # gitleaks:allow
+curl -fsS -u "$auth" -X POST http://localhost:3000/api/dashboards/db \
   -H 'Content-Type: application/json' \
   -d "{\"dashboard\": $(cat preview.json), \"overwrite\": false}"
 ```
