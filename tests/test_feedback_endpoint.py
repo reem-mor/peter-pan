@@ -60,6 +60,63 @@ def test_post_feedback_rejects_missing_required_field(client: TestClient) -> Non
     assert resp.status_code == 422
 
 
+def test_post_enriched_feedback_roundtrips_through_the_route(client: TestClient) -> None:
+    """PR #53's structured outcome fields, HTTP-level: accepted on POST and
+    served back verbatim by /feedback/summary entries (release-audit P2 —
+    previously proven only at store level)."""
+    enriched = _body(
+        alert_id="demo-oom",
+        root_cause_correct=True,
+        recommendation_correct=False,
+        dashboard_useful=True,
+        final_root_cause="session cache leak after config regression",
+        resolution_action="re-enabled the eviction job",
+        analyst_confidence=1.0,  # deliberate le=1.0: human input, not system output
+    )
+    assert client.post("/feedback", json=enriched).status_code == 201
+
+    entry = client.get("/feedback/summary").json()["entries"][-1]
+    assert entry["alert_id"] == "demo-oom"
+    assert entry["root_cause_correct"] is True
+    assert entry["recommendation_correct"] is False
+    assert entry["final_root_cause"] == "session cache leak after config regression"
+    assert entry["analyst_confidence"] == 1.0
+
+
+def test_post_feedback_rejects_out_of_range_analyst_confidence(client: TestClient) -> None:
+    resp = client.post("/feedback", json=_body(analyst_confidence=1.5))
+    assert resp.status_code == 422
+
+
+def test_summary_serves_a_mixed_legacy_and_enriched_log(client: TestClient) -> None:
+    """The on-disk JSONL a real deployment accumulates: legacy 5-field rows
+    (pre-#53), enriched rows, and a poisoned line. Summary must serve both
+    valid shapes — legacy rows emitting the enriched keys as nulls (the wire
+    shape the TS mirror types) — and skip the poison without 500ing."""
+    log = Path(ppos.settings.feedback_log_path)
+    log.parent.mkdir(parents=True, exist_ok=True)
+    legacy = {
+        "trace_id": "legacy-1",
+        "verdict": "helpful",
+        "comment": "pre-enrichment row",
+        "submitted_by": "sre-priya",
+        "submitted_at": "2026-01-04T08:00:00+00:00",
+    }
+    enriched = _body(trace_id="rich-1", alert_id="demo-5xx", root_cause_correct=False)
+    log.write_text(
+        json.dumps(legacy) + "\n" + json.dumps(enriched) + "\n" + "{not-json\n",
+        encoding="utf-8",
+    )
+
+    body = client.get("/feedback/summary").json()
+    assert body["total"] == 2
+    by_trace = {e["trace_id"]: e for e in body["entries"]}
+    assert by_trace["legacy-1"]["alert_id"] is None
+    assert by_trace["legacy-1"]["analyst_confidence"] is None
+    assert by_trace["rich-1"]["alert_id"] == "demo-5xx"
+    assert by_trace["rich-1"]["root_cause_correct"] is False
+
+
 def test_post_feedback_rejects_oversize_body(client: TestClient) -> None:
     huge = _body(comment="x" * (MAX_FEEDBACK_BYTES + 1))
     resp = client.post(
