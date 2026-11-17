@@ -22,6 +22,28 @@ PETER PAN is not a Grafana replacement or a thin Grafana wrapper. Grafana remain
 
 ---
 
+## For reviewers: see the engineering, then the roadmap
+
+The default `mirage` environment uses synthetic fixtures and requires no external AI account.
+
+| Start here | What you can inspect |
+|---|---|
+| [Quickstart](#quickstart) | Run the five-service fixture-first stack |
+| [CI](https://github.com/reem-mor/peter-pan/actions/workflows/ci.yml) | Unit tests, strict type checks, deterministic evals, security scans, Docker E2E |
+| [Testing](docs/TESTING.md) | Reproducible test and evaluation commands |
+| [Architecture](docs/ARCHITECTURE.md) | As-built components, opt-in integrations, planned upgrades |
+| [Roadmap](docs/ROADMAP.md) | Future targets, not verified production outcomes |
+
+```text
+Synthetic incident → input/severity checks → evidence retrieval
+                   → structured incident story → output guardrails
+                   → human-reviewed action preview and feedback
+```
+
+**Scope:** The default reproducible path is local and deterministic. Anthropic, Pinecone/Voyage, n8n Cloud, and AWS deployment are separately configured paths. Planned components are labeled in the status table, and fixture-based evaluations are not evidence of production MTTR reduction.
+
+---
+
 ## Table of Contents
 
 - [Implementation Status](#implementation-status)
@@ -85,9 +107,9 @@ flowchart TB
     Notion[Notion Runbooks]
     Jira[Jira Incidents and Post-mortems]
 
-    Predictor[predictor-service<br/>PyTorch Classifier and Severity Floors<br/>Port 8001]
-    RAG[rag-service<br/>LangChain and pgvector<br/>Port 8002]
-    Guardrails[guardrails-service<br/>NeMo Guardrails and Regex<br/>Port 8003]
+    Predictor[predictor-service<br/>Severity floor / opt-in PyTorch<br/>Port 8001]
+    RAG[rag-service<br/>Lexical / opt-in Pinecone<br/>Port 8002]
+    Guardrails[guardrails-service<br/>Deterministic regex rails<br/>Port 8003]
     Agent[agent-service<br/>LangGraph Controller<br/>Port 8004]
 
     Dashboard[Dynamic Incident Dashboard]
@@ -97,11 +119,11 @@ flowchart TB
     UI --> OS
     OS --> N8N
 
-    Grafana --> N8N
-    OpenSearch --> N8N
-    GitHub --> N8N
-    Notion --> RAG
-    Jira --> RAG
+    Grafana -. optional integration .-> N8N
+    OpenSearch -. optional integration .-> N8N
+    GitHub -. optional integration .-> N8N
+    Notion -. optional integration .-> RAG
+    Jira -. optional integration .-> RAG
 
     N8N --> Predictor
     N8N --> RAG
